@@ -8,12 +8,13 @@ import {
   register,
   updateUserDetails,
 } from "../controllers/auth.controller.js";
+import { protectedRoute } from "../middlewares/protectedRoute.middleware.js";
 
 const authRouter = Router();
 
 authRouter.post("/register", register);
 authRouter.post("/login", login);
-authRouter.put("/update-details", updateUserDetails);
+authRouter.put("/update-details", protectedRoute, updateUserDetails);
 authRouter.get("/my-details", getUserDetails);
 authRouter.get("/get-all-users", getUsers);
 authRouter.patch("/forget-password", forgetPassword);
