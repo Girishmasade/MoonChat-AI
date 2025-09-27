@@ -1,24 +1,35 @@
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
+import User from "../models/user.models.js";
 
-export const protectedRoute = async (err, req, res, next) => {
-    try {
-        const authHeaders = req.headers.authorization 
+export const protectedRoute = async (req, res, next) => {
+  try {
+    const authHeaders = req.headers.authorization;
 
-        if (!authHeaders || !authHeaders.startswith("Bearer")) 
-        return res.status(401).json({message: "Unauthorized access"})
+    if (!authHeaders || !authHeaders.startsWith("Bearer"))
+      return res.status(401).json({ message: "Unauthorized access" });
 
-        const token = authHeaders.split(" ")[1]
+    const token = authHeaders.split(" ")[1];
 
-        if (!token)
-        return res.status(401).json({message: "Unauthorized access"})
+    if (!token) return res.status(401).json({ message: "Unauthorized access" });
 
-        const decode = jwt.verify(token, process.env.JWT_SECRET)
+    const decode = jwt.verify(token, process.env.JWT_SECRET);
 
-        req.user = decode._id
+    const user = await User.findById(decode.userId);
 
-        next()
-
-    } catch (error) {
-        return res.status(500).json({msg: error.message})
+    if (!user) {
+      return res.status(401).json({
+        status: false,
+        message: "User not found. Please log in again.",
+      });
     }
-}
+
+    req.user = {
+      userId: decode.userId,
+      email: user.email,
+    };
+
+    next();
+  } catch (error) {
+    return res.status(500).json({ msg: error.message });
+  }
+};

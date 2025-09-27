@@ -22,7 +22,7 @@ export const register = async (req, res) => {
       username,
       email,
       password: hashedPassword,
-    })
+    });
     console.log(newUser);
 
     await newUser.save();
@@ -40,21 +40,23 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) return res.status(400).json({message: "all fields required"});
+    if (!email || !password)
+      return res.status(400).json({ message: "all fields required" });
 
     const user = await User.findOne({ email });
     console.log(user);
-    
-    if (!user) return res.status(400).json({message: "Invalid user"});
+
+    if (!user) return res.status(400).json({ message: "Invalid user" });
 
     const isPassword = await bcrypt.compare(password, user.password);
     console.log(isPassword);
-    
-    if (!isPassword) return res.status(401).json({ message: "Invalid credentials" });
+
+    if (!isPassword)
+      return res.status(401).json({ message: "Invalid credentials" });
 
     const token = jwt.sign(
       {
-        id: user._id,
+        userId: user._id,
         email: user.email,
         username: user.username,
       },
@@ -64,7 +66,7 @@ export const login = async (req, res) => {
 
     console.log(token);
 
-    return res.status(200).json({token, message: "LoggedIn Successfully" });
+    return res.status(200).json({ token, message: "LoggedIn Successfully" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -72,11 +74,43 @@ export const login = async (req, res) => {
 
 export const updateUserDetails = async (req, res) => {
   try {
-  } catch (error) {}
+    const userId = req.user.userId
+
+    if (!userId) {
+      return res.status(400).json({
+        status: false,
+        message: "User ID is required",
+      });
+    }
+
+    const { name, contact, username } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      userId, 
+      {$set: {username, name, contact}},
+      {new: true}
+    ).select("-password")
+
+    res.status(200).json({
+      status: true,
+      message: "Profile Updated Successfully.",
+      user
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: false,
+      message: error.message,
+    });
+  }
 };
+
 
 export const getUserDetails = async (req, res) => {
   try {
+    const { id } = req.params;
+
+    const user = await User.findById({ _id: id });
+    console.log(user);
   } catch (error) {}
 };
 
