@@ -104,14 +104,33 @@ export const updateUserDetails = async (req, res) => {
   }
 };
 
+export const uploadAvatar = async(req, res) => {
+  try {
+    
+  } catch (error) {
+    
+  }
+}
+
 
 export const getUserDetails = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const user = await User.findById({ _id: id });
+    const user = await User.findById(id).select("-password")
     console.log(user);
-  } catch (error) {}
+
+    res.status(200).json({
+      status: true,
+      user,
+    });
+
+  } catch (error) {
+     return res.status(500).json({
+      status: false,
+      message: error.message,
+    });
+  }
 };
 
 export const getUsers = async (req, res) => {
