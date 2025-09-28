@@ -72,8 +72,6 @@ export const login = async (req, res) => {
   }
 };
 
-
-
 export const updateUserDetails = async (req, res) => {
   try {
     const userId = req.user.userId;
