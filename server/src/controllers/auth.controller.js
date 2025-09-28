@@ -1,8 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.models.js";
 import bcrypt from "bcrypt";
-import log from 'console'
-import cloudinary from "../config/cloudinary.config.js";
 
 export const register = async (req, res) => {
   try {
@@ -74,9 +72,11 @@ export const login = async (req, res) => {
   }
 };
 
+
+
 export const updateUserDetails = async (req, res) => {
   try {
-    const userId = req.user.userId
+    const userId = req.user.userId;
 
     if (!userId) {
       return res.status(400).json({
@@ -88,15 +88,15 @@ export const updateUserDetails = async (req, res) => {
     const { name, contact, username } = req.body;
 
     const user = await User.findByIdAndUpdate(
-      userId, 
-      {$set: {username, name, contact}},
-      {new: true}
-    ).select("-password")
+      userId,
+      { $set: { username, name, contact } },
+      { new: true }
+    ).select("-password");
 
     res.status(200).json({
       status: true,
       message: "Profile Updated Successfully.",
-      user
+      user,
     });
   } catch (error) {
     return res.status(500).json({
@@ -111,7 +111,7 @@ export const uploadAvatar = async (req, res) => {
     const userId = req.user?.userId;
 
     const user = await User.findById(userId);
-    log(user)
+    console.log(user);
     if (!user) {
       return res.status(400).json({ message: "Invalid user" });
     }
@@ -120,8 +120,8 @@ export const uploadAvatar = async (req, res) => {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    const uploadedFile = req.file;  
-    log(uploadedFile)
+    const uploadedFile = req.file;
+    console.log(uploadedFile);
 
     user.avatar = uploadedFile.path;
     await user.save();
@@ -131,25 +131,56 @@ export const uploadAvatar = async (req, res) => {
       avatar: uploadedFile.path,
     });
   } catch (error) {
+    console.log(error.message);
     return res.status(500).json({ message: error.message });
   }
 };
-
 
 export const getUserDetails = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const user = await User.findById(id).select("-password")
+    const user = await User.findById(id).select("-password");
     console.log(user);
 
     res.status(200).json({
       status: true,
       user,
     });
+  } catch (error) {
+    return res.status(500).json({
+      status: false,
+      message: error.message,
+    });
+  }
+};
+
+export const forgetPassword = async (req, res) => {
+  try {
+
+   const {email, password} = req.body
+    if (!email || !password) {
+      return res.status(400).json({message: "email and password is required"})
+    }
+
+    const user = await User.findOne({email})
+    if (!user) {
+      return res.status(400).json({message: "User not found"})
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10)
+    console.log(hashedPassword);
+    
+    user.password = hashedPassword
+    await user.save()
+
+    return res.status(200).json({user: {
+      _id: user._id,
+      email: user.email
+    }, message: "Password updated successfully"})
 
   } catch (error) {
-     return res.status(500).json({
+    return res.status(500).json({
       status: false,
       message: error.message,
     });
@@ -157,11 +188,6 @@ export const getUserDetails = async (req, res) => {
 };
 
 export const getUsers = async (req, res) => {
-  try {
-  } catch (error) {}
-};
-
-export const forgetPassword = async (req, res) => {
   try {
   } catch (error) {}
 };
