@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.models.js";
 import bcrypt from "bcrypt";
+import log from 'console'
+import cloudinary from "../config/cloudinary.config.js";
 
 export const register = async (req, res) => {
   try {
@@ -104,13 +106,34 @@ export const updateUserDetails = async (req, res) => {
   }
 };
 
-export const uploadAvatar = async(req, res) => {
+export const uploadAvatar = async (req, res) => {
   try {
-    
+    const userId = req.user?.userId;
+
+    const user = await User.findById(userId);
+    log(user)
+    if (!user) {
+      return res.status(400).json({ message: "Invalid user" });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const uploadedFile = req.file;  
+    log(uploadedFile)
+
+    user.avatar = uploadedFile.path;
+    await user.save();
+
+    return res.status(200).json({
+      message: "File uploaded successfully",
+      avatar: uploadedFile.path,
+    });
   } catch (error) {
-    
+    return res.status(500).json({ message: error.message });
   }
-}
+};
 
 
 export const getUserDetails = async (req, res) => {

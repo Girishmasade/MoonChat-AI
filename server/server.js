@@ -2,6 +2,7 @@ import express, { urlencoded } from 'express'
 import { config } from 'dotenv'
 import connectDB from './src/config/database.config.js'
 import router from './src/routers/index.js'
+import cloudinary from './src/config/cloudinary.config.js'
 
 config({
     path: "./.env"
@@ -16,6 +17,7 @@ const port = process.env.PORT || 8000
 
 
 connectDB()
+cloudinary
 
 app.get("/", (req, res) => {
     res.send("Server is runing")
