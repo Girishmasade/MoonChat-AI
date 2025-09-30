@@ -2,7 +2,7 @@ import React from "react";
 
 const RealTimeCollaboration = () => {
   return (
-    <div className="mx-auto px-4 sm:px-6 lg:px-16 py-12 md:py-32 max-w-[90rem] min-h-screen">
+    <div className="mx-auto px-4 sm:px-6 lg:px-16 py-12 md:py-20 max-w-[90rem] min-h-screen">
       <div className="grid lg:grid-cols-2 gap-8 items-center">
         <div>
           <img
