@@ -14,18 +14,24 @@ const AppHeader = () => {
   return (
     <Header
       style={{
-        display: "fixed",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "0 32px",
-        backdropFilter: "blur(10px)",
-        WebkitBackdropFilter: "blur(10px)",
-        background:
-          theme === "dark"
-            ? "rgba(20,20,20,0.7)"
-            : "rgba(255,255,255,0.7)",
-        borderBottom: "1px solid rgba(255,255,255,0.1)",
-      }}
+    position: "fixed",          
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "64px",             
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "0 32px",
+    zIndex: 1000,
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
+    background:
+      theme === "dark"
+        ? "rgba(20,20,20,0.7)"
+        : "rgba(255,255,255,0.7)",
+    borderBottom: "1px solid rgba(255,255,255,0.1)",
+  }}
     >
       {/* Left Logo */}
       <div

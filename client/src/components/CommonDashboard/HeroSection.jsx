@@ -9,7 +9,7 @@ import { AiFillMessage, AiOutlineLink, AiOutlineSend } from "react-icons/ai";
 
 export default function HeroSection() {
   return (
-    <section className="mx-auto px-4 sm:px-6 lg:px-16 py-12 md:py-32 max-w-7xl min-h-screen">
+    <section className="mx-auto px-4 sm:px-6 lg:px-16 py-24 md:py-32 max-w-7xl min-h-screen">
       <div className="grid items-center gap-10 md:grid-cols-2">
         {/* left */}
         <div className="space-y-6">
