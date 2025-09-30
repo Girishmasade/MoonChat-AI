@@ -14,7 +14,7 @@ const AppHeader = () => {
   return (
     <Header
       style={{
-        display: "flex",
+        display: "fixed",
         alignItems: "center",
         justifyContent: "space-between",
         padding: "0 32px",
