@@ -23,14 +23,14 @@ const Footer = () => {
         <div className="space-y-3 text-white mt-3">
           <h1 className=" text-xl font-semibold mb-3">Company</h1>
           <ul>
-            <li className="mt-2 hover:text-gray-400">
-              <a href="#">About</a>
+            <li className="mt-2">
+              <a href="#" className="hover:text-gray-400">About</a>
             </li>
-            <li className="mt-2 hover:text-gray-400">
-              <a href="#">Privacy</a>
+            <li className="mt-2">
+              <a href="#"  className="hover:text-gray-400">Privacy</a>
             </li>
-            <li className="mt-2 hover:text-gray-400">
-              <a href="#">Terms</a>
+            <li className="mt-2">
+              <a href="#"  className="hover:text-gray-400">Terms</a>
             </li>
           </ul>
         </div>
