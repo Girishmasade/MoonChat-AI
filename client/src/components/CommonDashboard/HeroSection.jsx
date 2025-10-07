@@ -6,6 +6,7 @@ import {
 } from "@ant-design/icons";
 import { Avatar, Divider, Tooltip } from "antd";
 import { AiFillMessage, AiOutlineLink, AiOutlineSend } from "react-icons/ai";
+import { Link } from "react-router-dom";
 
 export default function HeroSection() {
   return (
@@ -27,9 +28,9 @@ export default function HeroSection() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <button className="w-full sm:w-auto text-md font-semibold border p-3 rounded-lg bg-[#873ee0] border-black btn hover:bg-[#9641ff]">
+            <Link to={"/signup"} className="w-full sm:w-auto text-md font-semibold border p-3 rounded-lg bg-[#873ee0] border-black btn hover:bg-[#9641ff]">
               Get Started
-            </button>
+            </Link>
           </div>
 
           <div className="flex gap-4 text-muted-foreground items-center text-sm">

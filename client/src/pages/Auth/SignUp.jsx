@@ -4,7 +4,7 @@ import { GoogleOutlined, GithubOutlined } from "@ant-design/icons";
 
 const { Title, Text, Link } = Typography;
 
-const UserLogin = () => {
+const SignUp = () => {
   return (
     <section
       className="min-h-screen flex items-center justify-center px-4"
@@ -21,24 +21,39 @@ const UserLogin = () => {
             marginBottom: 0,
           }}
         >
-          Welcome Back
+          Create an Account
         </Title>
         <p type="secondary" className="block text-sm text-center mb-6 text-gray-200">
-          Sign in to your AI chat account
+        Join our AI-powered chat platform
         </p>
 
         <Form
           layout="vertical"
           name="login"
+          autoComplete="off"
           initialValues={{ remember: true }}
           onFinish={(values) => console.log("Login values:", values)}
         >
+
+          <Form.Item
+          
+            label={<span style={{ color: "white" }}>Username</span>}
+            name="username"
+            rules={[{ required: true, message: "Please input your username!" }]}
+          >
+            <Input
+            autoComplete="off"
+            placeholder="Enter your username" />
+          </Form.Item>
+
           <Form.Item
             label={<span style={{ color: "white" }}>Email</span>}
             name="email"
             rules={[{ required: true, message: "Please input your email!" }]}
           >
-            <Input placeholder="Enter your email" />
+            <Input
+             autoComplete="off"
+            placeholder="Enter your email" />
           </Form.Item>
 
           <Form.Item
@@ -46,14 +61,10 @@ const UserLogin = () => {
             name="password"
             rules={[{ required: true, message: "Please input your password!" }]}
           >
-            <Input.Password placeholder="Enter your password" />
+            <Input.Password
+             autoComplete="off"
+            placeholder="Enter your password" />
           </Form.Item>
-
-          <div className="flex justify-end mb-4">
-            <Link href="#" style={{ color: "#60a5fa" }}>
-              Forgot password?
-            </Link>
-          </div>
 
           <Form.Item>
             <Button
@@ -65,7 +76,7 @@ const UserLogin = () => {
                 border: "none",
               }}
             >
-              Sign In
+              Sign Up
             </Button>
           </Form.Item>
         </Form>
@@ -84,9 +95,9 @@ const UserLogin = () => {
         </div>
 
         <div className="text-center mt-6">
-          <Text className="text-gray-400">Don't have an account?</Text>{" "}
-          <Link href="/signup" style={{ color: "#60a5fa" }}>
-            Sign up
+          <Text className="text-gray-400">Already have an account?</Text>{" "}
+          <Link href="/login" style={{ color: "#60a5fa" }}>
+            Sign in
           </Link>
         </div>
       </div>
@@ -94,4 +105,4 @@ const UserLogin = () => {
   );
 };
 
-export default UserLogin;
+export default SignUp;

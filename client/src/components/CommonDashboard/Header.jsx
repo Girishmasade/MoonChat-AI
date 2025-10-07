@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Layout, Menu, Button } from "antd";
 import { SunOutlined, MoonOutlined } from "@ant-design/icons";
+import { Link } from "react-router-dom";
 
 const { Header } = Layout;
 
@@ -71,7 +72,7 @@ const AppHeader = () => {
           style={{ fontSize: "20px", color: theme === "dark" ? "#fff" : "#000" }}
         />
         <Button type="primary" style={{ background: "#9254de", border: "none" }}>
-          Login
+          <Link to={"/login"}>Login</Link>
         </Button>
       </div>
     </Header>

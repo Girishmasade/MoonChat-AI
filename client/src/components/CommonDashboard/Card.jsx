@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 const Card = () => {
   return (
@@ -13,7 +14,7 @@ const Card = () => {
         </div>
 
         <div className="flex lg:justify-end justify-center items-center lg:mt-0 mt-4">
-          <button className='btn bg-gray-800 text-white px-8 py-3 rounded-lg shadow-lg hover:scale-105 hover:shadow-2xl transition-all duration-300 ease-in-out '>sign Up Free</button>
+          <Link to={"/signup"}  className='btn bg-gray-800 text-white px-8 py-3 rounded-lg shadow-lg hover:scale-105 hover:shadow-2xl transition-all duration-300 ease-in-out '>sign Up Free</Link>
         </div>
       </div>
     </div>
