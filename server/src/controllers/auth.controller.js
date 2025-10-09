@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.models.js";
 import bcrypt from "bcrypt";
 import passport from "passport";
+import ErrorHandler from "../utils/errorHadler.js";
 
 export const register = async (req, res) => {
   try {
@@ -37,23 +38,21 @@ export const register = async (req, res) => {
   }
 };
 
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password)
-      return res.status(400).json({ message: "all fields required" });
+    if (!email || !password) return next(new ErrorHandler("All fields are required", 400));
 
     const user = await User.findOne({ email });
     console.log(user);
 
-    if (!user) return res.status(400).json({ message: "Invalid user" });
+    if (!user) return next(new ErrorHandler("User not found", 404));
 
     const isPassword = await bcrypt.compare(password, user.password);
     console.log(isPassword);
 
-    if (!isPassword)
-      return res.status(401).json({ message: "Invalid credentials" });
+    if (!isPassword) return next(new ErrorHandler("Invalid email or password", 400));
 
     const token = jwt.sign(
       {
@@ -69,7 +68,7 @@ export const login = async (req, res) => {
 
     return res.status(200).json({ token, message: "LoggedIn Successfully" });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+   next(error)
   }
 };
 

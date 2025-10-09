@@ -6,6 +6,7 @@ import cloudinary from './src/config/cloudinary.config.js'
 import session from 'express-session'
 import passport from 'passport'
 import './src/config/passport.config.js'
+import { errorMiddleware } from './src/middlewares/error.middleware.js'
 
 config({
     path: "./.env"
@@ -28,10 +29,12 @@ app.use(passport.initialize()) // it is used for activate passport middleware
 app.use(passport.session()) // it is used for remember the user in express session
 
 app.use("/api/v1", router)
+app.use(errorMiddleware) 
 
 
 connectDB()
 cloudinary
+
 
 app.get("/", (req, res) => {
     res.send("Server is runing")
