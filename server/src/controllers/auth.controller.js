@@ -73,6 +73,8 @@ export const login = async (req, res) => {
   }
 };
 
+// Google OAuth google login and callback
+
 export const googleLogin = (req, res, next) => {
     passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next)
 }
@@ -102,6 +104,8 @@ export const googleCallback = async (req, res, next) => {
   }
 }
 
+// GitHub OAuth github login and callback
+
 export const githubLogin = async (req, res, next) => {
   passport.authenticate('github', { scope: ['user:email']})(req, res, next)
 }
@@ -124,6 +128,8 @@ export const githubCallback = async (req, res, next) => {
     return res.status(200).json({ token, message: "LoggedIn Successfully"})
   })(req, res, next)
 }
+
+// Update User Details
 
 export const updateUserDetails = async (req, res) => {
   try {
@@ -249,7 +255,18 @@ export const getUsers = async (req, res) => {
   }
 };
 
-export const deleteUser = async (reqq, res) => {
+export const deleteUser = async (req, res) => {
   try {
-  } catch (error) {}
+    const {id} = req.params
+
+    const user = await User.findByIdAndDelete(id)
+    if (!user) {
+      return res.status(400).json({message: "User not found"})
+    }
+
+    return res.status(200).json({user, message: "User deleted successfully"})
+
+  } catch (error) {
+    return res.status(500).json({message: error.message})
+  }
 };
