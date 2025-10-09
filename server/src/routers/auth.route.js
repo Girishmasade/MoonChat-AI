@@ -4,6 +4,10 @@ import {
   forgetPassword,
   getUserDetails,
   getUsers,
+  githubCallback,
+  githubLogin,
+  googleCallback,
+  googleLogin,
   login,
   register,
   updateUserDetails,
@@ -16,8 +20,18 @@ const authRouter = Router();
 
 authRouter.post("/register", register);
 authRouter.post("/login", login);
+
+// google login routes
+
+authRouter.get("/google", googleLogin)
+authRouter.get("/google/callback", googleCallback)
+
+// github login routes
+authRouter.get("/github", githubLogin)
+authRouter.get("/github/callback", githubCallback)
+
 authRouter.put("/update-details/:id", protectedRoute, updateUserDetails);
-authRouter.get("/my-details/:id", protectedRoute, getUserDetails);
+authRouter.get("/profile/:id", protectedRoute, getUserDetails);
 authRouter.put("/upload-avatar", upload.single("avatar"), protectedRoute, uploadAvatar)
 authRouter.get("/get-all-users", getUsers);
 authRouter.patch("/forget-password/:id", forgetPassword);

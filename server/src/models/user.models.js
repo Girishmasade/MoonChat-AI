@@ -18,6 +18,14 @@ const userSchema = new Schema({
         trim: true,
         unique: true
     },
+    googleId: {
+        type: String,
+        default: null
+    },
+    githubId: {
+        type: String,
+        default: null
+    },
     contact: {
         type: Number,
         trim: true

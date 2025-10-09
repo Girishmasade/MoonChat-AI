@@ -3,6 +3,9 @@ import { config } from 'dotenv'
 import connectDB from './src/config/database.config.js'
 import router from './src/routers/index.js'
 import cloudinary from './src/config/cloudinary.config.js'
+import session from 'express-session'
+import passport from 'passport'
+import './src/config/passport.config.js'
 
 config({
     path: "./.env"
@@ -11,9 +14,20 @@ config({
 const app = express()
 app.use(express.json())
 app.use(urlencoded({extended: true}))
-app.use("/api/v1", router)
+
 
 const port = process.env.PORT || 8000
+
+app.use(session({
+    secret: "keyboard cat",
+    resave: false,
+    saveUninitialized: true,
+}))
+
+app.use(passport.initialize()) // it is used for activate passport middleware
+app.use(passport.session()) // it is used for remember the user in express session
+
+app.use("/api/v1", router)
 
 
 connectDB()

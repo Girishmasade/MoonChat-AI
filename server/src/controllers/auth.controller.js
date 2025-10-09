@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.models.js";
 import bcrypt from "bcrypt";
+import passport from "passport";
 
 export const register = async (req, res) => {
   try {
@@ -71,6 +72,58 @@ export const login = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+export const googleLogin = (req, res, next) => {
+    passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next)
+}
+
+export const googleCallback = async (req, res, next) => {
+  try {
+    passport.authenticate("google", {failureRedirect: "/login"}, (err, user) => {
+      if (err || !user) return res.status(400).json({message: "Authentication Failed"})
+  
+
+      const token = jwt.sign(
+        {
+          userId: user._id,
+          email: user.email,
+          username: user.username,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRY }
+      );
+
+      return res.status(200).json({ token, message: "LoggedIn Successfully" });
+    })(req, res, next)
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({message: error.message})
+  }
+}
+
+export const githubLogin = async (req, res, next) => {
+  passport.authenticate('github', { scope: ['user:email']})(req, res, next)
+}
+
+export const githubCallback = async (req, res, next) => {
+  passport.authenticate('github', {failureRedirect: '/login'}, (err, user) => {
+    if (err || !user) return res.status(400).json({message: "Authentication Failed"})
+    
+
+    const token = jwt.sign(
+      {
+        userId: user._id,
+        email: user.email,
+        username: user.username,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRY }
+    );
+    
+    return res.status(200).json({ token, message: "LoggedIn Successfully"})
+  })(req, res, next)
+}
 
 export const updateUserDetails = async (req, res) => {
   try {
@@ -187,7 +240,13 @@ export const forgetPassword = async (req, res) => {
 
 export const getUsers = async (req, res) => {
   try {
-  } catch (error) {}
+
+    const users = await User.find().select("-password")
+    return res.status(200).json({users, message: "All users"})
+
+  } catch (error) {
+    return res.status(500).json({message: error.message})
+  }
 };
 
 export const deleteUser = async (reqq, res) => {
