@@ -3,7 +3,7 @@ import { FeaturesData } from '../../utils/features'
 
 const Features = () => {
   return (
-    <div className='mx-auto px-4 sm:px-6 lg:px-16 py-12 md:py-20 max-w-7xl text-white'>
+    <div className='mx-auto px-4 sm:px-6 lg:px-16 py-12 md:py-20 max-w-7xl'>
       <div className="flex flex-col justify-center items-center gap-2">
         <h1 className="text-4xl font-bold leading-loosed">Everything you need to chat</h1>
         <p className="text-md text-gray-400 mt-3">Powerful features designed for teams of any size.</p>

@@ -12,17 +12,17 @@ const RealTimeCollaboration = () => {
           />
         </div>
         <div className="flex flex-col w-full">
-          <h1 className="text-4xl text-white font-bold">
+          <h1 className="text-4xl font-bold">
             Real-time collaboration, simplified
           </h1>
 
-          <p className="text-gray-400 mt-4 max-w-prose">
+          <p className="dark:text-gray-400 text-gray-600 mt-4 max-w-prose">
             See messages appear instantly, react with emojis, and share files
             without leaving the conversation. Stay in sync across all your
             devices.
           </p>
 
-          <ul className="text-gray-300 mt-6 list-disc pl-5 space-y-2">
+          <ul className="dark:text-gray-400 text-gray-600 mt-6 list-disc pl-5 space-y-2">
              <li>Ai support system</li>
             <li>Sub-second message delivery</li>
             <li>Presence indicators and typing states</li>
@@ -39,7 +39,7 @@ const RealTimeCollaboration = () => {
                 🤖
               </div>
               <h3 className="text-white font-semibold mt-4">AI support</h3>
-              <p className="text-sm text-gray-400 mt-2 leading-relaxed">
+              <p className="text-sm dark:text-gray-400 text-gray-200 mt-2 leading-relaxed">
                 Smart suggestions and moderation to keep conversations helpful
                 and safe.
               </p>
@@ -51,7 +51,7 @@ const RealTimeCollaboration = () => {
                 ⚡
               </div>
               <h3 className="text-white font-semibold mt-4">Fast delivery</h3>
-              <p className="text-sm text-gray-400 mt-2 leading-relaxed">
+              <p className="text-sm dark:text-gray-400 text-gray-200 mt-2 leading-relaxed">
                 Optimized real-time pipelines ensure messages arrive instantly.
               </p>
             </div>
@@ -62,7 +62,7 @@ const RealTimeCollaboration = () => {
                 🔒
               </div>
               <h3 className="text-white font-semibold mt-4">Fully secure</h3>
-              <p className="text-sm text-gray-400 mt-2 leading-relaxed">
+              <p className="text-sm dark:text-gray-400 text-gray-200 mt-2 leading-relaxed">
                 End-to-end encryption and strict access controls by default.
               </p>
             </div>

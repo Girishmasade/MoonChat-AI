@@ -1,38 +1,49 @@
-import React, { useState } from "react";
-import { Layout, Menu, Button } from "antd";
+import React, { useEffect, useState } from "react";
+import { Layout, Button } from "antd";
 import { SunOutlined, MoonOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
 const { Header } = Layout;
 
 const AppHeader = () => {
-  const [theme, setTheme] = useState("dark");
+  const [isDark, setIsDark] = useState(false);
 
+  // 🔄 Toggle dark/light theme
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+    const newIsDark = !isDark;
+    setIsDark(newIsDark);
+    document.documentElement.classList.toggle("dark", newIsDark);
+    localStorage.setItem("theme", newIsDark ? "dark" : "light");
   };
+
+  // ✅ Load theme from localStorage on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    const isDarkMode = savedTheme === "dark";
+    setIsDark(isDarkMode);
+    document.documentElement.classList.toggle("dark", isDarkMode);
+  }, []);
 
   return (
     <Header
       style={{
-    position: "fixed",          
-    top: 0,
-    left: 0,
-    right: 0,
-    height: "64px",             
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "0 32px",
-    zIndex: 1000,
-    backdropFilter: "blur(10px)",
-    WebkitBackdropFilter: "blur(10px)",
-    background:
-      theme === "dark"
-        ? "rgba(20,20,20,0.7)"
-        : "rgba(255,255,255,0.7)",
-    borderBottom: "1px solid rgba(255,255,255,0.1)",
-  }}
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        height: "64px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "0 32px",
+        zIndex: 1000,
+        backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
+        background: isDark
+          ? "rgba(20,20,20,0.7)"
+          : "rgba(255,255,255,0.7)",
+        borderBottom: "1px solid #e8e8e8",
+      }}
     >
       {/* Left Logo */}
       <div
@@ -42,7 +53,7 @@ const AppHeader = () => {
           gap: "8px",
           fontSize: "18px",
           fontWeight: "bold",
-          color: theme === "dark" ? "#fff" : "#000",
+          color: isDark ? "#fff" : "#000",
         }}
       >
         <div
@@ -67,11 +78,14 @@ const AppHeader = () => {
       <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
         <Button
           type="text"
-          icon={theme === "dark" ? <SunOutlined /> : <MoonOutlined />}
+          icon={isDark ? <SunOutlined /> : <MoonOutlined />}
           onClick={toggleTheme}
-          style={{ fontSize: "20px", color: theme === "dark" ? "#fff" : "#000" }}
+          style={{ fontSize: "20px", color: isDark ? "#fff" : "#000" }}
         />
-        <Button type="primary" style={{ background: "#9254de", border: "none" }}>
+        <Button
+          type="primary"
+          style={{ background: "#9254de", border: "none" }}
+        >
           <Link to={"/login"}>Login</Link>
         </Button>
       </div>

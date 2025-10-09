@@ -2,6 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
-:root{
-  background-color: #080013;
+:root {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+}
+
+.dark {
+  --bg-color: #121212;
+  --text-color: #ffffff;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@layer utilities {
+  @keyframes blinkBg {
+    0%, 100% {
+      background-color: transparent;
+    }
+    50% {
+      background-color: #c4b5fd; 
+    }
+  }
+
+  .animate-blink {
+    animation: blinkBg 3s infinite;
+  }
 }

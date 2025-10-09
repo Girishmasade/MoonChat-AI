@@ -6,24 +6,21 @@ const { Title, Text, Link } = Typography;
 
 const UserLogin = () => {
   return (
-    <section
-      className="min-h-screen flex items-center justify-center px-4"
-      style={{ color: "#fff" }}
-    >
-      <div className="w-full max-w-md bg-[#1e1e1e73] p-8 rounded-lg shadow-lg">
+    <section className="min-h-screen flex items-center justify-center px-4 bg-white dark:bg-[#0f0f0f] transition-colors duration-300">
+      <div className="w-full max-w-md bg-gray-100 dark:bg-[#141414b3] p-8 rounded-lg shadow-lg transition-colors duration-300">
         <Title
           level={2}
+          className="text-center mb-0"
           style={{
             background: "linear-gradient(to right, #2563eb, #14b8a6)",
             WebkitBackgroundClip: "text",
             color: "transparent",
-            textAlign: "center",
-            marginBottom: 0,
           }}
         >
           Welcome Back
         </Title>
-        <p type="secondary" className="block text-sm text-center mb-6 text-gray-200">
+
+        <p className="block text-sm text-center mb-6 text-gray-700 dark:text-gray-300">
           Sign in to your AI chat account
         </p>
 
@@ -34,7 +31,7 @@ const UserLogin = () => {
           onFinish={(values) => console.log("Login values:", values)}
         >
           <Form.Item
-            label={<span style={{ color: "white" }}>Email</span>}
+            label={<span className="text-gray-800 dark:text-white">Email</span>}
             name="email"
             rules={[{ required: true, message: "Please input your email!" }]}
           >
@@ -42,7 +39,7 @@ const UserLogin = () => {
           </Form.Item>
 
           <Form.Item
-            label={<span style={{ color: "white" }}>Password</span>}
+            label={<span className="text-gray-800 dark:text-white">Password</span>}
             name="password"
             rules={[{ required: true, message: "Please input your password!" }]}
           >
@@ -50,7 +47,10 @@ const UserLogin = () => {
           </Form.Item>
 
           <div className="flex justify-end mb-4">
-            <Link href="#" style={{ color: "#60a5fa" }}>
+            <Link
+              href="#"
+              className="text-blue-500 hover:underline dark:text-blue-400"
+            >
               Forgot password?
             </Link>
           </div>
@@ -70,7 +70,7 @@ const UserLogin = () => {
           </Form.Item>
         </Form>
 
-        <Divider plain style={{ color: "#555" }}>
+        <Divider plain className="text-gray-500 dark:text-gray-400">
           OR CONTINUE WITH
         </Divider>
 
@@ -84,8 +84,13 @@ const UserLogin = () => {
         </div>
 
         <div className="text-center mt-6">
-          <Text className="text-gray-400">Don't have an account?</Text>{" "}
-          <Link href="/signup" style={{ color: "#60a5fa" }}>
+          <Text className="text-gray-700 dark:text-gray-400">
+            Don’t have an account?
+          </Text>{" "}
+          <Link
+            href="/signup"
+            className="text-blue-500 dark:text-blue-400 hover:underline"
+          >
             Sign up
           </Link>
         </div>
