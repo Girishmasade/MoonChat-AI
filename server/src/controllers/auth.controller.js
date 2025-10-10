@@ -3,19 +3,17 @@ import User from "../models/user.models.js";
 import bcrypt from "bcrypt";
 import passport from "passport";
 import ErrorHandler from "../utils/errorHadler.js";
+import SuccessHandler from "../utils/successHandler.js";
 
-export const register = async (req, res) => {
+export const register = async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
-    if (!username || !email || !password) {
-      return res.status(400).json({ message: "All Fields required" });
-    }
+    if (!username || !email || !password) return next(new ErrorHandler("All fields are required", 400));
+    
 
     const existingUser = await User.findOne({ email });
 
-    if (existingUser) {
-      return res.status(400).json({ message: "User Not Exisits" });
-    }
+    if (existingUser) return next(new ErrorHandler("User already exists", 400));
 
     const hashedPassword = await bcrypt.hash(password, 10);
     console.log(hashedPassword);
@@ -31,10 +29,10 @@ export const register = async (req, res) => {
 
     return res
       .status(200)
-      .json({ newUser, message: "User Registered SuccessFully" });
+      .json(new SuccessHandler(200, "Registered Successfully"));
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: error.message });
+    next(error)
   }
 };
 
@@ -50,7 +48,7 @@ export const login = async (req, res, next) => {
     if (!user) return next(new ErrorHandler("User not found", 404));
 
     const isPassword = await bcrypt.compare(password, user.password);
-    console.log(isPassword);
+    // console.log(isPassword);
 
     if (!isPassword) return next(new ErrorHandler("Invalid email or password", 400));
 
@@ -64,9 +62,9 @@ export const login = async (req, res, next) => {
       { expiresIn: process.env.JWT_EXPIRY }
     );
 
-    console.log(token);
+    // console.log(token);
 
-    return res.status(200).json({ token, message: "LoggedIn Successfully" });
+    return res.status(200).json(new SuccessHandler(200, "LoggedIn Successfully", { token }) );
   } catch (error) {
    next(error)
   }
@@ -81,7 +79,7 @@ export const googleLogin = (req, res, next) => {
 export const googleCallback = async (req, res, next) => {
   try {
     passport.authenticate("google", {failureRedirect: "/login"}, (err, user) => {
-      if (err || !user) return res.status(400).json({message: "Authentication Failed"})
+      if (err || !user) return next(new ErrorHandler("Authentication Failed", 400));
   
 
       const token = jwt.sign(
@@ -94,12 +92,12 @@ export const googleCallback = async (req, res, next) => {
         { expiresIn: process.env.JWT_EXPIRY }
       );
 
-      return res.status(200).json({ token, message: "LoggedIn Successfully" });
+      return res.status(200).json(new SuccessHandler(200, "LoggedIn Successfully", { token }) );
     })(req, res, next)
 
   } catch (error) {
     console.log(error);
-    return res.status(500).json({message: error.message})
+    next(error)
   }
 }
 
@@ -111,7 +109,7 @@ export const githubLogin = async (req, res, next) => {
 
 export const githubCallback = async (req, res, next) => {
   passport.authenticate('github', {failureRedirect: '/login'}, (err, user) => {
-    if (err || !user) return res.status(400).json({message: "Authentication Failed"})
+    if (err || !user) return next(new ErrorHandler("Authentication Failed", 400));
     
 
     const token = jwt.sign(
@@ -124,22 +122,17 @@ export const githubCallback = async (req, res, next) => {
       { expiresIn: process.env.JWT_EXPIRY }
     );
     
-    return res.status(200).json({ token, message: "LoggedIn Successfully"})
+    return res.status(200).json(new SuccessHandler(200, "LoggedIn Successfully", { token }) );
   })(req, res, next)
 }
 
 // Update User Details
 
-export const updateUserDetails = async (req, res) => {
+export const updateUserDetails = async (req, res, next) => {
   try {
     const userId = req.user.userId;
 
-    if (!userId) {
-      return res.status(400).json({
-        status: false,
-        message: "User ID is required",
-      });
-    }
+    if (!userId) return next(new ErrorHandler("Unauthorized", 401));
 
     const { name, contact, username } = req.body;
 
@@ -155,26 +148,20 @@ export const updateUserDetails = async (req, res) => {
       user,
     });
   } catch (error) {
-    return res.status(500).json({
-      status: false,
-      message: error.message,
-    });
+    next(error)
   }
 };
 
-export const uploadAvatar = async (req, res) => {
+export const uploadAvatar = async (req, res, next) => {
   try {
     const userId = req.user?.userId;
 
     const user = await User.findById(userId);
     console.log(user);
-    if (!user) {
-      return res.status(400).json({ message: "Invalid user" });
-    }
+    if (!user) return next(new ErrorHandler("User not found", 404));
+    
 
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
-    }
+    if (!req.file) return next(new ErrorHandler("File not found", 404));
 
     const uploadedFile = req.file;
     console.log(uploadedFile);
@@ -182,32 +169,23 @@ export const uploadAvatar = async (req, res) => {
     user.avatar = uploadedFile.path;
     await user.save();
 
-    return res.status(200).json({
-      message: "File uploaded successfully",
-      avatar: uploadedFile.path,
-    });
+    return res.status(200).json(new SuccessHandler(200, "Avatar uploaded successfully", { avatar: user.avatar }) );
   } catch (error) {
     console.log(error.message);
-    return res.status(500).json({ message: error.message });
+    next(error)
   }
 };
 
-export const getUserDetails = async (req, res) => {
+export const getUserDetails = async (req, res, next) => {
   try {
     const { id } = req.params;
 
     const user = await User.findById(id).select("-password");
     console.log(user);
 
-    res.status(200).json({
-      status: true,
-      user,
-    });
+    res.status(200).json(new SuccessHandler(200, "User details fetched successfully", { user }) );
   } catch (error) {
-    return res.status(500).json({
-      status: false,
-      message: error.message,
-    });
+   next(error)
   }
 };
 
