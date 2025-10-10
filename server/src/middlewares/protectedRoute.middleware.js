@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.models.js";
+import ErrorHandler from "../utils/errorHadler.js";
 
 export const protectedRoute = async (req, res, next) => {
   try {
@@ -33,3 +34,5 @@ export const protectedRoute = async (req, res, next) => {
     return res.status(500).json({ msg: error.message });
   }
 };
+
+

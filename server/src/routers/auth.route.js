@@ -1,5 +1,7 @@
 import { Router } from "express";
 import {
+  adminLogin,
+  adminRegister,
   deleteUser,
   forgetPassword,
   getUserDetails,
@@ -17,6 +19,12 @@ import { protectedRoute } from "../middlewares/protectedRoute.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
 const authRouter = Router();
+
+// admin routes
+
+authRouter.post("/admin/register", adminRegister);
+authRouter.post("/admin/login", adminLogin)
+// Public Routes
 
 authRouter.post("/register", register);
 authRouter.post("/login", login);

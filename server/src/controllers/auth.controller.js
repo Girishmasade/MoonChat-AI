@@ -5,6 +5,77 @@ import passport from "passport";
 import ErrorHandler from "../utils/errorHadler.js";
 import SuccessHandler from "../utils/successHandler.js";
 
+// Admin Registration and Login (for testing purpose only, can be removed later)
+
+export const adminRegister = async (req, res, next) => {
+  try {
+    const {username, email, password, name, secretKey} = req.body
+    if (!username || !email || !password || !secretKey) return next(new ErrorHandler("All fields are required", 400));
+
+    if (secretKey !== process.env.ADMIN_SECRET_KEY) return next(new ErrorHandler("Invalid secret key", 400));
+
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) return next(new ErrorHandler("User already exists", 400));
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      username,
+      email,
+      name,
+      password: hashedPassword,
+      isAdmin: true
+    });
+    
+    await newUser.save();
+
+    return res
+      .status(200)
+      .json(new SuccessHandler(200, "Admin Registered Successfully", { user: newUser }) );
+
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const adminLogin = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) return next(new ErrorHandler("All fields are required", 400));
+
+    const user = await User.findOne({ email });
+
+    if (!user) return next(new ErrorHandler("User not found", 404));
+
+    if (!user.isAdmin) return next(new ErrorHandler("Access denied. Admins only.", 403));
+
+    const isPassword = await bcrypt.compare(password, user.password);
+
+    if (!isPassword) return next(new ErrorHandler("Invalid email or password", 400));
+    
+    const token = jwt.sign(
+      {
+        userId: user._id,
+        email: user.email,
+        username: user.username,
+        isAdmin: user.isAdmin
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRY }
+    );
+
+    return res.status(200).json(new SuccessHandler(200, "Admin LoggedIn Successfully", { token }) );
+
+  } catch (error) {
+    next(error)
+  }
+}
+
+
+// User Registration and Login
+
 export const register = async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
@@ -61,6 +132,7 @@ export const login = async (req, res, next) => {
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRY }
     );
+    
 
     // console.log(token);
 
@@ -232,18 +304,17 @@ export const getUsers = async (req, res) => {
   }
 };
 
-export const deleteUser = async (req, res) => {
+export const deleteUser = async (req, res, next) => {
   try {
     const {id} = req.params
 
     const user = await User.findByIdAndDelete(id)
-    if (!user) {
-      return res.status(400).json({message: "User not found"})
-    }
+    if (!user) return next(new ErrorHandler("User not found", 404));
+    
 
-    return res.status(200).json({user, message: "User deleted successfully"})
+    return res.status(200).json(new SuccessHandler(200, "User deleted successfully") );
 
   } catch (error) {
-    return res.status(500).json({message: error.message})
+    next(error)
   }
 };
