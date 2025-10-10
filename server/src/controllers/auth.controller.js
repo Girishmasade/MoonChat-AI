@@ -12,7 +12,7 @@ export const adminRegister = async (req, res, next) => {
     const {username, email, password, name, secretKey} = req.body
     if (!username || !email || !password || !secretKey) return next(new ErrorHandler("All fields are required", 400));
 
-    if (secretKey !== process.env.ADMIN_SECRET_KEY) return next(new ErrorHandler("Invalid secret key", 400));
+    if (secretKey !== process.env.SECRET_KEY) return next(new ErrorHandler("Invalid secret key", 400));
 
     const existingUser = await User.findOne({ email });
 
@@ -66,7 +66,16 @@ export const adminLogin = async (req, res, next) => {
       { expiresIn: process.env.JWT_EXPIRY }
     );
 
-    return res.status(200).json(new SuccessHandler(200, "Admin LoggedIn Successfully", { token }) );
+    const adminData = {
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      isAdmin: user.isAdmin
+    }
+
+    await user.save();
+
+    return res.status(200).json(new SuccessHandler(200, "Admin LoggedIn Successfully", { token, user:adminData }) );
 
   } catch (error) {
     next(error)
