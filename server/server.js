@@ -6,13 +6,13 @@ import cloudinary from './src/config/cloudinary.config.js'
 import session from 'express-session'
 import passport from 'passport'
 import './src/config/passport.config.js'
+import {app, server} from './socket.js'
 import { errorMiddleware } from './src/middlewares/error.middleware.js'
 
 config({
     path: "./.env"
 })
 
-const app = express()
 app.use(express.json())
 app.use(urlencoded({extended: true}))
 
@@ -40,6 +40,6 @@ app.get("/", (req, res) => {
     res.send("Server is runing")
 })
 
-app.listen("8800", () => {
+server.listen("8800", () => {
     console.log(`server is successfully runing on the port: http://localhost:${port}/`);
 })

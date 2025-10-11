@@ -2,6 +2,7 @@ import Chats from "../models/chats.models.js";
 import User from "../models/user.models.js";
 import ErrorHandler from "../utils/errorHadler.js";
 import SuccessHandler from "../utils/successHandler.js";
+import { io, onlineUsers } from "../../socket.js";
 
 export const addContact = async (req, res, next) => {
   try {
@@ -49,7 +50,9 @@ export const addContact = async (req, res, next) => {
 
     return res
       .status(200)
-      .json(new SuccessHandler(200, "Contact added successfully", { contactUser }));
+      .json(
+        new SuccessHandler(200, "Contact added successfully", { contactUser })
+      );
   } catch (error) {
     next(error);
   }
@@ -61,7 +64,10 @@ export const getAllContacts = async (req, res, next) => {
 
     const users = await User.findById(userId)
       .select("-password -googleId -githubId -isAdmin -createdAt -updatedAt")
-      .populate("contacts", "-password -googleId -githubId -isAdmin -createdAt -updatedAt");
+      .populate(
+        "contacts",
+        "-password -googleId -githubId -isAdmin -createdAt -updatedAt"
+      );
 
     console.log(users);
 
@@ -71,7 +77,9 @@ export const getAllContacts = async (req, res, next) => {
 
     return res
       .status(200)
-      .json(new SuccessHandler(200, "All contacts", { contacts: users.contacts }));
+      .json(
+        new SuccessHandler(200, "All contacts", { contacts: users.contacts })
+      );
   } catch (error) {
     next(error);
   }
@@ -100,9 +108,7 @@ export const removeContact = async (req, res, next) => {
       return next(new ErrorHandler("Contact not found in your list", 404));
     }
 
-    user.contacts = user.contacts.filter(
-      (id) => id.toString() !== contactId
-    );
+    user.contacts = user.contacts.filter((id) => id.toString() !== contactId);
 
     await user.save();
 
@@ -114,7 +120,6 @@ export const removeContact = async (req, res, next) => {
   }
 };
 
-
 export const sendMessage = async (req, res, next) => {
   try {
     const senderId = req.user.userId;
@@ -124,18 +129,31 @@ export const sendMessage = async (req, res, next) => {
       return next(new ErrorHandler("SenderId and ReceiverId is required", 400));
     }
 
-    const { messages } = req.body;
-    if (!messages) {
-      return next(new ErrorHandler("Message is required", 400));
+    const { messages, media } = req.body;
+    if (!messages && !media) {
+      return next(new ErrorHandler("Messages and media is required", 400));
+    }
+
+    const mediaFiles = req.files ? req.files.map((file) => file.path) : [];
+
+    if (mediaFiles.length > 0) {
+      console.log("Media files uploaded:", media);
     }
 
     const newMessage = new Chats({
       senderId,
       receiverId,
       messages: messages,
+      media: mediaFiles,
     });
 
     await newMessage.save();
+
+    const receiverSocketId = onlineUsers.get(receiverId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("newMessage", newMessage);
+    }
+
     return res
       .status(200)
       .json(new SuccessHandler(200, "Message sent", { data: newMessage }));
@@ -143,3 +161,32 @@ export const sendMessage = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getAllMessages = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const { contactId } = req.params;
+
+    if (!contactId) {
+      return next(new ErrorHandler("Contact ID is required", 400));
+    }
+
+    const messages = await Chats.find({
+      $or: [
+        { senderId: userId, receiverId: contactId },
+        { senderId: contactId, receiverId: userId },
+      ],
+    })
+      .sort({ createdAt: 1 })
+      .populate("senderId", "username email")
+      .populate("receiverId", "username email");
+
+    return res
+      .status(200)
+      .json(new SuccessHandler(200, "All messages", { messages }));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const AiMessage = async (req, res, next) => {};

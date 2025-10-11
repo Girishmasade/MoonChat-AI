@@ -9,10 +9,12 @@ import SuccessHandler from "../utils/successHandler.js";
 
 export const adminRegister = async (req, res, next) => {
   try {
-    const {username, email, password, name, secretKey} = req.body
-    if (!username || !email || !password || !secretKey) return next(new ErrorHandler("All fields are required", 400));
+    const { username, email, password, name, secretKey } = req.body;
+    if (!username || !email || !password || !secretKey)
+      return next(new ErrorHandler("All fields are required", 400));
 
-    if (secretKey !== process.env.SECRET_KEY) return next(new ErrorHandler("Invalid secret key", 400));
+    if (secretKey !== process.env.SECRET_KEY)
+      return next(new ErrorHandler("Invalid secret key", 400));
 
     const existingUser = await User.findOne({ email });
 
@@ -25,42 +27,48 @@ export const adminRegister = async (req, res, next) => {
       email,
       name,
       password: hashedPassword,
-      isAdmin: true
+      isAdmin: true,
     });
-    
+
     await newUser.save();
 
     return res
       .status(200)
-      .json(new SuccessHandler(200, "Admin Registered Successfully", { user: newUser }) );
-
+      .json(
+        new SuccessHandler(200, "Admin Registered Successfully", {
+          user: newUser,
+        })
+      );
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 
 export const adminLogin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) return next(new ErrorHandler("All fields are required", 400));
+    if (!email || !password)
+      return next(new ErrorHandler("All fields are required", 400));
 
     const user = await User.findOne({ email });
 
     if (!user) return next(new ErrorHandler("User not found", 404));
 
-    if (!user.isAdmin) return next(new ErrorHandler("Access denied. Admins only.", 403));
+    if (!user.isAdmin)
+      return next(new ErrorHandler("Access denied. Admins only.", 403));
 
     const isPassword = await bcrypt.compare(password, user.password);
 
-    if (!isPassword) return next(new ErrorHandler("Invalid email or password", 400));
-    
+    if (!isPassword)
+      return next(new ErrorHandler("Invalid email or password", 400));
+
     const token = jwt.sign(
       {
         userId: user._id,
         email: user.email,
         username: user.username,
-        isAdmin: user.isAdmin
+        isAdmin: user.isAdmin,
       },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRY }
@@ -70,26 +78,31 @@ export const adminLogin = async (req, res, next) => {
       id: user._id,
       username: user.username,
       email: user.email,
-      isAdmin: user.isAdmin
-    }
+      isAdmin: user.isAdmin,
+    };
 
     await user.save();
 
-    return res.status(200).json(new SuccessHandler(200, "Admin LoggedIn Successfully", { token, user:adminData }) );
-
+    return res
+      .status(200)
+      .json(
+        new SuccessHandler(200, "Admin LoggedIn Successfully", {
+          token,
+          user: adminData,
+        })
+      );
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
-
+};
 
 // User Registration and Login
 
 export const register = async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
-    if (!username || !email || !password) return next(new ErrorHandler("All fields are required", 400));
-    
+    if (!username || !email || !password)
+      return next(new ErrorHandler("All fields are required", 400));
 
     const existingUser = await User.findOne({ email });
 
@@ -112,7 +125,7 @@ export const register = async (req, res, next) => {
       .json(new SuccessHandler(200, "Registered Successfully"));
   } catch (error) {
     console.log(error);
-    next(error)
+    next(error);
   }
 };
 
@@ -120,7 +133,8 @@ export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) return next(new ErrorHandler("All fields are required", 400));
+    if (!email || !password)
+      return next(new ErrorHandler("All fields are required", 400));
 
     const user = await User.findOne({ email });
     console.log(user);
@@ -130,7 +144,8 @@ export const login = async (req, res, next) => {
     const isPassword = await bcrypt.compare(password, user.password);
     // console.log(isPassword);
 
-    if (!isPassword) return next(new ErrorHandler("Invalid email or password", 400));
+    if (!isPassword)
+      return next(new ErrorHandler("Invalid email or password", 400));
 
     const token = jwt.sign(
       {
@@ -141,27 +156,70 @@ export const login = async (req, res, next) => {
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRY }
     );
-    
 
     // console.log(token);
 
-    return res.status(200).json(new SuccessHandler(200, "LoggedIn Successfully", { token }) );
+    return res
+      .status(200)
+      .json(new SuccessHandler(200, "LoggedIn Successfully", { token }));
   } catch (error) {
-   next(error)
+    next(error);
   }
 };
 
 // Google OAuth google login and callback
 
 export const googleLogin = (req, res, next) => {
-    passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next)
-}
+  passport.authenticate("google", { scope: ["profile", "email"] })(
+    req,
+    res,
+    next
+  );
+};
 
 export const googleCallback = async (req, res, next) => {
   try {
-    passport.authenticate("google", {failureRedirect: "/login"}, (err, user) => {
-      if (err || !user) return next(new ErrorHandler("Authentication Failed", 400));
-  
+    passport.authenticate(
+      "google",
+      { failureRedirect: "/login" },
+      (err, user) => {
+        if (err || !user)
+          return next(new ErrorHandler("Authentication Failed", 400));
+
+        const token = jwt.sign(
+          {
+            userId: user._id,
+            email: user.email,
+            username: user.username,
+          },
+          process.env.JWT_SECRET,
+          { expiresIn: process.env.JWT_EXPIRY }
+        );
+
+        return res
+          .status(200)
+          .json(new SuccessHandler(200, "LoggedIn Successfully", { token }));
+      }
+    )(req, res, next);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+// GitHub OAuth github login and callback
+
+export const githubLogin = async (req, res, next) => {
+  passport.authenticate("github", { scope: ["user:email"] })(req, res, next);
+};
+
+export const githubCallback = async (req, res, next) => {
+  passport.authenticate(
+    "github",
+    { failureRedirect: "/login" },
+    (err, user) => {
+      if (err || !user)
+        return next(new ErrorHandler("Authentication Failed", 400));
 
       const token = jwt.sign(
         {
@@ -173,39 +231,12 @@ export const googleCallback = async (req, res, next) => {
         { expiresIn: process.env.JWT_EXPIRY }
       );
 
-      return res.status(200).json(new SuccessHandler(200, "LoggedIn Successfully", { token }) );
-    })(req, res, next)
-
-  } catch (error) {
-    console.log(error);
-    next(error)
-  }
-}
-
-// GitHub OAuth github login and callback
-
-export const githubLogin = async (req, res, next) => {
-  passport.authenticate('github', { scope: ['user:email']})(req, res, next)
-}
-
-export const githubCallback = async (req, res, next) => {
-  passport.authenticate('github', {failureRedirect: '/login'}, (err, user) => {
-    if (err || !user) return next(new ErrorHandler("Authentication Failed", 400));
-    
-
-    const token = jwt.sign(
-      {
-        userId: user._id,
-        email: user.email,
-        username: user.username,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRY }
-    );
-    
-    return res.status(200).json(new SuccessHandler(200, "LoggedIn Successfully", { token }) );
-  })(req, res, next)
-}
+      return res
+        .status(200)
+        .json(new SuccessHandler(200, "LoggedIn Successfully", { token }));
+    }
+  )(req, res, next);
+};
 
 // Update User Details
 
@@ -229,7 +260,7 @@ export const updateUserDetails = async (req, res, next) => {
       user,
     });
   } catch (error) {
-    next(error)
+    next(error);
   }
 };
 
@@ -240,7 +271,6 @@ export const uploadAvatar = async (req, res, next) => {
     const user = await User.findById(userId);
     console.log(user);
     if (!user) return next(new ErrorHandler("User not found", 404));
-    
 
     if (!req.file) return next(new ErrorHandler("File not found", 404));
 
@@ -250,10 +280,16 @@ export const uploadAvatar = async (req, res, next) => {
     user.avatar = uploadedFile.path;
     await user.save();
 
-    return res.status(200).json(new SuccessHandler(200, "Avatar uploaded successfully", { avatar: user.avatar }) );
+    return res
+      .status(200)
+      .json(
+        new SuccessHandler(200, "Avatar uploaded successfully", {
+          avatar: user.avatar,
+        })
+      );
   } catch (error) {
     console.log(error.message);
-    next(error)
+    next(error);
   }
 };
 
@@ -264,36 +300,43 @@ export const getUserDetails = async (req, res, next) => {
     const user = await User.findById(id).select("-password");
     console.log(user);
 
-    res.status(200).json(new SuccessHandler(200, "User details fetched successfully", { user }) );
+    res
+      .status(200)
+      .json(
+        new SuccessHandler(200, "User details fetched successfully", { user })
+      );
   } catch (error) {
-   next(error)
+    next(error);
   }
 };
 
 export const forgetPassword = async (req, res) => {
   try {
-
-   const {email, password} = req.body
+    const { email, password } = req.body;
     if (!email || !password) {
-      return res.status(400).json({message: "email and password is required"})
+      return res
+        .status(400)
+        .json({ message: "email and password is required" });
     }
 
-    const user = await User.findOne({email})
+    const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({message: "User not found"})
+      return res.status(400).json({ message: "User not found" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10)
+    const hashedPassword = await bcrypt.hash(password, 10);
     console.log(hashedPassword);
-    
-    user.password = hashedPassword
-    await user.save()
 
-    return res.status(200).json({user: {
-      _id: user._id,
-      email: user.email
-    }, message: "Password updated successfully"})
+    user.password = hashedPassword;
+    await user.save();
 
+    return res.status(200).json({
+      user: {
+        _id: user._id,
+        email: user.email,
+      },
+      message: "Password updated successfully",
+    });
   } catch (error) {
     return res.status(500).json({
       status: false,
@@ -304,26 +347,24 @@ export const forgetPassword = async (req, res) => {
 
 export const getUsers = async (req, res) => {
   try {
-
-    const users = await User.find().select("-password")
-    return res.status(200).json({users, message: "All users"})
-
+    const users = await User.find().select("-password");
+    return res.status(200).json({ users, message: "All users" });
   } catch (error) {
-    return res.status(500).json({message: error.message})
+    return res.status(500).json({ message: error.message });
   }
 };
 
 export const deleteUser = async (req, res, next) => {
   try {
-    const {id} = req.params
+    const { id } = req.params;
 
-    const user = await User.findByIdAndDelete(id)
+    const user = await User.findByIdAndDelete(id);
     if (!user) return next(new ErrorHandler("User not found", 404));
-    
 
-    return res.status(200).json(new SuccessHandler(200, "User deleted successfully") );
-
+    return res
+      .status(200)
+      .json(new SuccessHandler(200, "User deleted successfully"));
   } catch (error) {
-    next(error)
+    next(error);
   }
 };
