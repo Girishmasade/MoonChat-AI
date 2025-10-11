@@ -34,6 +34,11 @@ const userSchema = new Schema({
         type: Number,
         trim: true
     },
+    contacts: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: "user",
+    },
+
     password: {
         type: String,
         required: true,
