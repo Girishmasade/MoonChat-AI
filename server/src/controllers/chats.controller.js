@@ -3,6 +3,7 @@ import User from "../models/user.models.js";
 import ErrorHandler from "../utils/errorHadler.js";
 import SuccessHandler from "../utils/successHandler.js";
 import { io, onlineUsers } from "../../socket.js";
+import { model } from "mongoose";
 
 export const addContact = async (req, res, next) => {
   try {
@@ -143,7 +144,7 @@ export const sendMessage = async (req, res, next) => {
     const newMessage = new Chats({
       senderId,
       receiverId,
-      messages: messages,
+      messages,
       media: mediaFiles,
     });
 
@@ -189,4 +190,79 @@ export const getAllMessages = async (req, res, next) => {
   }
 };
 
-export const AiMessage = async (req, res, next) => {};
+export const AiMessage = async (req, res, next) => {
+  try {
+    const senderId = req.user.userId;
+    const receiverId = process.env.AI_USER_ID; // Gemini AI User ID
+    const { messages, media } = req.body;
+
+    if (!senderId || !receiverId) {
+      return next(new ErrorHandler("SenderId and ReceiverId is required", 400));
+    }
+
+    if (!messages && (!media || media.length === 0)) {
+      return next(new ErrorHandler("Messages and Media is required", 400));
+    }
+
+    const modal = geminiai.getGenerativeModel({ model: "gemini-2.5-pro" });
+
+    const result = await modal.generateContent(messages);
+    const response = result.response.text();
+
+    const mediaFiles = req.files ? req.files.map((file) => file.path) : [];
+
+    if (mediaFiles.length > 0) {
+      console.log("Media files uploaded:", media);
+    }
+
+    const userMessage = new Chats({
+      senderId,
+      receiverId,
+      messages: messages,
+      media: mediaFiles,
+    });
+
+    // to save ai message in db
+
+    const aiMessage = new Chats({
+      senderId: "GeminiAI",
+      receiverId: senderId,
+      messages: response,
+      isAI: true,
+    });
+
+    await Promise.all([userMessage.save(), aiMessage.save()]);
+
+    return res
+      .status(200)
+      .json(new SuccessHandler(200, "AI Message", { aiMessage }));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAiMessages = async (req, res, next) => {
+  try {
+    const senderId = req.user.userId;
+    const receiverId = process.env.AI_USER_ID; // Gemini AI User ID
+
+    if (!senderId || !receiverId) {
+      return next(new ErrorHandler("SenderId and ReceiverId is required", 400));
+    }
+
+    const messages = await Chats.find({
+      $or: [
+        { senderId: senderId, receiverId: receiverId },
+        { senderId: receiverId, receiverId: senderId },
+      ]
+    }).populate("senderId", "username email")
+      .populate("receiverId", "username email")
+      .sort({ createdAt: 1 });
+      
+    return res
+      .status(200)
+      .json(new SuccessHandler(200, "All AI messages", { messages }));
+  } catch (error) {
+    next(error);
+  }
+}
