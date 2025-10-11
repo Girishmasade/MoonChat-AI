@@ -4,23 +4,27 @@ const chatsSchema = new Schema({
     senderId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "user",
+        required: true,
     },
-    reciverId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "user",
+     receiverId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
     },
-    message: {
+    messages: {
         type: String,
         required: true,
     },
     media: {
-        type: Array,
+       type: [String], //includes images, videos, files etc
         default: []
     },
-    emoji:{
-        type: String,
+    lastseen: {
+        type: Date,
+        default: null
     }
+
 }, { timestamps: true})
 
-const Chats = mongoose.model("chats", chatsSchema)
+const Chats = mongoose.model("chat", chatsSchema)
 export default Chats
