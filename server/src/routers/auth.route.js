@@ -26,8 +26,8 @@ authRouter.post("/admin/register", adminRegister);
 authRouter.post("/admin/login", adminLogin)
 // Public Routes
 
-authRouter.post("/register", register);
-authRouter.post("/login", login);
+authRouter.post("/signup", register);
+authRouter.post("/signin", login);
 
 // google login routes
 

@@ -32,13 +32,11 @@ export const adminRegister = async (req, res, next) => {
 
     await newUser.save();
 
-    return res
-      .status(200)
-      .json(
-        new SuccessHandler(200, "Admin Registered Successfully", {
-          user: newUser,
-        })
-      );
+    return res.status(200).json(
+      new SuccessHandler(200, "Admin Registered Successfully", {
+        user: newUser,
+      })
+    );
   } catch (error) {
     next(error);
   }
@@ -83,14 +81,12 @@ export const adminLogin = async (req, res, next) => {
 
     await user.save();
 
-    return res
-      .status(200)
-      .json(
-        new SuccessHandler(200, "Admin LoggedIn Successfully", {
-          token,
-          user: adminData,
-        })
-      );
+    return res.status(200).json(
+      new SuccessHandler(200, "Admin LoggedIn Successfully", {
+        token,
+        user: adminData,
+      })
+    );
   } catch (error) {
     next(error);
   }
@@ -159,9 +155,16 @@ export const login = async (req, res, next) => {
 
     // console.log(token);
 
-    return res
-      .status(200)
-      .json(new SuccessHandler(200, "LoggedIn Successfully", { token }));
+    return res.status(200).json(
+      new SuccessHandler(200, "LoggedIn Successfully", {
+        token,
+        user: {
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+        },
+      })
+    );
   } catch (error) {
     next(error);
   }
@@ -280,13 +283,11 @@ export const uploadAvatar = async (req, res, next) => {
     user.avatar = uploadedFile.path;
     await user.save();
 
-    return res
-      .status(200)
-      .json(
-        new SuccessHandler(200, "Avatar uploaded successfully", {
-          avatar: user.avatar,
-        })
-      );
+    return res.status(200).json(
+      new SuccessHandler(200, "Avatar uploaded successfully", {
+        avatar: user.avatar,
+      })
+    );
   } catch (error) {
     console.log(error.message);
     next(error);

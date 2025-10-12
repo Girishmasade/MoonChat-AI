@@ -7,6 +7,9 @@ import {
 import Dashboard from "./pages/Commondashboard/Dashboard";
 import UserLogin from "./pages/Auth/UserLogin";
 import SignUp from "./pages/Auth/SignUp";
+import UserDashboard from "./pages/UserPages/UserDashboard";
+import ProtectedRoutes from "./components/Protected & Public Route/ProtectedRoutes";
+import PublicRoute from "./components/Protected & Public Route/PublicRoute";
 
 function App() {
   return (
@@ -14,8 +17,31 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to={"/dashboard"} />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/login" element={<UserLogin />} />
-        <Route path="/signup" element={<SignUp />} />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <UserLogin />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <SignUp />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          path="/chat-dashboard"
+          element={
+            <ProtectedRoutes>
+              <UserDashboard />
+            </ProtectedRoutes>
+          }
+        />
       </Routes>
     </Router>
   );
