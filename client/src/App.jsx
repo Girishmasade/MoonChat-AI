@@ -10,6 +10,7 @@ import SignUp from "./pages/Auth/SignUp";
 import UserDashboard from "./pages/UserPages/UserDashboard";
 import ProtectedRoutes from "./components/Protected & Public Route/ProtectedRoutes";
 import PublicRoute from "./components/Protected & Public Route/PublicRoute";
+import MainLayout from "./components/All components/MainLayout";
 
 function App() {
   return (
@@ -34,14 +35,9 @@ function App() {
           }
         />
 
-        <Route
-          path="/chat-dashboard"
-          element={
-            <ProtectedRoutes>
-              <UserDashboard />
-            </ProtectedRoutes>
-          }
-        />
+          <Route element={<MainLayout />}>
+            <Route path="/chat-dashboard" element={<ProtectedRoutes><UserDashboard /></ProtectedRoutes>} />
+          </Route>
       </Routes>
     </Router>
   );
