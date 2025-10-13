@@ -6,67 +6,60 @@ import {
   MenuUnfoldOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Avatar, Badge, Button, Layout, Space, theme } from "antd";
+import { Avatar, Badge, Button, Layout, Space } from "antd";
 import Sidebar from "./Sidebar";
-import { Footer } from "antd/es/layout/layout";
 
-const { Header, Sider, Content } = Layout;
+const { Header, Sider, Content, Footer } = Layout;
 
 const MainLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
-
   return (
-    <Layout style={{ minHeight: "100vh" }}>
+    <Layout
+      style={{
+      }}
+    >
+      {/* Sidebar */}
       <Sider
         trigger={null}
         collapsible
         collapsed={collapsed}
+        width={220}
         style={{
-          background: "#001529", // Ant Design default sidebar color
+          background: "#001529",
+          position: "sticky",
+          top: 0,
+          height: "100vh",
         }}
       >
-        {/* Logo Section */}
-        <div
-          className="flex items-center justify-center py-6"
-          style={{
-            height: "100px",
-            background: "transparent",
-            textAlign: "center",
-          }}
-        >
-        <Link to={'/chat-dashboard'}>
-          <img
-            src="/Logo.png"
-            alt="NovaChat AI"
-            style={{
-              paddingTop: "10px",
-              width: collapsed ? "50px" : "140px",
-              height: "auto",
-              transition: "all 0.3s ease",
-              filter: "drop-shadow(0 0 6px rgba(0, 255, 255, 0.6))",
-            }}
-          />
-        </Link>
-        </div>
-
         <Sidebar />
       </Sider>
 
-      <Layout>
+      {/* Main Section */}
+      <Layout
+        style={{
+          background: "#0b0e11",
+          color: "#fff",
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100vh", // ✅ Ensures the layout fills full height
+        }}
+      >
+        {/* Header */}
         <Header
           style={{
-            padding: 0,
-            background: colorBgContainer,
+            padding: "0 16px",
+            background: "#0b0e11",
+            borderBottom: "1px solid #1c1f26",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            paddingLeft: "16px",
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
+            height: "64px",
           }}
         >
           <Button
@@ -74,16 +67,15 @@ const MainLayout = () => {
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             onClick={() => setCollapsed(!collapsed)}
             style={{
-              fontSize: "16px",
-              width: 48,
-              height: 48,
+              fontSize: "18px",
+              color: "#fff",
             }}
           />
 
-          <div className="flex gap-5 pr-5">
-            <Space size={2} style={{ paddingTop: "10px" }}>
+          <div className="flex gap-5 pr-5 items-center">
+            <Space size={2}>
               <Badge count={3} size="small" offset={[0, 4]}>
-                <BellFilled style={{ fontSize: "25px", color: "#555" }} />
+                <BellFilled style={{ fontSize: "22px", color: "#fff" }} />
               </Badge>
             </Space>
 
@@ -101,23 +93,19 @@ const MainLayout = () => {
           </div>
         </Header>
 
+        {/* Content */}
         <Content
           style={{
-            margin: "14px 10px 10px",
-            padding: 4,
-            background: colorBgContainer,
-            borderRadius: borderRadiusLG,
-            minHeight: "calc(100vh - 80px)",
+            padding: "10px 10px",
+            background: "#0b0e11",
+            color: "#fff",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
           <Outlet />
-
         </Content>
-         <Footer style={{ textAlign: 'center' }}>
-          NovaChat AI ©{new Date().getFullYear()} Created by @Girish-Masade
-        </Footer>
       </Layout>
-      
     </Layout>
   );
 };

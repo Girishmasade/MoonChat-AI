@@ -3,18 +3,18 @@ import { Typography, Card, Row, Col } from "antd";
 import Globe from "react-globe.gl";
 import * as THREE from "three";
 import { useSelector } from "react-redux";
+import AiFooter from "../../components/User/Footer";
 
 const { Title, Paragraph } = Typography;
 
 const UserDashboard = () => {
-  const user = useSelector((state) => state.auth.user)
+  const user = useSelector((state) => state.auth.user);
   const globeRef = useRef();
   const containerRef = useRef();
   const [dimensions, setDimensions] = useState({ width: 800, height: 500 });
   const [arcsData, setArcsData] = useState([]);
   const [userName, setUserName] = useState("Explorer");
 
-  // Responsive resizing
   useEffect(() => {
     const handleResize = () => {
       if (containerRef.current) {
@@ -29,7 +29,6 @@ const UserDashboard = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Auto-rotate globe
   useEffect(() => {
     if (globeRef.current) {
       const controls = globeRef.current.controls();
@@ -38,7 +37,6 @@ const UserDashboard = () => {
     }
   }, []);
 
-  // Neural-style arcs
   useEffect(() => {
     const connections = Array.from({ length: 40 }).map(() => ({
       startLat: Math.random() * 180 - 90,
@@ -50,7 +48,6 @@ const UserDashboard = () => {
     setArcsData(connections);
   }, []);
 
-  // Meteors
   const onGlobeReady = () => {
     const globe = globeRef.current;
     if (!globe) return;
@@ -66,10 +63,17 @@ const UserDashboard = () => {
       const y = (Math.random() - 0.5) * 2000;
       const z = (Math.random() - 0.5) * 2000;
       positions.push(x, y, z);
-      velocities.push((Math.random() - 0.5) * 0.2, (Math.random() - 0.5) * 0.2, (Math.random() - 0.5) * 0.2);
+      velocities.push(
+        (Math.random() - 0.5) * 0.2,
+        (Math.random() - 0.5) * 0.2,
+        (Math.random() - 0.5) * 0.2
+      );
     }
 
-    geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute(
+      "position",
+      new THREE.Float32BufferAttribute(positions, 3)
+    );
     const material = new THREE.PointsMaterial({
       color: "#ffffff88",
       size: 1.5,
@@ -109,7 +113,6 @@ const UserDashboard = () => {
       className="relative min-h-screen flex flex-col items-center justify-start overflow-hidden rounded-lg"
       style={{ backgroundColor: "#0a1f44" }}
     >
-      {/* Title & Welcome */}
       <div className="pt-10 px-4 text-center z-10 w-full max-w-screen-md">
         <Title
           level={1}
@@ -131,7 +134,8 @@ const UserDashboard = () => {
             textShadow: "0 0 10px #00ffff66",
           }}
         >
-          “Connecting minds, transcending distances — welcome to the intelligence of tomorrow.”
+          “Connecting minds, transcending distances — welcome to the
+          intelligence of tomorrow.”
         </Paragraph>
 
         <Title
@@ -141,14 +145,17 @@ const UserDashboard = () => {
             marginTop: "1.5rem",
             fontWeight: "bold",
             textShadow: "0 0 10px #ffffff22",
-            fontSize: 30
+            fontSize: 30,
           }}
         >
-          Welcome back, <span style={{ color: "#00ffff" }}>{user.username.charAt(0).toUpperCase() + user.username.slice(1)}</span> 👋
+          Welcome back,{" "}
+          <span style={{ color: "#00ffff" }}>
+            {user.username.charAt(0).toUpperCase() + user.username.slice(1)}
+          </span>{" "}
+          👋
         </Title>
       </div>
 
-      {/* Globe Container */}
       <div
         ref={containerRef}
         className="w-full flex justify-center items-center mt-6"
@@ -176,7 +183,6 @@ const UserDashboard = () => {
         />
       </div>
 
-      {/* Cards Section */}
       <div className="w-full px-6 mt-10 mb-10 max-w-7xl">
         <Row gutter={[24, 24]} justify="center">
           <Col xs={24} sm={12} md={20}>
@@ -189,7 +195,8 @@ const UserDashboard = () => {
                 Empower Connection
               </Title>
               <Paragraph style={{ color: "#e0e5eb" }}>
-                Engage globally, build bridges, and let NovaChat AI connect you in real time.
+                Engage globally, build bridges, and let NovaChat AI connect you
+                in real time.
               </Paragraph>
             </Card>
           </Col>
@@ -204,7 +211,8 @@ const UserDashboard = () => {
                 Amplify Intelligence
               </Title>
               <Paragraph style={{ color: "#e0e5eb" }}>
-                Leverage AI to learn, grow, and uncover insights you never imagined.
+                Leverage AI to learn, grow, and uncover insights you never
+                imagined.
               </Paragraph>
             </Card>
           </Col>
@@ -219,12 +227,15 @@ const UserDashboard = () => {
                 Secure & Trustworthy
               </Title>
               <Paragraph style={{ color: "#e0e5eb" }}>
-                Your data, your rules — NovaChat AI is built with privacy in mind.
+                Your data, your rules — NovaChat AI is built with privacy in
+                mind.
               </Paragraph>
             </Card>
           </Col>
         </Row>
       </div>
+
+      <AiFooter />
     </div>
   );
 };

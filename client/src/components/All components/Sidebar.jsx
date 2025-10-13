@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LuMessageCircleMore } from "react-icons/lu";
 import { MdPermContactCalendar } from "react-icons/md";
 import { IoIosSettings } from "react-icons/io";
@@ -51,7 +51,16 @@ const Sidebar = () => {
   }));
 
   return (
-    <div className="flex flex-col h-[100%] pt-10">
+    <div className="flex flex-col min-h-screen">
+      <div className="relative left-12 sm:left-8 w-full flex justify-center items-center py-4">
+        <Link to="/chat-dashboard">
+          <img
+            src="/Logo.png"
+            alt="NovaChat AI"
+            className="w-1/2 max-w-xs transition-all duration-300 drop-shadow-[0_0_6px_rgba(0,255,255,0.6)]"
+          />
+        </Link>
+      </div>
       <Menu
         mode="inline"
         theme="dark"
