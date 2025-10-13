@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import { useNavigate, useLocation, Outlet, Link } from "react-router-dom";
 import {
   BellFilled,
   MenuFoldOutlined,
@@ -8,6 +8,7 @@ import {
 } from "@ant-design/icons";
 import { Avatar, Badge, Button, Layout, Space, theme } from "antd";
 import Sidebar from "./Sidebar";
+import { Footer } from "antd/es/layout/layout";
 
 const { Header, Sider, Content } = Layout;
 
@@ -39,6 +40,7 @@ const MainLayout = () => {
             textAlign: "center",
           }}
         >
+        <Link to={'/chat-dashboard'}>
           <img
             src="/Logo.png"
             alt="NovaChat AI"
@@ -50,9 +52,9 @@ const MainLayout = () => {
               filter: "drop-shadow(0 0 6px rgba(0, 255, 255, 0.6))",
             }}
           />
+        </Link>
         </div>
 
-        {/* Sidebar Menu */}
         <Sidebar />
       </Sider>
 
@@ -79,7 +81,7 @@ const MainLayout = () => {
           />
 
           <div className="flex gap-5 pr-5">
-            <Space size={2} style={{paddingTop: "10px"}}>
+            <Space size={2} style={{ paddingTop: "10px" }}>
               <Badge count={3} size="small" offset={[0, 4]}>
                 <BellFilled style={{ fontSize: "25px", color: "#555" }} />
               </Badge>
@@ -101,16 +103,21 @@ const MainLayout = () => {
 
         <Content
           style={{
-            margin: "24px 16px",
-            padding: 24,
-            minHeight: 280,
+            margin: "14px 10px 10px",
+            padding: 4,
             background: colorBgContainer,
             borderRadius: borderRadiusLG,
+            minHeight: "calc(100vh - 80px)",
           }}
         >
           <Outlet />
+
         </Content>
+         <Footer style={{ textAlign: 'center' }}>
+          NovaChat AI ©{new Date().getFullYear()} Created by @Girish-Masade
+        </Footer>
       </Layout>
+      
     </Layout>
   );
 };

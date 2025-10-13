@@ -7,6 +7,8 @@ import { IoIosSettings } from "react-icons/io";
 import { FaUserFriends } from "react-icons/fa";
 import { RiDashboardFill } from "react-icons/ri";
 import { IoIosLogOut } from "react-icons/io";
+import { PiStarFour } from "react-icons/pi";
+
 import { Menu } from "antd";
 import { logout } from "../../redux/app/authSlice";
 
@@ -17,7 +19,8 @@ const Sidebar = () => {
   const navigate = useNavigate();
 
   const userLinks = [
-    { path: "/chat", label: "Chats", icon: <LuMessageCircleMore /> },
+    { path: "/novachat", label: "Novachat", icon: <PiStarFour /> },
+    { path: "/chats", label: "Chats", icon: <LuMessageCircleMore /> },
     { path: "/contacts", label: "Contacts", icon: <MdPermContactCalendar /> },
     { path: "/settings", label: "Settings", icon: <IoIosSettings /> },
   ];
@@ -49,25 +52,26 @@ const Sidebar = () => {
 
   return (
     <div className="flex flex-col h-[100%] pt-10">
-        <Menu
-          mode="inline"
-          theme="dark"
-          selectedKeys={[location.pathname]}
-          onClick={({ key }) => {
-            if (key === "logout") {
-              handleLogout();
-            } else {
-              navigate(key);
-            }
-          }}
-          items={menuItems}
-          style={{
-            flex: 1,
-            borderRight: 0,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        />
+      <Menu
+        mode="inline"
+        theme="dark"
+        selectedKeys={[location.pathname]}
+        onClick={({ key }) => {
+          if (key === "logout") {
+            handleLogout();
+          } else {
+            navigate(key);
+          }
+        }}
+        items={menuItems}
+        style={{
+          fontSize: 15,
+          flex: 1,
+          borderRight: 0,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      />
 
       <Menu
         mode="inline"

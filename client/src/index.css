@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 :root {
   --bg-color: #ffffff;
   --text-color: #000000;
@@ -31,4 +32,10 @@ body {
   .animate-blink {
     animation: blinkBg 3s infinite;
   }
+}
+
+.ant-menu-dark .ant-menu-item-selected {
+  background-color: #5674fc !important;
+  color: black !important;
+  /* Tailwind's green-500 */
 }
