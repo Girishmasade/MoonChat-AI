@@ -257,8 +257,7 @@ export const getAiMessages = async (req, res, next) => {
         { senderId: senderId, receiverId: receiverId },
         { senderId: receiverId, receiverId: senderId },
       ],
-    })
-      .sort({ createdAt: 1 });
+    }).sort({ createdAt: 1 });
 
     console.log(messages);
 
@@ -269,3 +268,45 @@ export const getAiMessages = async (req, res, next) => {
     next(error);
   }
 };
+
+export const aiClearChat = async (req, res, next) => {
+  try {
+    const senderId = req.user.userId;
+    const receiverId = process.env.AI_USER_ID;
+
+    if (!senderId || !receiverId) {
+      return next(new ErrorHandler("SenderId & receiverId is required", 400));
+    }
+
+    await Chats.deleteMany({
+      $or: [
+        { senderId, receiverId },
+        { senderId: receiverId, receiverId: senderId },
+      ],
+    });
+
+    const updatedChats = await Chats.find({
+      $or: [
+        { senderId, receiverId },
+        { senderId: receiverId, receiverId: senderId },
+      ],
+    }).sort({ createdAt: 1 });
+
+    return res
+      .status(200)
+      .json(200, "Message deleted Successfully", { data: updatedChats });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// export const clearSingleChat = async (req, res, next) => {
+//   try {
+//     const {messageId} = req.params
+
+//     const clearChat = await findById(messageId)
+
+//   } catch (error) {
+    
+//   }
+// }
