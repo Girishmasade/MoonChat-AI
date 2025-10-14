@@ -1,4 +1,3 @@
-// src/redux/api/authApi.js
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
@@ -9,7 +8,7 @@ export const authApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: AUTH_URL,
     prepareHeaders: (headers) => {
-      const token = JSON.parse(localStorage.getItem("userInfo"))?.token;
+      const token = getState().auth.token
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
       }

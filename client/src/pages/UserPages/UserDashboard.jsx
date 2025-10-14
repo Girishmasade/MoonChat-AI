@@ -13,7 +13,6 @@ const UserDashboard = () => {
   const containerRef = useRef();
   const [dimensions, setDimensions] = useState({ width: 800, height: 500 });
   const [arcsData, setArcsData] = useState([]);
-  const [userName, setUserName] = useState("Explorer");
 
   useEffect(() => {
     const handleResize = () => {
@@ -150,7 +149,10 @@ const UserDashboard = () => {
         >
           Welcome back,{" "}
           <span style={{ color: "#00ffff" }}>
-            {user.username.charAt(0).toUpperCase() + user.username.slice(1)}
+            {user?.username
+              ? user.username.charAt(0).toUpperCase() +
+                user.username.slice(1)
+              : "User"}
           </span>{" "}
           👋
         </Title>
@@ -187,7 +189,7 @@ const UserDashboard = () => {
         <Row gutter={[24, 24]} justify="center">
           <Col xs={24} sm={12} md={20}>
             <Card
-              bordered={false}
+              variant="borderless"
               className="shadow-xl rounded-lg h-full"
               style={{ backgroundColor: "#1e2a4a" }}
             >
@@ -203,7 +205,7 @@ const UserDashboard = () => {
 
           <Col xs={24} sm={12} md={20}>
             <Card
-              bordered={false}
+              variant="borderless"
               className="shadow-xl rounded-lg h-full"
               style={{ backgroundColor: "#1e2a4a" }}
             >
@@ -219,7 +221,7 @@ const UserDashboard = () => {
 
           <Col xs={24} sm={12} md={20}>
             <Card
-              bordered={false}
+              variant="borderless"
               className="shadow-xl rounded-lg h-full"
               style={{ backgroundColor: "#1e2a4a" }}
             >

@@ -28,8 +28,9 @@ const UserLogin = () => {
   const onSubmit = async (values) => {
     try {
       const response = await loginUser(values).unwrap();
+
         message.success("Logged in successfully!");
-      // console.log("Login successful:", response);
+      console.log("Login successful:", response);
       dispatch(setCredentials(response));
       navigate("/chat-dashboard");
     } catch (error) {

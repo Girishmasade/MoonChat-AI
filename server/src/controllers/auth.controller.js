@@ -105,14 +105,14 @@ export const register = async (req, res, next) => {
     if (existingUser) return next(new ErrorHandler("User already exists", 400));
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log(hashedPassword);
+    // console.log(hashedPassword);
 
     const newUser = new User({
       username,
       email,
       password: hashedPassword,
     });
-    console.log(newUser);
+    // console.log(newUser);
 
     await newUser.save();
 
@@ -133,7 +133,7 @@ export const login = async (req, res, next) => {
       return next(new ErrorHandler("All fields are required", 400));
 
     const user = await User.findOne({ email });
-    console.log(user);
+    // console.log(user);
 
     if (!user) return next(new ErrorHandler("User not found", 404));
 

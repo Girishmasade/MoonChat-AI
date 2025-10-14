@@ -9,12 +9,11 @@ import {
 import { Avatar, Badge, Button, Layout, Space } from "antd";
 import Sidebar from "./Sidebar";
 
-const { Header, Sider, Content, Footer } = Layout;
+const { Header, Sider, Content } = Layout;
 
 const MainLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
+
 
   return (
     <Layout

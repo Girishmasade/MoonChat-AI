@@ -34,7 +34,7 @@ const Sidebar = () => {
   ];
 
   const isAdmin = user?.isAdmin;
-  console.log(isAdmin);
+  // console.log(isAdmin);
 
   const navLinks = isAdmin ? adminLinks : userLinks;
 

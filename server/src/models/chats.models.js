@@ -2,12 +2,12 @@ import mongoose, { Schema } from "mongoose";
 
 const chatsSchema = new Schema({
     senderId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.Mixed,
         ref: "user",
         required: true,
     },
      receiverId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.Mixed,
       ref: "user",
       required: true,
     },

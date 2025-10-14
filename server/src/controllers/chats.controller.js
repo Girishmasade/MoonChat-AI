@@ -3,7 +3,7 @@ import User from "../models/user.models.js";
 import ErrorHandler from "../utils/errorHadler.js";
 import SuccessHandler from "../utils/successHandler.js";
 import { io, onlineUsers } from "../../socket.js";
-import { model } from "mongoose";
+import { geminiai } from "../config/geminiai.config.js";
 
 export const addContact = async (req, res, next) => {
   try {
@@ -193,6 +193,8 @@ export const getAllMessages = async (req, res, next) => {
 export const AiMessage = async (req, res, next) => {
   try {
     const senderId = req.user.userId;
+    // console.log(senderId);
+    
     const receiverId = process.env.AI_USER_ID; // Gemini AI User ID
     const { messages, media } = req.body;
 
@@ -222,20 +224,18 @@ export const AiMessage = async (req, res, next) => {
       media: mediaFiles,
     });
 
-    // to save ai message in db
-
-    const aiMessage = new Chats({
-      senderId: "GeminiAI",
+    const AiMessage = new Chats({
+      senderId: receiverId,
       receiverId: senderId,
       messages: response,
-      isAI: true,
-    });
+    })
 
-    await Promise.all([userMessage.save(), aiMessage.save()]);
+
+    await Promise.all([userMessage.save(), AiMessage.save()]);
 
     return res
       .status(200)
-      .json(new SuccessHandler(200, "AI Message", { aiMessage }));
+      .json(new SuccessHandler(200, "AI Message", { AiMessage }));
   } catch (error) {
     next(error);
   }
