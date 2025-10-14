@@ -202,7 +202,7 @@ export const AiMessage = async (req, res, next) => {
       return next(new ErrorHandler("SenderId and ReceiverId is required", 400));
     }
 
-    if (!messages || (!media || media.length === 0)) {
+    if (!messages && (!media || media.length === 0)) {
       return next(new ErrorHandler("Messages and Media is required", 400));
     }
 
@@ -228,8 +228,11 @@ export const AiMessage = async (req, res, next) => {
       senderId: receiverId,
       receiverId: senderId,
       messages: response,
-      media: [],
+      media: mediaFiles,
+      ttlForSender: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
+
+
 
     await Promise.all([userMessage.save(), AiMessage.save()]);
 

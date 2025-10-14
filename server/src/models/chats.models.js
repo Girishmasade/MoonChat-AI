@@ -1,30 +1,29 @@
 import mongoose, { Schema } from "mongoose";
 
-const chatsSchema = new Schema({
+const chatsSchema = new Schema(
+  {
     senderId: {
-        type: mongoose.Schema.Types.Mixed,
-        ref: "user",
-        required: true,
+      type: mongoose.Schema.Types.Mixed,
+      ref: "user",
+      required: true,
     },
-     receiverId: {
+    receiverId: {
       type: mongoose.Schema.Types.Mixed,
       ref: "user",
       required: true,
     },
     messages: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     media: {
-       type: [String], //includes images, videos, files etc
-        default: []
+      type: [String], //includes images, videos, files etc
+      default: [],
     },
-    lastseen: {
-        type: Date,
-        default: null
-    }
+    ttlForSender: { type: Date },
+  },
+  { timestamps: true }
+);
 
-}, { timestamps: true})
-
-const Chats = mongoose.model("chat", chatsSchema)
-export default Chats
+const Chats = mongoose.model("chat", chatsSchema);
+export default Chats;
