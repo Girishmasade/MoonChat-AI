@@ -194,7 +194,7 @@ export const AiMessage = async (req, res, next) => {
   try {
     const senderId = req.user.userId;
     // console.log(senderId);
-    
+
     const receiverId = process.env.AI_USER_ID; // Gemini AI User ID
     const { messages, media } = req.body;
 
@@ -202,7 +202,7 @@ export const AiMessage = async (req, res, next) => {
       return next(new ErrorHandler("SenderId and ReceiverId is required", 400));
     }
 
-    if (!messages && (!media || media.length === 0)) {
+    if (!messages || (!media || media.length === 0)) {
       return next(new ErrorHandler("Messages and Media is required", 400));
     }
 
@@ -228,8 +228,8 @@ export const AiMessage = async (req, res, next) => {
       senderId: receiverId,
       receiverId: senderId,
       messages: response,
-    })
-
+      media: [],
+    });
 
     await Promise.all([userMessage.save(), AiMessage.save()]);
 
@@ -254,15 +254,16 @@ export const getAiMessages = async (req, res, next) => {
       $or: [
         { senderId: senderId, receiverId: receiverId },
         { senderId: receiverId, receiverId: senderId },
-      ]
-    }).populate("senderId", "username email")
+      ],
+    })
+      .populate("senderId", "username email")
       .populate("receiverId", "username email")
       .sort({ createdAt: 1 });
-      
+
     return res
       .status(200)
       .json(new SuccessHandler(200, "All AI messages", { messages }));
   } catch (error) {
     next(error);
   }
-}
+};

@@ -1,23 +1,17 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"; // use /react if using hooks
+import { apiSlice } from "../app/apiSlice";
+const CHAT_API = `/aiChat`;
+const AI_USER_ID = import.meta.env.VITE_AI_USER_ID;
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-const CHAT_API = `${BACKEND_URL}/aiChat`;
- const AI_USER_ID = import.meta.env.VITE_AI_USER_ID;
-
-export const aiChatApi = createApi({
-  reducerPath: "aichatapi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: CHAT_API,
-  }),
+export const aiChatApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     sendChat: builder.mutation({
-      query: (userData) => ({
-        url: `/send-ai-messages/${AI_USER_ID}`,
+      query: (formData) => ({
+        url: `${CHAT_API}/send-ai-messages/${AI_USER_ID}`,
         method: "POST",
-        body: userData,
-      }),
-    }),
-  }),
-});
+        body: formData,
+      })
+    })
+  })
+})
 
-export const { useSendChatMutation } = aiChatApi;
+export const {useSendChatMutation} = aiChatApi

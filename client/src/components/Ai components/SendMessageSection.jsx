@@ -1,18 +1,19 @@
 import React, { useState } from "react";
-import { Input, Tooltip, Upload, message as AntMessage } from "antd";
+import { Input, Tooltip, Upload, message as AntMessage, Spin, Button } from "antd";
 import EmojiPicker from "emoji-picker-react";
 import { FaSmile, FaPaperclip, FaLocationArrow } from "react-icons/fa";
 import { useSendChatMutation } from "../../redux/api/aiChatApi";
 import { useSelector } from "react-redux";
 
-const ChatInput = () => {
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+const SendMessageSection = () => {
   const [message, setMessage] = useState("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [fileList, setFileList] = useState([]);
-  const [sendChat, { isLoading }] = useSendChatMutation();
+  const [uploading, setUploading] = useState(false);
+
   const user = useSelector((state) => state.auth.user);
-  console.log(user);
-  
+  const [sendChat, { isLoading }] = useSendChatMutation();
+
   const handleFileChange = ({ fileList: newFileList }) => {
     setFileList(newFileList);
   };
@@ -23,23 +24,24 @@ const ChatInput = () => {
     const formData = new FormData();
     formData.append("senderId", user?._id);
     formData.append("messages", message);
-
-    fileList.forEach((file) => {
-      formData.append("media", file.originFileObj);
-    });
+    fileList.forEach((file) => formData.append("media", file.originFileObj));
 
     try {
+      setUploading(true);
       const response = await sendChat(formData).unwrap();
-      console.log(response);
-      
+
       if (response?.data?.AiMessage) {
+        AntMessage.success("Message sent successfully");
         setMessage("");
         setFileList([]);
         setShowEmojiPicker(false);
+        console.log("AI Response:", response.data.AiMessage.messages);
       }
     } catch (error) {
-      console.error("Error sending chat:", error);
+      console.error("Send chat error:", error);
       AntMessage.error("Failed to send message");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -49,21 +51,19 @@ const ChatInput = () => {
 
   return (
     <div className="relative flex items-center gap-2 p-2 bg-white rounded-md shadow-md w-full max-w-3xl mx-auto">
-
+      
       <Tooltip title="Attach File">
         <Upload
-          multiple
           fileList={fileList}
           onChange={handleFileChange}
-          beforeUpload={() => false} 
-          showUploadList={false}
+          beforeUpload={() => false} // prevent automatic upload
+          multiple
+          showUploadList
+          accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
         >
-          <button
-            type="button"
-            className="text-gray-500 hover:text-gray-700 text-lg p-2 rounded-full"
-          >
+          <Button type="text" className="text-gray-500 hover:text-gray-700 text-lg p-2 rounded-full">
             <FaPaperclip />
-          </button>
+          </Button>
         </Upload>
       </Tooltip>
 
@@ -89,23 +89,19 @@ const ChatInput = () => {
         placeholder="Type your message..."
         className="flex-1 rounded-full border-none focus:ring-0 focus:outline-none"
         onPressEnter={handleSend}
-        disabled={isLoading}
+        disabled={isLoading || uploading}
       />
 
       <button
         type="button"
         onClick={handleSend}
-        disabled={isLoading || (!message.trim() && fileList.length === 0)}
+        disabled={isLoading || uploading || (!message.trim() && fileList.length === 0)}
         className="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full transition-colors"
       >
-        {isLoading ? (
-          <span className="text-sm">...</span>
-        ) : (
-          <FaLocationArrow />
-        )}
+        {isLoading || uploading ? <Spin size="small" /> : <FaLocationArrow />}
       </button>
     </div>
   );
 };
 
-export default ChatInput;
+export default SendMessageSection;

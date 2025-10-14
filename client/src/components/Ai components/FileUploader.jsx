@@ -1,49 +1,65 @@
 import React, { useState } from "react";
-import { Upload, Button, message, Spin } from "antd";
+import { Upload, Button, message as AntMessage, Spin } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
+import { useSendChatMutation } from "../../redux/api/aiChatApi";
+import { useSelector } from "react-redux";
 
 const FileUploader = () => {
   const [fileList, setFileList] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const user = useSelector((state) => state.auth.user);
+  const [sendChat] = useSendChatMutation();
 
-  const handleChange = (info) => {
-    setFileList(info.fileList);
+  const handleFileChange = ({ fileList: newFileList }) => {
+    setFileList(newFileList);
+  };
 
-    if (info.file.status === "uploading") {
-      setLoading(true);
-    } else {
-      setLoading(false);
-    }
+  const handleUpload = async () => {
+    if (fileList.length === 0) return;
 
-    if (info.file.status === "done") {
-      message.success(`${info.file.name} uploaded successfully`);
-    } else if (info.file.status === "error") {
-      message.error(`${info.file.name} upload failed`);
+    const formData = new FormData();
+    formData.append("senderId", user?._id);
+    fileList.forEach((file) => formData.append("media", file.originFileObj));
+
+    try {
+      setUploading(true);
+      const response = await sendChat(formData).unwrap();
+
+      if (response?.data?.AiMessage) {
+        AntMessage.success("Files uploaded successfully");
+        setFileList([]);
+        console.log("AI Response:", response.data.AiMessage.messages);
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      AntMessage.error("Failed to upload files");
+    } finally {
+      setUploading(false);
     }
   };
 
   return (
-    <div>
+    <div className="flex items-center gap-2">
       <Upload
-        action=""
         fileList={fileList}
-        onChange={handleChange}
+        onChange={handleFileChange}
         multiple
+        beforeUpload={() => false} // prevent automatic upload
+        showUploadList
         accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
       >
-        <Button
-          style={{ background: "transparent", outline: "none", border: "none" }}
-          disabled={loading}
-        >
-          📎
+        <Button disabled={uploading}>
+          <UploadOutlined /> Attach
         </Button>
       </Upload>
 
-      {loading && (
-        <div style={{ marginTop: 16 }}>
-          <Spin tip="Uploading..." />
-        </div>
-      )}
+      <Button
+        type="primary"
+        onClick={handleUpload}
+        disabled={uploading || fileList.length === 0}
+      >
+        {uploading ? <Spin size="small" /> : "Send"}
+      </Button>
     </div>
   );
 };

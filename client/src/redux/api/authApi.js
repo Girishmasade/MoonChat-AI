@@ -1,24 +1,12 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { apiSlice } from "../app/apiSlice";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
-const AUTH_URL = `${BACKEND_URL}/auth`
+const AUTH_URL = `/auth`;
 
-export const authApi = createApi({
-  reducerPath: "authApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: AUTH_URL,
-    prepareHeaders: (headers) => {
-      const token = getState().auth.token
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     registerUser: builder.mutation({
       query: (userData) => ({
-        url: "/signup",
+        url: `${AUTH_URL}/signup`,
         method: "POST",
         body: userData,
       }),
@@ -26,7 +14,7 @@ export const authApi = createApi({
 
     loginUser: builder.mutation({
       query: (userData) => ({
-        url: "/signin",
+        url: `${AUTH_URL}/signin`,
         method: "POST",
         body: userData,
       }),

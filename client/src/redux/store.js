@@ -1,17 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./app/authSlice.js";
-import { authApi } from "./api/authApi.js";
-import { aiChatApi } from "./api/aiChatApi.js";
+import { apiSlice } from "./app/apiSlice.js";
 
 export const store = configureStore({
   reducer: {
+    [apiSlice.reducerPath]: apiSlice.reducer,
     auth: authReducer,
-    [authApi.reducerPath]: authApi.reducer,
-    [aiChatApi.reducerPath]: aiChatApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
-  .concat(authApi.middleware)
-  .concat(aiChatApi.middleware)
-  ,
+  .concat(apiSlice.middleware),
 });
