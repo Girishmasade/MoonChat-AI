@@ -4,6 +4,7 @@ import ErrorHandler from "../utils/errorHadler.js";
 import SuccessHandler from "../utils/successHandler.js";
 import { io, onlineUsers } from "../../socket.js";
 import { geminiai } from "../config/geminiai.config.js";
+import mongoose from "mongoose";
 
 export const addContact = async (req, res, next) => {
   try {
@@ -232,8 +233,6 @@ export const AiMessage = async (req, res, next) => {
       ttlForSender: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
 
-
-
     await Promise.all([userMessage.save(), AiMessage.save()]);
 
     return res
@@ -259,9 +258,9 @@ export const getAiMessages = async (req, res, next) => {
         { senderId: receiverId, receiverId: senderId },
       ],
     })
-      .populate("senderId", "username email")
-      .populate("receiverId", "username email")
       .sort({ createdAt: 1 });
+
+    console.log(messages);
 
     return res
       .status(200)

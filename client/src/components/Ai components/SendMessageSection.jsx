@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { Input, Tooltip, Upload, message as AntMessage, Spin, Button } from "antd";
-import EmojiPicker from "emoji-picker-react";
 import { FaSmile, FaPaperclip, FaLocationArrow } from "react-icons/fa";
 import { useSendChatMutation } from "../../redux/api/aiChatApi";
 import { useSelector } from "react-redux";
+
+const EmojiPicker = React.lazy(() => import("emoji-picker-react"));
 
 const ChatInput = () => {
   const [message, setMessage] = useState("");
@@ -14,24 +15,17 @@ const ChatInput = () => {
   const user = useSelector((state) => state.auth.user);
   const [sendChat, { isLoading }] = useSendChatMutation();
 
-  // Update file list
   const handleFileChange = ({ fileList: newFileList }) => {
     setFileList(newFileList);
   };
 
-  // Send text + media
   const handleSend = async () => {
-    // Prevent sending empty
     if (!message.trim() && fileList.length === 0) return;
 
     const formData = new FormData();
     if (user?._id) formData.append("senderId", user._id);
     if (message.trim()) formData.append("messages", message.trim());
-
-    fileList.forEach((file) => {
-      // Append actual file, not originFileObj
-      formData.append("media", file.originFileObj || file);
-    });
+    fileList.forEach((file) => formData.append("media", file.originFileObj || file));
 
     try {
       setUploading(true);
@@ -52,20 +46,17 @@ const ChatInput = () => {
     }
   };
 
-  // Emoji picker click
   const onEmojiClick = (emojiData) => {
     setMessage((prev) => prev + emojiData.emoji);
   };
 
   return (
     <div className="relative flex items-center gap-2 p-2 bg-white rounded-md shadow-md w-full max-w-3xl mx-auto">
-      
-      {/* File upload */}
       <Tooltip title="Attach File">
         <Upload
           fileList={fileList}
           onChange={handleFileChange}
-          beforeUpload={() => false} // important
+          beforeUpload={() => false} // Prevent auto upload
           multiple
           showUploadList
           accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
@@ -76,7 +67,6 @@ const ChatInput = () => {
         </Upload>
       </Tooltip>
 
-      {/* Emoji picker */}
       <Tooltip title="Emoji">
         <button
           type="button"
@@ -89,11 +79,12 @@ const ChatInput = () => {
 
       {showEmojiPicker && (
         <div className="absolute bottom-14 left-16 z-50">
-          <EmojiPicker onEmojiClick={onEmojiClick} />
+          <Suspense fallback={<div>Loading...</div>}>
+            <EmojiPicker onEmojiClick={onEmojiClick} />
+          </Suspense>
         </div>
       )}
 
-      {/* Text input */}
       <Input
         value={message}
         onChange={(e) => setMessage(e.target.value)}
@@ -103,17 +94,24 @@ const ChatInput = () => {
         disabled={isLoading || uploading}
       />
 
-      {/* Send button */}
-      <button
-        type="button"
+      <SendButton
         onClick={handleSend}
         disabled={isLoading || uploading || (!message.trim() && fileList.length === 0)}
-        className="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full transition-colors"
-      >
-        {isLoading || uploading ? <Spin size="small" /> : <FaLocationArrow />}
-      </button>
+        loading={isLoading || uploading}
+      />
     </div>
   );
 };
+
+const SendButton = ({ onClick, disabled, loading }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    className="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full flex items-center justify-center"
+  >
+    {loading ? <Spin size="small" style={{ color: "white" }} /> : <FaLocationArrow />}
+  </button>
+);
 
 export default ChatInput;

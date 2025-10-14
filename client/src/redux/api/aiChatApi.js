@@ -9,9 +9,13 @@ export const aiChatApi = apiSlice.injectEndpoints({
         url: `${CHAT_API}/send-ai-messages/${AI_USER_ID}`,
         method: "POST",
         body: formData,
-      })
-    })
-  })
-})
+      }),
+    }),
 
-export const {useSendChatMutation} = aiChatApi
+    getChat: builder.query({
+      query: () => `${CHAT_API}/get-ai-messages/${AI_USER_ID}`,
+    }),
+  }),
+});
+
+export const { useSendChatMutation, useGetChatQuery } = aiChatApi;
