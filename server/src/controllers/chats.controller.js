@@ -194,10 +194,9 @@ export const getAllMessages = async (req, res, next) => {
 export const AiMessage = async (req, res, next) => {
   try {
     const senderId = req.user.userId;
-    // console.log(senderId);
-
-    const receiverId = process.env.AI_USER_ID; // Gemini AI User ID
+    const receiverId = process.env.AI_USER_ID;
     const { messages, media } = req.body;
+    const io = req.app.get("io"); 
 
     if (!senderId || !receiverId) {
       return next(new ErrorHandler("SenderId and ReceiverId is required", 400));
@@ -208,40 +207,36 @@ export const AiMessage = async (req, res, next) => {
     }
 
     const modal = geminiai.getGenerativeModel({ model: "gemini-2.5-pro" });
-
     const result = await modal.generateContent(messages);
-    const response = result.response.text();
+    const aiResponse = result.response.text();
 
     const mediaFiles = req.files ? req.files.map((file) => file.path) : [];
 
-    if (mediaFiles.length > 0) {
-      console.log("Media files uploaded:", media);
-    }
-
-    const userMessage = new Chats({
-      senderId,
-      receiverId,
-      messages: messages,
-      media: mediaFiles,
-    });
+    const userMessage = new Chats({ senderId, receiverId, messages, media: mediaFiles });
+    await userMessage.save();
 
     const AiMessage = new Chats({
       senderId: receiverId,
       receiverId: senderId,
-      messages: response,
+      messages: aiResponse,
       media: mediaFiles,
       ttlForSender: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
+    await AiMessage.save();
 
-    await Promise.all([userMessage.save(), AiMessage.save()]);
+    io.to(senderId).emit("newAiMessage", {
+      senderId: receiverId,
+      receiverId: senderId,
+      messages: aiResponse,
+      media: mediaFiles,
+    });
 
-    return res
-      .status(200)
-      .json(new SuccessHandler(200, "AI Message", { AiMessage }));
+    return res.status(200).json(new SuccessHandler(200, "AI Message Sent", { AiMessage }));
   } catch (error) {
     next(error);
   }
 };
+
 
 export const getAiMessages = async (req, res, next) => {
   try {
@@ -259,7 +254,7 @@ export const getAiMessages = async (req, res, next) => {
       ],
     }).sort({ createdAt: 1 });
 
-    console.log(messages);
+    // console.log(messages);
 
     return res
       .status(200)

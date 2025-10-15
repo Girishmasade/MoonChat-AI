@@ -1,8 +1,16 @@
 import React, { useState, Suspense } from "react";
-import { Input, Tooltip, Upload, message as AntMessage, Spin, Button } from "antd";
+import {
+  Input,
+  Tooltip,
+  Upload,
+  message as AntMessage,
+  Spin,
+  Button,
+} from "antd";
 import { FaSmile, FaPaperclip, FaLocationArrow } from "react-icons/fa";
 import { useSendChatMutation } from "../../redux/api/aiChatApi";
 import { useSelector } from "react-redux";
+import { socket } from "../../socket.io/socketclient";
 
 const EmojiPicker = React.lazy(() => import("emoji-picker-react"));
 
@@ -25,21 +33,46 @@ const ChatInput = () => {
     const formData = new FormData();
     if (user?._id) formData.append("senderId", user._id);
     if (message.trim()) formData.append("messages", message.trim());
-    fileList.forEach((file) => formData.append("media", file.originFileObj || file));
+    fileList.forEach((file) =>
+      formData.append("media", file.originFileObj || file)
+    );
 
     try {
       setUploading(true);
       const response = await sendChat(formData).unwrap();
+      // console.log(response);
+      
+      const aiMessage = response?.data?.AiMessage;
+      console.log(aiMessage);
+      
 
-      if (response?.data?.AiMessage) {
+      if (aiMessage) {
         AntMessage.success("Message sent successfully");
+        console.log(aiMessage);
+
+        // Emit user message to socket (instant UI update)
+        socket.emit("sendMessage", {
+          senderId: user._id,
+          receiverId: process.env.REACT_APP_AI_USER_ID || "GeminiAI2025",
+          messages: message.trim(),
+          media: fileList.map((f) => f.name),
+        });
+
+        socket.emit("newAiMessage", {
+          senderId: aiMessage.senderId,
+          receiverId: aiMessage.receiverId,
+          messages: aiMessage.messages,
+          media: aiMessage.media,
+        });
+
+        console.log("🤖 AI Response:", aiMessage.messages);
+
         setMessage("");
         setFileList([]);
         setShowEmojiPicker(false);
-        console.log("AI Response:", response.data.AiMessage.messages);
       }
     } catch (error) {
-      console.error("Send chat error:", error);
+      console.log("Send chat error:", error);
       AntMessage.error(error?.data?.message || "Failed to send message");
     } finally {
       setUploading(false);
@@ -51,17 +84,21 @@ const ChatInput = () => {
   };
 
   return (
-    <div className="relative flex items-center gap-2 p-2 bg-white rounded-md shadow-md w-full max-w-3xl mx-auto">
+    <div className="relative flex items-center gap-3 p-3 bg-white rounded-xl shadow-md w-full max-w-3xl mx-auto border border-gray-100">
       <Tooltip title="Attach File">
         <Upload
+          key={fileList.length}
           fileList={fileList}
           onChange={handleFileChange}
-          beforeUpload={() => false} // Prevent auto upload
+          beforeUpload={() => false}
           multiple
           showUploadList
           accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
         >
-          <Button type="text" className="text-gray-500 hover:text-gray-700 text-lg p-2 rounded-full">
+          <Button
+            type="text"
+            className="text-gray-500 hover:text-gray-700 text-lg p-2 rounded-full"
+          >
             <FaPaperclip />
           </Button>
         </Upload>
@@ -92,11 +129,14 @@ const ChatInput = () => {
         className="flex-1 rounded-full border-none focus:ring-0 focus:outline-none"
         onPressEnter={handleSend}
         disabled={isLoading || uploading}
+        style={{outline: "none"}}
       />
 
       <SendButton
         onClick={handleSend}
-        disabled={isLoading || uploading || (!message.trim() && fileList.length === 0)}
+        disabled={
+          isLoading || uploading || (!message.trim() && fileList.length === 0)
+        }
         loading={isLoading || uploading}
       />
     </div>
@@ -108,9 +148,15 @@ const SendButton = ({ onClick, disabled, loading }) => (
     type="button"
     onClick={onClick}
     disabled={disabled}
-    className="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full flex items-center justify-center"
+    className={`${
+      disabled ? "bg-blue-300" : "bg-blue-500 hover:bg-blue-600"
+    } text-white p-3 rounded-full flex items-center justify-center transition`}
   >
-    {loading ? <Spin size="small" style={{ color: "white" }} /> : <FaLocationArrow />}
+    {loading ? (
+      <Spin size="small" style={{ color: "white" }} />
+    ) : (
+      <FaLocationArrow />
+    )}
   </button>
 );
 

@@ -28,13 +28,12 @@ const UserLogin = () => {
   const onSubmit = async (values) => {
     try {
       const response = await loginUser(values).unwrap();
-
-        message.success("Logged in successfully!");
+      message.success("Logged in successfully!");
       console.log("Login successful:", response);
       dispatch(setCredentials(response));
       navigate("/chat-dashboard");
     } catch (error) {
-       message.error(error?.data?.message || "Invalid credentials!");
+      message.error(error?.data?.message || "Invalid credentials!");
       console.log("Login failed:", error);
     }
   };
@@ -93,7 +92,7 @@ const UserLogin = () => {
               value={password}
               name="password"
               onChange={onChange}
-               autoComplete="current-password"
+              autoComplete="current-password"
               placeholder="Enter your password"
             />
           </Form.Item>

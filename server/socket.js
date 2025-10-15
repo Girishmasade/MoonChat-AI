@@ -15,6 +15,7 @@ const io = new Server(server, {
 });
 
 app.use(cors());
+app.set("io", io);
 
 const onlineUsers = new Map();
 

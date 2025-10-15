@@ -1,13 +1,41 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import SendMessageSection from "./SendMessageSection";
 import { useGetChatQuery } from "../../redux/api/aiChatApi";
 import { useSelector } from "react-redux";
-
+import { socket } from "../../socket.io/socketclient";
 const MessageSection = () => {
   const user = useSelector((state) => state.auth.user);
   const { data, isLoading, isError, refetch } = useGetChatQuery();
 
-  const messages = data?.data?.messages || [];
+  const [messages, setMessages] = useState([]);
+  const userId = user?._id;
+
+  useEffect(() => {
+    if (data?.data?.messages) {
+      setMessages(data.data.messages);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    socket.auth = { userId: userId };
+    socket.connect();
+
+    socket.emit("joinRoom", userId);
+    console.log("🟢 Joined socket room:", userId);
+
+    socket.on("recieveMessage", (newMessage) => {
+      console.log("📩 New message from socket:", newMessage);
+      setMessages((prev) => [...prev, newMessage]);
+    });
+
+    return () => {
+      socket.off("receiveMessage");
+      socket.disconnect();
+      console.log("🔌 Socket disconnected from MessageSection");
+    };
+  }, [userId]);
 
   if (isLoading) return <div className="p-6">Loading messages...</div>;
   if (isError) return <div className="p-6">Failed to load messages.</div>;
@@ -61,7 +89,12 @@ const MessageSection = () => {
                       } else if (["mp3", "wav"].includes(ext)) {
                         // Audio
                         return (
-                          <audio key={idx} src={file} controls className="w-full" />
+                          <audio
+                            key={idx}
+                            src={file}
+                            controls
+                            className="w-full"
+                          />
                         );
                       } else {
                         // Other file

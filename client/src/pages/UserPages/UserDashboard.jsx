@@ -4,6 +4,7 @@ import Globe from "react-globe.gl";
 import * as THREE from "three";
 import { useSelector } from "react-redux";
 import AiFooter from "../../components/User/Footer";
+import { socket } from "../../socket.io/socketclient";
 
 const { Title, Paragraph } = Typography;
 
@@ -13,6 +14,22 @@ const UserDashboard = () => {
   const containerRef = useRef();
   const [dimensions, setDimensions] = useState({ width: 800, height: 500 });
   const [arcsData, setArcsData] = useState([]);
+
+  const userId = user?._id
+
+   useEffect(() => {
+    if(userId){
+      socket.auth = {userId: userId}
+      socket.connect()
+      socket.emit("joinRoom", userId)
+      console.log("✅ Socket connected for:", userId);
+    }
+  
+    return () => {
+      socket.disconnect()
+        console.log("🔌 Socket disconnected");
+    }
+  }, [userId])
 
   useEffect(() => {
     const handleResize = () => {
