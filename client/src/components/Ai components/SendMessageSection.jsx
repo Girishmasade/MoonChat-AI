@@ -14,11 +14,12 @@ import { socket } from "../../socket.io/socketclient";
 
 const EmojiPicker = React.lazy(() => import("emoji-picker-react"));
 
-const ChatInput = () => {
+const ChatInput = ({ refetchMessages }) => {
   const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [fileList, setFileList] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const receiverId = import.meta.env.VITE_AI_USER_ID;
 
   const user = useSelector((state) => state.auth.user);
   const [sendChat, { isLoading }] = useSendChatMutation();
@@ -40,20 +41,15 @@ const ChatInput = () => {
     try {
       setUploading(true);
       const response = await sendChat(formData).unwrap();
-      // console.log(response);
-      
       const aiMessage = response?.data?.AiMessage;
-      console.log(aiMessage);
-      
 
       if (aiMessage) {
         AntMessage.success("Message sent successfully");
-        console.log(aiMessage);
 
-        // Emit user message to socket (instant UI update)
+        // Emit user message to socket for instant UI update
         socket.emit("sendMessage", {
           senderId: user._id,
-          receiverId: process.env.REACT_APP_AI_USER_ID || "GeminiAI2025",
+          receiverId: receiverId,
           messages: message.trim(),
           media: fileList.map((f) => f.name),
         });
@@ -64,8 +60,10 @@ const ChatInput = () => {
           messages: aiMessage.messages,
           media: aiMessage.media,
         });
-
-        console.log("🤖 AI Response:", aiMessage.messages);
+        
+        if (refetchMessages) {
+          refetchMessages();
+        }
 
         setMessage("");
         setFileList([]);
@@ -129,7 +127,7 @@ const ChatInput = () => {
         className="flex-1 rounded-full border-none focus:ring-0 focus:outline-none"
         onPressEnter={handleSend}
         disabled={isLoading || uploading}
-        style={{outline: "none"}}
+        style={{ outline: "none" }}
       />
 
       <SendButton
@@ -152,11 +150,7 @@ const SendButton = ({ onClick, disabled, loading }) => (
       disabled ? "bg-blue-300" : "bg-blue-500 hover:bg-blue-600"
     } text-white p-3 rounded-full flex items-center justify-center transition`}
   >
-    {loading ? (
-      <Spin size="small" style={{ color: "white" }} />
-    ) : (
-      <FaLocationArrow />
-    )}
+    {loading ? <Spin size="small" style={{ color: "white" }} /> : <FaLocationArrow />}
   </button>
 );
 

@@ -15,7 +15,15 @@ export const aiChatApi = apiSlice.injectEndpoints({
     getChat: builder.query({
       query: () => `${CHAT_API}/get-ai-messages/${AI_USER_ID}`,
     }),
+
+    clearChat: builder.mutation({
+      query: (receiverId = AI_USER_ID) => ({
+        url: `${CHAT_API}/delete-ai-messages/${receiverId}`,
+        method: "DELETE"
+      })
+    })
+
   }),
 });
 
-export const { useSendChatMutation, useGetChatQuery } = aiChatApi;
+export const { useSendChatMutation, useGetChatQuery, useClearChatMutation } = aiChatApi;

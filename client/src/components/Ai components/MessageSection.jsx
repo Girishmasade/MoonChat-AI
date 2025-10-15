@@ -13,6 +13,7 @@ const MessageSection = () => {
   useEffect(() => {
     if (data?.data?.messages) {
       setMessages(data.data.messages);
+      refetch();
     }
   }, [data]);
 
@@ -25,13 +26,15 @@ const MessageSection = () => {
     socket.emit("joinRoom", userId);
     console.log("🟢 Joined socket room:", userId);
 
-    socket.on("recieveMessage", (newMessage) => {
+    const handleNewMessage = (newMessage) => {
       console.log("📩 New message from socket:", newMessage);
       setMessages((prev) => [...prev, newMessage]);
-    });
+    };
+
+    socket.on("receiveMessage", handleNewMessage);
 
     return () => {
-      socket.off("receiveMessage");
+      socket.off("receiveMessage", handleNewMessage);
       socket.disconnect();
       console.log("🔌 Socket disconnected from MessageSection");
     };
