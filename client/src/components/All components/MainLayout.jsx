@@ -8,18 +8,15 @@ import {
 } from "@ant-design/icons";
 import { Avatar, Badge, Button, Layout, Space } from "antd";
 import Sidebar from "./Sidebar";
+import NotificationButton from "./Notification";
 
 const { Header, Sider, Content } = Layout;
 
 const MainLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
 
-
   return (
-    <Layout
-      style={{
-      }}
-    >
+    <Layout style={{}}>
       {/* Sidebar */}
       <Sider
         trigger={null}
@@ -72,11 +69,7 @@ const MainLayout = () => {
           />
 
           <div className="flex gap-5 pr-5 items-center">
-            <Space size={2}>
-              <Badge count={3} size="small" offset={[0, 4]}>
-                <BellFilled style={{ fontSize: "22px", color: "#fff" }} />
-              </Badge>
-            </Space>
+            <NotificationButton/>
 
             <Space size={24}>
               <Avatar
