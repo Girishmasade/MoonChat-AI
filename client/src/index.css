@@ -37,5 +37,18 @@ body {
 .ant-menu-dark .ant-menu-item-selected {
   background-color: #5674fc !important;
   color: black !important;
-  /* Tailwind's green-500 */
+}
+
+.custom-dark-tabs .ant-tabs-tab {
+  color: #cbd5e1;
+  font-weight: 500;
+  font-size: large;
+}
+
+.custom-dark-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #38bdf8 !important; 
+}
+
+.custom-dark-tabs .ant-tabs-ink-bar {
+  background-color: #38bdf8 !important;
 }
