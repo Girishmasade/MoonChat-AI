@@ -23,7 +23,7 @@ const authRouter = Router();
 // admin routes
 
 authRouter.post("/admin/register", adminRegister);
-authRouter.post("/admin/login", adminLogin)
+authRouter.post("/admin/siginin", adminLogin)
 // Public Routes
 
 authRouter.post("/signup", register);

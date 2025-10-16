@@ -10,7 +10,7 @@ const ProtectedRoutes = ({ children }) => {
   const isAuth = token || storedToken;
 
   if (!isAuth) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/siginin" replace />;
   }
 
   console.log("✅ Protected route: access granted");

@@ -184,7 +184,7 @@ export const googleCallback = async (req, res, next) => {
   try {
     passport.authenticate(
       "google",
-      { failureRedirect: "/login" },
+      { failureRedirect: "/siginin" },
       (err, user) => {
         if (err || !user)
           return next(new ErrorHandler("Authentication Failed", 400));
@@ -219,7 +219,7 @@ export const githubLogin = async (req, res, next) => {
 export const githubCallback = async (req, res, next) => {
   passport.authenticate(
     "github",
-    { failureRedirect: "/login" },
+    { failureRedirect: "/siginin" },
     (err, user) => {
       if (err || !user)
         return next(new ErrorHandler("Authentication Failed", 400));

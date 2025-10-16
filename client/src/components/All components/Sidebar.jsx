@@ -40,7 +40,7 @@ const Sidebar = () => {
   const handleLogout = () => {
     dispatch(logout());
     localStorage.clear;
-    navigate(isAdmin ? "/admin-login" : "/login");
+    navigate(isAdmin ? "/admin-login" : "/siginin");
   };
 
   const menuItems = navLinks.map((link) => ({
