@@ -92,11 +92,11 @@ const Sidebar = () => {
         items={[
           {
             key: "logout",
-            icon: <IoIosLogOut />,
-            label: "Logout",
+            icon: <IoIosLogOut className="custom-dark-color" />,
+            label: <span className="text-red-500 font-medium">Logout</span>,
           },
         ]}
-        style={{ borderTop: "1px solid #333", color: "red" }}
+        style={{ borderTop: "1px solid #333"}}
       />
     </div>
   );

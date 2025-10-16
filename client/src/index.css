@@ -52,3 +52,7 @@ body {
 .custom-dark-tabs .ant-tabs-ink-bar {
   background-color: #38bdf8 !important;
 }
+
+.custom-dark-color  {
+  color: rgb(248, 55, 55) !important;
+}
