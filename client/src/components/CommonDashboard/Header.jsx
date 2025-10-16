@@ -8,7 +8,6 @@ const { Header } = Layout;
 const AppHeader = () => {
   const [isDark, setIsDark] = useState(false);
 
-  // 🔄 Toggle dark/light theme
   const toggleTheme = () => {
     const newIsDark = !isDark;
     setIsDark(newIsDark);
@@ -16,7 +15,6 @@ const AppHeader = () => {
     localStorage.setItem("theme", newIsDark ? "dark" : "light");
   };
 
-  // ✅ Load theme from localStorage on mount
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     const isDarkMode = savedTheme === "dark";
@@ -62,19 +60,17 @@ const AppHeader = () => {
             color: "#fff",
             fontWeight: "bold",
             borderRadius: "6px",
-            width: "32px",
+            width: "52px",
             height: "32px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          C
+          Nova
         </div>
-        Chatter
+        Chatt
       </div>
-
-      {/* Right Side */}
       <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
         <Button
           type="text"

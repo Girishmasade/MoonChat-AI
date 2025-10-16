@@ -6,12 +6,12 @@ const Footer = () => {
     <div className="border-t mt-10 lg:mt-0">
       <div className="px-8 py-10 grid lg:grid-cols-4 lg:justify-center lg:text-center">
         <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <p className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-gradient-to-br from-violet-500 to-violet-500 text-primary-foreground font-bold">
-              C
+          <div className="flex items-center gap-1">
+            <p className="inline-flex h-8 w-12 items-center justify-center rounded-md bg-gradient-to-br from-violet-500 to-violet-500 text-primary-foreground font-bold">
+              Nova
             </p>
-            <h1 className="text-lg font-semibold tracking-tight">
-              Chatter
+            <h1 className="text-lg font-semibold tracking-tight text-violet-300">
+              Chatt
             </h1>
           </div>
           <p className="mt-2 text-gray-400 text-start">
