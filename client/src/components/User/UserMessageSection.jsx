@@ -1,16 +1,22 @@
-import React, { useEffect, useRef, useState } from "react";
-import SendUsersMessagesSection from "./SendUsersMessagesSection";
-import { useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
 import { useGetMessageQuery } from "../../redux/api/chatsApi";
+import { useSelector } from "react-redux";
 import { socket } from "../../socket.io/socketclient";
+import SendUsersMessagesSection from "./SendUsersMessagesSection";
 
-const UserMessageSection = ({ selectedUser }) => {
+const UserMessageSection = () => {
   const user = useSelector((state) => state.auth.user);
-  const reciverId = selectedUser?._id;
-  const { data, isLoading, isError, refetch } = useGetMessageQuery(reciverId);
-
   const [messages, setMessages] = useState([]);
+  
+  const selctedUser = useSelector((state) => state.chat.selectedUser)
+  const reciverId = selctedUser._id
+  const { data, isLoading, isError, refetch } = useGetMessageQuery(reciverId);
+  
   const userId = user?._id;
+
+  const dattta = data?.data?.messages
+  console.log(dattta);
+  
 
   useEffect(() => {
     if (data?.data?.messages) {
@@ -26,7 +32,7 @@ const UserMessageSection = ({ selectedUser }) => {
     socket.connect();
 
     socket.emit("joinRoom", userId);
-    console.log("🟢 Joined socket room:", userId);
+    // console.log("🟢 Joined socket room:", userId);
 
     const handleNewMessage = (newMessage) => {
       // console.log("📩 New message from socket:", newMessage);
@@ -47,7 +53,7 @@ const UserMessageSection = ({ selectedUser }) => {
 
   return (
     <div className="flex flex-col bg-gray-900 text-white h-full overflow-y-auto">
-     
+      {/* File Upload */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {messages.map((item, index) => {
           const isSender = item.senderId === user?._id;
@@ -124,12 +130,7 @@ const UserMessageSection = ({ selectedUser }) => {
           );
         })}
       </div>
-
-      {/* Message input area */}
-      <SendUsersMessagesSection
-        refetchMessages={refetch}
-        selectedUser={selectedUser}
-      />
+      <SendUsersMessagesSection refetchMessages={refetch} />
     </div>
   );
 };

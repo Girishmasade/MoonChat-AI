@@ -12,7 +12,7 @@ const HeaderComponent = () => {
 
   const handleClearChat = async () => {
     try {
-      const response = await clearChat(receiverId).unwrap();
+      await clearChat(receiverId).unwrap();
       message.success("Chat deleted successfully!");
       // console.log("✅ Deleted:", response);
     } catch (error) {

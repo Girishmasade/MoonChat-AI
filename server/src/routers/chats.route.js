@@ -1,9 +1,8 @@
 import { Router } from "express";
 import {
   addContact,
-  AiMessage,
+  clearMessages,
   contactList,
-  getAiMessages,
   getAllContacts,
   getAllMessages,
   removeContact,
@@ -16,17 +15,13 @@ const chatRouter = Router();
 
 chatRouter.post("/add-contacts", protectedRoute, addContact);
 chatRouter.get("/all-contacts", protectedRoute, getAllContacts);
-chatRouter.get("/contact-list/:listId", protectedRoute, contactList)
+chatRouter.get("/contact-list/:listId", protectedRoute, contactList);
 chatRouter.delete("/delete-contact/:contactId", protectedRoute, removeContact);
 
 // Messages Route
 
-chatRouter.post(
-  "/send-message/:id",
-  protectedRoute,
-  uploadMedia.any(),
-  sendMessage
-);
+chatRouter.post( "/send-message/:id", protectedRoute, uploadMedia.any(), sendMessage);
 chatRouter.get("/get-message/:contactId", protectedRoute, getAllMessages);
+chatRouter.delete("/delete-message/:receiverId", protectedRoute, clearMessages)
 
 export default chatRouter;

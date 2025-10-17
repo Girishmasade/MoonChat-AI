@@ -1,11 +1,19 @@
-import React from "react";
-import { Image } from "antd";
+import React, { useState } from "react";
+import { Button, Collapse, Image, message } from "antd";
+import { AiOutlineMore } from "react-icons/ai";
 import UserMessageSection from "./UserMessageSection";
+import { useClearChatsMutation } from "../../redux/api/chatsApi";
+import { useSelector } from "react-redux";
 
-const UserMessageHeader = ({ selectedUser }) => {
+const { Panel } = Collapse;
+
+const UserMessageHeader = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+ const selectedUser = useSelector((state) => state.chat.selectedUser);
+  // No user selected view
   if (!selectedUser) {
     return (
-      <div className="w-full bg-gradient-to-br from-gray-900 to-gray-800 flex flex-col items-center justify-center text-center text-gray-400 px-4">
+      <div className="w-full h-full bg-gradient-to-br from-gray-900 to-gray-800 flex flex-col items-center justify-center text-gray-400 text-center px-4">
         <div className="p-6 bg-gray-800 rounded-xl shadow-lg flex flex-col items-center gap-4">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -23,23 +31,47 @@ const UserMessageHeader = ({ selectedUser }) => {
           </svg>
           <h1 className="text-2xl font-bold text-white">No User Selected</h1>
           <p className="text-gray-400 text-base">
-            Select a user from the list to start chatting instantly.
+            Select a user from the list to start chatting.
           </p>
           <span className="text-sm text-gray-500">
-            Your conversations will appear here.
+            Your messages will appear here.
           </span>
         </div>
       </div>
     );
   }
 
+ 
+  const receiverId = selectedUser?._id;
+  // console.log(receiverId);
+  const [clearChats, { isLoading }] = useClearChatsMutation(receiverId);
+
+  // Clear chat handler
+  const handleClearChat = async () => {
+    try {
+      await clearChats().unwrap();
+      message.success("Chat cleared successfully!");
+      setMenuOpen(false);
+      // Optionally, you can add logic to clear local chat messages state here
+      // e.g., dispatch(resetChatMessages()) if using Redux
+    } catch (error) {
+      console.error("Failed to delete chat:", error);
+      message.error("Failed to delete chat.");
+    }
+  };
+
   return (
-    <div className="flex flex-col w-full bg-gray-800 text-white rounded-lg">
-      <div className="flex justify-between border-b px-2">
-        <div className="flex gap-3 h-[80px] pt-2 items-center">
+    <div className="flex flex-col w-full bg-gray-800 text-white rounded-lg overflow-hidden">
+      {/* Header */}
+      <div className="flex justify-between items-center border-b border-gray-700 px-4 h-[80px]">
+        <div className="flex items-center gap-3">
           <Image
             preview={false}
-            alt={`${selectedUser.name}'s avatar`}
+            alt={`${selectedUser.username}'s avatar`}
+            src={
+              selectedUser.avatar ||
+              "https://cdn.pixabay.com/photo/2023/05/03/10/36/ai-generated-7967242_960_720.png"
+            }
             style={{
               width: "60px",
               height: "60px",
@@ -47,36 +79,60 @@ const UserMessageHeader = ({ selectedUser }) => {
               objectFit: "cover",
               border: "2px solid #00ffff",
             }}
-            src={
-              selectedUser.avatar ||
-              "https://cdn.pixabay.com/photo/2023/05/03/10/36/ai-generated-7967242_960_720.png"
-            }
           />
 
-          <div className="bg-gray-800 flex flex-col">
-            <h1 className="text-2xl font-bold mb-1">
+          <div>
+            <h1 className="text-2xl font-semibold leading-tight">
               Chat with{" "}
-              <span className="bg-gradient-to-tr from-blue-400 to-cyan-600 text-transparent bg-clip-text">
-                {selectedUser.name || "User"} {selectedUser.lastname || ""}
+              <span className="bg-gradient-to-tr from-blue-400 to-cyan-600 bg-clip-text text-transparent">
+                {selectedUser.name || selectedUser.username || "User"}{" "}
+                {selectedUser.lastname || ""}
               </span>
             </h1>
-            <p>
+            <p className="text-sm mt-1">
               Status:{" "}
               <span
-                className={`${
+                className={`font-semibold ${
                   selectedUser.status === "online"
-                    ? "text-green-500"
+                    ? "text-green-400"
                     : "text-gray-400"
-                } font-semibold`}
+                }`}
               >
                 {selectedUser.status || "offline"}
               </span>
             </p>
           </div>
         </div>
+
+        {/* Menu */}
+        <div className="relative">
+          <Button
+            type="text"
+            icon={<AiOutlineMore className="text-2xl" />}
+            onClick={() => setMenuOpen((prev) => !prev)}
+            className="text-white hover:text-cyan-400"
+          />
+          {menuOpen && (
+            <div className="absolute right-0 mt-3 w-56 bg-white border border-gray-200 rounded-xl shadow-xl p-2 z-50 animate-fadeIn">
+              <Collapse ghost>
+                <Panel header="Chat Options" key="1">
+                  <button
+                    onClick={handleClearChat}
+                    disabled={isLoading}
+                    className={`text-gray-700 font-medium hover:text-blue-600 transition-colors w-full text-left ${
+                      isLoading ? "opacity-60 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    {isLoading ? "Clearing..." : "Clear Chat"}
+                  </button>
+                </Panel>
+              </Collapse>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Message Section */}
+      {/* Messages */}
       <UserMessageSection selectedUser={selectedUser} />
     </div>
   );

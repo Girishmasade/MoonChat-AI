@@ -275,6 +275,37 @@ export const AiMessage = async (req, res, next) => {
   }
 };
 
+export const clearMessages = async (req, res, next) => {
+  try {
+    const senderId = req.user.userId
+    const {receiverId} = req.params
+
+     if (!senderId || !receiverId) {
+      return next(new ErrorHandler("SenderId & receiverId is required", 400));
+    }
+
+    await Chats.deleteMany({
+      $or: [
+        {senderId, receiverId},
+        {senderId: receiverId, receiverId:senderId}
+      ]
+    })
+
+      const updatedChats = await Chats.find({
+      $or: [
+        { senderId, receiverId },
+        { senderId: receiverId, receiverId: senderId },
+      ],
+    }).sort({ createdAt: 1 });
+
+   return res
+      .status(200)
+      .json(200, "Message deleted Successfully", { data: updatedChats });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export const getAiMessages = async (req, res, next) => {
   try {
     const senderId = req.user.userId;
