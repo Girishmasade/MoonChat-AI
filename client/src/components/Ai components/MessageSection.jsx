@@ -24,10 +24,10 @@ const MessageSection = () => {
     socket.connect();
 
     socket.emit("joinRoom", userId);
-    console.log("🟢 Joined socket room:", userId);
+    // console.log("🟢 Joined socket room:", userId);
 
     const handleNewMessage = (newMessage) => {
-      console.log("📩 New message from socket:", newMessage);
+      // console.log("📩 New message from socket:", newMessage);
       setMessages((prev) => [...prev, newMessage]);
     };
 
@@ -36,7 +36,7 @@ const MessageSection = () => {
     return () => {
       socket.off("receiveMessage", handleNewMessage);
       socket.disconnect();
-      console.log("🔌 Socket disconnected from MessageSection");
+      // console.log("🔌 Socket disconnected from MessageSection");
     };
   }, [userId]);
 

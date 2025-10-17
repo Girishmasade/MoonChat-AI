@@ -1,7 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const savedUser = localStorage.getItem("selectedUser");
+
 const initialState = {
-  selectedUser: null,
+  selectedUser: savedUser ? JSON.parse(savedUser) : null,
 };
 
 const chatSlice = createSlice({
@@ -11,6 +13,7 @@ const chatSlice = createSlice({
   reducers: {
     setSelectedUser: (state, action) => {
       state.selectedUser = action.payload;
+      localStorage.setItem("selectedUser", JSON.stringify(action.payload));
     },
   },
 });

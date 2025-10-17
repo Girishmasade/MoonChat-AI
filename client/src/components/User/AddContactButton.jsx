@@ -1,23 +1,28 @@
-import { Button, Form, Input, Modal, Upload } from "antd";
+import { Button, Form, Input, message, Modal, Spin } from "antd";
 import { useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
+import { useAddContactMutation } from "../../redux/api/chatsApi";
 
 const AddContactButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [form] = Form.useForm();
+  const [addContact, { isLoading }] = useAddContactMutation();
 
-  const handleFinish = (values) => {
-    console.log("Form values:", values);
+  const handleFinish = async (values) => {
+    try {
+      const response = await addContact(values).unwrap();
+      console.log(response.contactUser);
 
-    const existingContacts =
-      JSON.parse(localStorage.getItem("contactData")) || [];
-    const updatedContacts = [...existingContacts, values];
+      message.success("Contact added successfully");
 
-    localStorage.setItem("contactData", JSON.stringify(updatedContacts));
-    console.log("Saved contacts:", updatedContacts);
-
-    form.resetFields();
-    setIsOpen(false);
+      form.resetFields();
+      setIsOpen(false);
+    } catch (error) {
+      const errorMsg =
+        error?.message || error?.data?.message || "Something went wrong";
+      message.error(errorMsg);
+      console.error(error);
+    }
   };
 
   return (
@@ -25,13 +30,23 @@ const AddContactButton = () => {
       <Button
         onClick={() => setIsOpen(true)}
         type="primary"
-        className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex gap-3 hover:bg-gradient-to-r hover:from-indigo-600 hover:to-blue-600"
+        className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex gap-3 hover:from-indigo-600 hover:to-blue-600"
       >
         <AiOutlinePlus /> Add Contact
       </Button>
 
-      <Modal open={isOpen} onCancel={() => setIsOpen(false)} footer={null}>
-        <Form form={form} layout="vertical" onFinish={handleFinish}>
+      <Modal
+        open={isOpen}
+        onCancel={() => setIsOpen(false)}
+        footer={null}
+        destroyOnHidden
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleFinish}
+          disabled={isLoading}
+        >
           <div className="flex flex-col pb-3 gap-2">
             <h1 className="font-semibold text-lg">Add Contact</h1>
             <p className="text-sm text-gray-500">
@@ -44,7 +59,7 @@ const AddContactButton = () => {
             label="Username"
             rules={[{ required: true, message: "Username is required" }]}
           >
-            <Input placeholder="Enter Username" autoFocus />
+            <Input placeholder="Enter Username"/>
           </Form.Item>
 
           <Form.Item
@@ -57,19 +72,21 @@ const AddContactButton = () => {
             <Input placeholder="Enter Email" />
           </Form.Item>
 
-          <Form.Item label="Avatar" rules={[{ required: true }]}>
-            <Input placeholder="Enter link" autoFocus />
-          </Form.Item>
-
-          <div className="flex justify-between gap-4">
+          <div className="flex justify-between gap-4 mt-4">
             <Button
               onClick={() => setIsOpen(false)}
               className="w-full"
               type="default"
+              disabled={isLoading}
             >
               Cancel
             </Button>
-            <Button type="primary" htmlType="submit" className="w-full">
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="w-full"
+              loading={isLoading}
+            >
               Save
             </Button>
           </div>

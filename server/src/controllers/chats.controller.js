@@ -4,7 +4,7 @@ import ErrorHandler from "../utils/errorHadler.js";
 import SuccessHandler from "../utils/successHandler.js";
 import { io, onlineUsers } from "../../socket.js";
 import { geminiai } from "../config/geminiai.config.js";
-import mongoose from "mongoose";
+// import mongoose from "mongoose";
 
 export const addContact = async (req, res, next) => {
   try {
@@ -15,14 +15,9 @@ export const addContact = async (req, res, next) => {
       return next(new ErrorHandler("Please provide all the fields", 400));
     }
 
-    const contactUser = await User.findOne({ email }).select([
-      "-password",
-      "-googleId",
-      "-githubId",
-      "-isAdmin",
-      "-createdAt",
-      "-updatedAt",
-    ]);
+    const contactUser = await User.findOne({ email }).select(
+      "name lastname username email avatar"
+    );
 
     if (!contactUser) {
       return next(new ErrorHandler("User not found", 404));
@@ -35,6 +30,7 @@ export const addContact = async (req, res, next) => {
     }
 
     const currentUser = await User.findById(userId);
+
     if (!currentUser) {
       return next(new ErrorHandler("Current user not found", 404));
     }
@@ -50,15 +46,23 @@ export const addContact = async (req, res, next) => {
     currentUser.contacts.push(contactUser._id);
     await currentUser.save();
 
-    return res
-      .status(200)
-      .json(
-        new SuccessHandler(200, "Contact added successfully", { contactUser })
-      );
+    return res.status(200).json(
+      new SuccessHandler(200, "Contact added successfully", {
+        contactUser: {
+          _id: contactUser._id,
+          name: contactUser.name,
+          lastname: contactUser.lastname,
+          username: contactUser.username,
+          email: contactUser.email,
+          avatar: contactUser.avatar 
+        },
+      })
+    );
   } catch (error) {
     next(error);
   }
 };
+
 
 export const getAllContacts = async (req, res, next) => {
   try {
@@ -71,7 +75,7 @@ export const getAllContacts = async (req, res, next) => {
         "-password -googleId -githubId -isAdmin -createdAt -updatedAt"
       );
 
-    console.log(users);
+    // console.log(users);
 
     if (!users) {
       return next(new ErrorHandler("No contacts found", 404));
@@ -86,6 +90,33 @@ export const getAllContacts = async (req, res, next) => {
     next(error);
   }
 };
+
+export const contactList = async (req, res, next) => {
+  try {
+    const { listId } = req.params;
+
+    const user = await User.findById(listId)
+      .populate({
+        path: "contacts",
+        select: "name lastname username email avatar", // Only return required fields
+      })
+      .select("-password -googleId -githubId -isAdmin -createdAt -updatedAt");
+
+    if (!user) {
+      return next(new ErrorHandler("User not found", 404));
+    }
+
+    res.status(200).json(
+      new SuccessHandler({
+        message: "Contacts fetched successfully",
+        data: user.contacts,
+      })
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
 
 export const removeContact = async (req, res, next) => {
   try {
@@ -196,7 +227,7 @@ export const AiMessage = async (req, res, next) => {
     const senderId = req.user.userId;
     const receiverId = process.env.AI_USER_ID;
     const { messages, media } = req.body;
-    const io = req.app.get("io"); 
+    const io = req.app.get("io");
 
     if (!senderId || !receiverId) {
       return next(new ErrorHandler("SenderId and ReceiverId is required", 400));
@@ -212,7 +243,12 @@ export const AiMessage = async (req, res, next) => {
 
     const mediaFiles = req.files ? req.files.map((file) => file.path) : [];
 
-    const userMessage = new Chats({ senderId, receiverId, messages, media: mediaFiles });
+    const userMessage = new Chats({
+      senderId,
+      receiverId,
+      messages,
+      media: mediaFiles,
+    });
     await userMessage.save();
 
     const AiMessage = new Chats({
@@ -231,12 +267,13 @@ export const AiMessage = async (req, res, next) => {
       media: mediaFiles,
     });
 
-    return res.status(200).json(new SuccessHandler(200, "AI Message Sent", { AiMessage }));
+    return res
+      .status(200)
+      .json(new SuccessHandler(200, "AI Message Sent", { AiMessage }));
   } catch (error) {
     next(error);
   }
 };
-
 
 export const getAiMessages = async (req, res, next) => {
   try {
@@ -302,6 +339,6 @@ export const aiClearChat = async (req, res, next) => {
 //     const clearChat = await findById(messageId)
 
 //   } catch (error) {
-    
+
 //   }
 // }

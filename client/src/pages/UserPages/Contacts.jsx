@@ -1,45 +1,54 @@
-import React, { useState } from "react";
-import { Avatar, Input, Button, Tooltip, Empty } from "antd";
+import { useState } from "react";
+import {
+  Avatar,
+  Input,
+  Button,
+  Tooltip,
+  Empty,
+  Spin,
+} from "antd";
 import {
   AiOutlineSearch,
   AiOutlineMessage,
-  AiOutlineDelete,
 } from "react-icons/ai";
 import AddContactButton from "../../components/User/AddContactButton";
 import { useDispatch } from "react-redux";
 import { setSelectedUser } from "../../redux/app/chatSlice";
 import { useNavigate } from "react-router-dom";
+import { useGetContactsQuery } from "../../redux/api/chatsApi";
 
 const Contacts = () => {
   const [search, setSearch] = useState("");
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // For navigating to chat screen
+  const navigate = useNavigate();
 
-  // Load contacts from localStorage
-  let getContacts = [];
-  try {
-    getContacts = JSON.parse(localStorage.getItem("contactData")) || [];
-  } catch (e) {
-    console.error("Invalid contact data in localStorage");
-  }
+  const { data, isLoading } = useGetContactsQuery();
 
-  // Filter contacts based on search input
-  const handleFilter = getContacts.filter((item) =>
-    (item.username || item.name || "")
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+  const contactsData = data?.data?.contacts || []
+  console.log(contactsData);
+  
 
-  // Handle chat initiation
-  const chatWithContacts = (contact) => {
+const handleFilter = contactsData.filter((item) =>
+  (item.username || item.name || "")
+    .toLowerCase()
+    .includes(search.toLowerCase())
+);
+
+  // const handleFilter = contacts
+
+  const chatWithContact = (contact) => {
     dispatch(setSelectedUser(contact));
     console.log("contact added in a list", contact);
-    // navigate(`/chat/${contact.id}`); // Adjust route as needed
+    navigate(`/chats/${contact._id}`); // Optional
   };
 
-  // const removeFromContact = () => {
-  //   localStorage.removeItem("contactData")
-  // };
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <Spin />
+      </div>
+    );
+  }
 
 
   return (
@@ -69,18 +78,14 @@ const Contacts = () => {
           </p>
         </div>
 
-        {getContacts.length === 0 ? (
+        {contactsData.length === 0 ? (
           <Empty
-            description={
-              <span className="text-gray-400">No contacts found</span>
-            }
+            description={<span className="text-gray-400">No contacts found</span>}
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           />
         ) : handleFilter.length === 0 ? (
           <Empty
-            description={
-              <span className="text-gray-400">No matching contacts</span>
-            }
+            description={<span className="text-gray-400">No matching contacts</span>}
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           />
         ) : (
@@ -114,21 +119,12 @@ const Contacts = () => {
 
                   <Tooltip title="Send Message">
                     <Button
-                      onClick={() => chatWithContacts(item)}
+                      onClick={() => chatWithContact(item)}
                       shape="circle"
                       className="bg-gray-300 hover:bg-green-600 transition-all duration-300 border-none flex items-center justify-center"
                       icon={<AiOutlineMessage className="text-xl text-white" />}
                     />
                   </Tooltip>
-
-                  {/* <Tooltip title="Delete Contact">
-                    <Button
-                     onClick={() => removeFromContact()}
-                      shape="circle"
-                      className="bg-gray-300 hover:bg-red-600 transition-all duration-300 border-none flex items-center justify-center"
-                      icon={<AiOutlineDelete className="text-xl" />}
-                    />
-                  </Tooltip> */}
                 </div>
               </div>
             ))}

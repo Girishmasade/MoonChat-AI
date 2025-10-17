@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   addContact,
   AiMessage,
+  contactList,
   getAiMessages,
   getAllContacts,
   getAllMessages,
@@ -15,6 +16,7 @@ const chatRouter = Router();
 
 chatRouter.post("/add-contacts", protectedRoute, addContact);
 chatRouter.get("/all-contacts", protectedRoute, getAllContacts);
+chatRouter.get("/contact-list/:listId", protectedRoute, contactList)
 chatRouter.delete("/delete-contact/:contactId", protectedRoute, removeContact);
 
 // Messages Route
