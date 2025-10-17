@@ -22,12 +22,12 @@ const UserDashboard = () => {
       socket.auth = {userId: userId}
       socket.connect()
       socket.emit("joinRoom", userId)
-      console.log("✅ Socket connected for:", userId);
+      // console.log("✅ Socket connected for:", userId);
     }
   
     return () => {
       socket.disconnect()
-        console.log("🔌 Socket disconnected");
+        // console.log("🔌 Socket disconnected");
     }
   }, [userId])
 

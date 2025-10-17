@@ -28,7 +28,7 @@ const Signup = () => {
     registerUser(userData)
       .unwrap()
       .then((response) => {
-        console.log("Registration successful:", response);
+        // console.log("Registration successful:", response);
         // dispatch(setCredentials(response));
         navigate("/siginin")
       })

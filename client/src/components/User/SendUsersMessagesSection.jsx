@@ -44,7 +44,7 @@ const SendUsersMessagesSection = () => {
     try {
       const response = sendMessage({ id: receiverId, formData });
       const message = response?.data?.data;
-      console.log(message);
+      // console.log(message);
 
       AntMessage.success("Message sent!");
 

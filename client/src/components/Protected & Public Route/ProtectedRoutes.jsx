@@ -13,7 +13,7 @@ const ProtectedRoutes = ({ children }) => {
     return <Navigate to="/siginin" replace />;
   }
 
-  console.log("✅ Protected route: access granted");
+  // console.log("✅ Protected route: access granted");
   return children;
 };
 

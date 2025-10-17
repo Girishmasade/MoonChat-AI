@@ -14,8 +14,8 @@ const UserMessageSection = () => {
   
   const userId = user?._id;
 
-  const dattta = data?.data?.messages
-  console.log(dattta);
+  // const dattta = data?.data?.messages
+  // console.log(dattta);
   
 
   useEffect(() => {

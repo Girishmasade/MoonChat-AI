@@ -25,7 +25,7 @@ const Contacts = () => {
   const { data, isLoading } = useGetContactsQuery();
 
   const contactsData = data?.data?.contacts || []
-  console.log(contactsData);
+  // console.log(contactsData);
   
 
 const handleFilter = contactsData.filter((item) =>
@@ -38,8 +38,8 @@ const handleFilter = contactsData.filter((item) =>
 
   const chatWithContact = (contact) => {
     dispatch(setSelectedUser(contact));
-    console.log("contact added in a list", contact);
-    navigate(`/chats/${contact._id}`); // Optional
+    // console.log("contact added in a list", contact);
+    navigate(`/chats`); // Optional
   };
 
   if (isLoading) {
