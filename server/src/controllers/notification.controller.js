@@ -1,6 +1,6 @@
 import Notification from "../models/notification.model.js";
 import ErrorHandler from "../utils/errorHadler.js";
-import { io, onlineUsers } from "../../socket.js"
+import { io, onlineUsers } from "../../socket.js";
 import SuccessHandler from "../utils/successHandler.js";
 
 export const sendNotification = async (
@@ -94,13 +94,13 @@ export const isRead = async (req, res, next) => {
     }
 
     // Get io instance from app
-    // const io = req.app.get("io");
+    const io = req.app.get("io");
 
-    // // Emit real-time event to receiver if online
-    // const receiverSocketId = onlineUsers.get(userId);
-    // if (receiverSocketId && io) {
-    //   io.to(receiverSocketId).emit("readNotification", updatedNotification);
-    // }
+    // Emit real-time event to receiver if online
+    const receiverSocketId = onlineUsers.get(userId);
+    if (receiverSocketId && io) {
+      io.to(receiverSocketId).emit("readNotification", updatedNotification);
+    }
 
     return res.status(200).json(
       new SuccessHandler(200, "Notification marked as read", {
@@ -114,6 +114,36 @@ export const isRead = async (req, res, next) => {
 
 export const stopNotification = async (req, res, next) => {
   try {
+    const userId = req.user.userId;
+    const { type } = req.body; // e.g. "email", "push", etc.
+
+    if (!type) {
+      return next(new ErrorHandler("Notification type is required", 400));
+    }
+
+    // Find user's notification settings
+    let notification = await Notification.findOne({ receiverId: userId });
+
+    // If user has no notification record yet, create one
+    if (!notification) {
+      notification = new Notification({
+        receiverId: userId,
+        senderId: userId, // optional if you don't need sender
+        content: "Notification settings initialized",
+      });
+    }
+
+    // Toggle the setting (true -> false or false -> true)
+    notification.notificationSettings[type] =
+      !notification.notificationSettings[type];
+
+    await notification.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Notification setting for '${type}' updated successfully`,
+      data: notification.notificationSettings,
+    });
   } catch (error) {
     next(error);
   }

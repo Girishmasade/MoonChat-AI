@@ -16,6 +16,6 @@ notificationRouter.post(
 );
 notificationRouter.get("/get-notification", protectedRoute, getNotification);
 notificationRouter.put("/is-read/:id", protectedRoute, isRead);
-notificationRouter.patch("/stop-notification", stopNotification);
+notificationRouter.patch("/stop-notification", protectedRoute, stopNotification);
 
 export default notificationRouter;
