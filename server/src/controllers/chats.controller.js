@@ -4,6 +4,7 @@ import ErrorHandler from "../utils/errorHadler.js";
 import SuccessHandler from "../utils/successHandler.js";
 import { io, onlineUsers } from "../../socket.js";
 import { geminiai } from "../config/geminiai.config.js";
+import { sendNotification } from "./notification.controller.js";
 // import mongoose from "mongoose";
 
 export const addContact = async (req, res, next) => {
@@ -63,6 +64,13 @@ export const addContact = async (req, res, next) => {
   }
 };
 
+export const requestContact = async (req, res, next) => {
+  try {
+    
+  } catch (error) {
+    
+  }
+} 
 
 export const getAllContacts = async (req, res, next) => {
   try {
@@ -186,6 +194,8 @@ export const sendMessage = async (req, res, next) => {
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("newMessage", newMessage);
     }
+
+    await sendNotification(senderId, receiverId, "message", messages, io)
 
     return res
       .status(200)
