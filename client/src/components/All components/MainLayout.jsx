@@ -9,12 +9,13 @@ import {
 import { Avatar, Badge, Button, Layout, Space } from "antd";
 import Sidebar from "./Sidebar";
 import NotificationButton from "./Notification";
+import { useSelector } from "react-redux";
 
 const { Header, Sider, Content } = Layout;
 
 const MainLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
-
+  const user = useSelector(state => state.auth.user)
   return (
     <Layout style={{}}>
       {/* Sidebar */}
@@ -73,6 +74,7 @@ const MainLayout = () => {
 
             <Space size={24}>
               <Avatar
+                src={user?.avatar}
                 shape="circle"
                 size="large"
                 icon={<UserOutlined />}
