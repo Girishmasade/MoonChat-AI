@@ -9,7 +9,7 @@ const PublicRoute = ({ children }) => {
   const isAuthenticated = token || storedToken;
 
   if (isAuthenticated) {
-    console.log("🚫 Already logged in — redirecting to dashboard");
+    // console.log("🚫 Already logged in — redirecting to dashboard");
     return <Navigate to="/chat-dashboard" replace />;
   }
 

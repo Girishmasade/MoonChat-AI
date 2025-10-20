@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { Form, Input, Button, Typography, Divider } from "antd";
 import { GoogleOutlined, GithubOutlined } from "@ant-design/icons";
-import { useRegisterUserMutation } from "../../redux/api/authApi";
+import {
+  useGoogleLoginQuery,
+  useRegisterUserMutation,
+} from "../../redux/api/authApi";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setCredentials } from "../../redux/app/authSlice";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 
 const { Title, Text, Link } = Typography;
 
@@ -13,7 +17,7 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [registerUser, { isLoading }] = useRegisterUserMutation();
 
   const onChange = (e) => {
@@ -30,11 +34,19 @@ const Signup = () => {
       .then((response) => {
         // console.log("Registration successful:", response);
         // dispatch(setCredentials(response));
-        navigate("/siginin")
+        navigate("/siginin");
       })
       .catch((error) => {
         console.error("Registration failed:", error);
       });
+  };
+
+  const onGoogleLogin = () => {
+    window.open(`${import.meta.env.VITE_BACKEND_URL}/auth/google`, "_self");
+  };
+
+  const onGithubLogin = () => {
+    window.open(`${import.meta.env.VITE_BACKEND_URL}/auth/github`, "_self");
   };
 
   if (isLoading)
@@ -162,6 +174,17 @@ const Signup = () => {
                   border: "1px solid #333",
                   color: "#fff",
                 }}
+                iconRender={(visible) =>
+                  visible ? (
+                    <span style={{ color: "#fff" }}>
+                      <AiFillEye />
+                    </span>
+                  ) : (
+                    <span style={{ color: "#fff" }}>
+                      <AiFillEyeInvisible />
+                    </span>
+                  )
+                }
               />
             </Form.Item>
 
@@ -200,6 +223,7 @@ const Signup = () => {
 
           <div style={{ display: "flex", gap: "1rem" }}>
             <Button
+              onClick={onGoogleLogin}
               icon={<GoogleOutlined />}
               block
               style={{
@@ -211,6 +235,7 @@ const Signup = () => {
               Google
             </Button>
             <Button
+              onClick={onGithubLogin}
               icon={<GithubOutlined />}
               block
               style={{
@@ -225,7 +250,10 @@ const Signup = () => {
 
           <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
             <Text style={{ color: "#aaa" }}>Already have an account?</Text>{" "}
-            <Link href="/siginin" style={{ color: "#3b82f6", fontWeight: "500" }}>
+            <Link
+              href="/siginin"
+              style={{ color: "#3b82f6", fontWeight: "500" }}
+            >
               Sign in
             </Link>
           </div>

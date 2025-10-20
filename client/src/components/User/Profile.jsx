@@ -37,7 +37,7 @@ const Profile = () => {
   const onFinish = async (values) => {
     try {
       const response = await updateProfile(values).unwrap();
-      console.log(response);
+      // console.log(response);
       message.success(response.message);
       dispatch(setCredentials({ user: response.user }));
       setEditing(false);

@@ -29,7 +29,7 @@ passport.use(
        async (accessToken, refreshToken, profile, done) => {
             try {
                 let user = await User.findOne({googleId: profile.id});
-                console.log(user);
+                // console.log(user);
                 
                 if(!user){
                     user = await new User({
@@ -43,7 +43,7 @@ passport.use(
                 }
                 return done(null, user);
             } catch (error) {
-                console.log(error);
+                // console.log(error);
                 return done(error, null);
             }
         }
@@ -62,7 +62,7 @@ passport.use(
        async (accessToken, refreshToken, profile, done) => {
             try {
                 let user = await User.findOne({githubId: profile.id});
-                console.log(user);
+                // console.log(user);
 
                 if (!user) {
                     user = await User.create({

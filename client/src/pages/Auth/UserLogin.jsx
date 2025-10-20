@@ -5,13 +5,13 @@ import { useDispatch } from "react-redux";
 import { setCredentials } from "../../redux/app/authSlice";
 import { useNavigate } from "react-router-dom";
 import { useLoginUserMutation } from "../../redux/api/authApi";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 
 const { Title, Text, Link } = Typography;
 
 const UserLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loginUser, { isLoading }] = useLoginUserMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -25,22 +25,25 @@ const UserLogin = () => {
   const onSubmit = async (values) => {
     try {
       const response = await loginUser(values).unwrap();
-      message.success("Logged in successfully!");
       dispatch(setCredentials(response));
+      message.success("Logged in successfully!");
       navigate("/chat-dashboard");
     } catch (error) {
       message.error(error?.data?.message || "Invalid credentials!");
     }
   };
 
-  if (isLoading)
-    return (
-      <div className="text-center mt-20 text-lg text-white">Loading...</div>
-    );
+  // OAuth login redirects
+  const onGoogleLogin = () => {
+    window.open(`${import.meta.env.VITE_BACKEND_URL}/auth/google`, "_self");
+  };
+
+  const onGithubLogin = () => {
+    window.open(`${import.meta.env.VITE_BACKEND_URL}/auth/github`, "_self");
+  };
 
   return (
     <>
-      {/* make placeholder text white */}
       <style>
         {`
           input::placeholder, 
@@ -74,7 +77,6 @@ const UserLogin = () => {
             borderRadius: "16px",
             padding: "2rem",
             boxShadow: "0 8px 30px rgba(0, 0, 0, 0.6)",
-            transition: "all 0.3s ease",
           }}
         >
           <Title
@@ -113,6 +115,7 @@ const UserLogin = () => {
                 name="email"
                 onChange={onChange}
                 placeholder="Enter your email"
+                className="placeholder:text-white"
                 style={{
                   backgroundColor: "#1f1f1f",
                   border: "1px solid #333",
@@ -138,19 +141,19 @@ const UserLogin = () => {
                   border: "1px solid #333",
                   color: "#fff",
                 }}
+                iconRender={(visible) =>
+                  visible ? (
+                    <span style={{ color: "#fff" }}>
+                      <AiFillEye />
+                    </span>
+                  ) : (
+                    <span style={{ color: "#fff" }}>
+                      <AiFillEyeInvisible />
+                    </span>
+                  )
+                }
               />
             </Form.Item>
-
-            <div style={{ textAlign: "right", marginBottom: "1rem" }}>
-              <Link
-                href="#"
-                style={{
-                  color: "#3b82f6",
-                }}
-              >
-                Forgot password?
-              </Link>
-            </div>
 
             <Form.Item>
               <Button
@@ -176,6 +179,7 @@ const UserLogin = () => {
 
           <div style={{ display: "flex", gap: "1rem" }}>
             <Button
+              onClick={onGoogleLogin}
               icon={<GoogleOutlined />}
               block
               style={{
@@ -187,6 +191,7 @@ const UserLogin = () => {
               Google
             </Button>
             <Button
+              onClick={onGithubLogin}
               icon={<GithubOutlined />}
               block
               style={{
@@ -201,7 +206,10 @@ const UserLogin = () => {
 
           <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
             <Text style={{ color: "#aaa" }}>Don’t have an account?</Text>{" "}
-            <Link href="/signup" style={{ color: "#3b82f6", fontWeight: "500" }}>
+            <Link
+              href="/signup"
+              style={{ color: "#3b82f6", fontWeight: "500" }}
+            >
               Sign up
             </Link>
           </div>

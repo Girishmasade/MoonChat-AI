@@ -177,41 +177,36 @@ export const login = async (req, res, next) => {
 // Google OAuth google login and callback
 
 export const googleLogin = (req, res, next) => {
-  passport.authenticate("google", { scope: ["profile", "email"] })(
+  passport.authenticate("google", { scope: ["profile", "email"], prompt: "select_account", })(
     req,
     res,
     next
   );
 };
 
-export const googleCallback = async (req, res, next) => {
-  try {
-    passport.authenticate(
-      "google",
-      { failureRedirect: "/siginin" },
-      (err, user) => {
-        if (err || !user)
-          return next(new ErrorHandler("Authentication Failed", 400));
+export const googleCallback = (req, res, next) => {
+  passport.authenticate(
+    "google",
+    { failureRedirect: "/signin" },
+    (err, user) => {
+      if (err || !user) return res.redirect("/signin");
 
-        const token = jwt.sign(
-          {
-            userId: user._id,
-            email: user.email,
-            username: user.username,
-          },
-          process.env.JWT_SECRET,
-          { expiresIn: process.env.JWT_EXPIRY }
-        );
+      // Generate JWT
+      const token = jwt.sign(
+        {
+          userId: user._id,
+          email: user.email,
+          username: user.username,
+          avatar: user.avatar,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "7d" } 
+      );
 
-        return res
-          .status(200)
-          .json(new SuccessHandler(200, "LoggedIn Successfully", { token }));
-      }
-    )(req, res, next);
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
+      // Redirect to frontend with token
+      res.redirect(`${process.env.FRONTEND_URL}/oauth-success?token=${token}`);
+    }
+  )(req, res, next);
 };
 
 // GitHub OAuth github login and callback
@@ -233,14 +228,15 @@ export const githubCallback = async (req, res, next) => {
           userId: user._id,
           email: user.email,
           username: user.username,
+          avatar: user.avatar,
         },
         process.env.JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRY }
       );
 
-      return res
-        .status(200)
-        .json(new SuccessHandler(200, "LoggedIn Successfully", { token }));
+      return res.redirect(
+        `${process.env.FRONTEND_URL}oauth-success?token=${token}`
+      );
     }
   )(req, res, next);
 };

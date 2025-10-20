@@ -11,7 +11,7 @@ const AddContactButton = () => {
   const handleFinish = async (values) => {
     try {
       const response = await addContact(values).unwrap();
-      console.log(response.contactUser);
+      // console.log(response.contactUser);
 
       message.success("Contact added successfully");
 

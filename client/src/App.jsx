@@ -15,6 +15,7 @@ import AiChatting from "./pages/AIchatting/AiChatting";
 import Chats from "./pages/UserPages/Chats";
 import Contacts from "./pages/UserPages/Contacts";
 import Settings from "./pages/UserPages/Settings";
+import OAuthSuccess from "./pages/Auth/OAuthSuccess/OAuthSuccess";
 
 function App() {
   return (
@@ -38,6 +39,8 @@ function App() {
             </PublicRoute>
           }
         />
+
+        <Route path="/oauth-success" element={<OAuthSuccess/>} />
 
         <Route element={<MainLayout />}>
           <Route

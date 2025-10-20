@@ -20,6 +20,13 @@ export const authApi = apiSlice.injectEndpoints({
       }),
     }),
 
+    googleLogin: builder.query({
+      query: () => ({
+        url: `${AUTH_URL}/google`,
+        method: "GET",
+      })
+    }),
+
     uploadAvatar: builder.mutation({
       query: (formData) => ({
         url: `${AUTH_URL}/upload-avatar`,
@@ -46,6 +53,7 @@ export const authApi = apiSlice.injectEndpoints({
 export const {
   useRegisterUserMutation,
   useLoginUserMutation,
+  useGoogleLoginQuery,
   useUploadAvatarMutation,
   useGetProfileQuery,
   useUpdateProfileMutation,

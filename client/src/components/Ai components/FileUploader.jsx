@@ -28,7 +28,7 @@ const FileUploader = () => {
       if (response?.data?.AiMessage) {
         AntMessage.success("Files uploaded successfully");
         setFileList([]);
-        console.log("AI Response:", response.data.AiMessage.messages);
+        // console.log("AI Response:", response.data.AiMessage.messages);
       }
     } catch (error) {
       console.error("Upload error:", error);
