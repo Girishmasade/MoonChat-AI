@@ -19,7 +19,34 @@ export const authApi = apiSlice.injectEndpoints({
         body: userData,
       }),
     }),
+
+    uploadAvatar: builder.mutation({
+      query: (formData) => ({
+        url: `${AUTH_URL}/upload-avatar`,
+        method: "PUT",
+        body: formData,
+      }),
+    }),
+
+    getProfile: builder.query({
+      query: () => `${AUTH_URL}/profile`,
+    }),
+
+    updateProfile: builder.mutation({
+      query: (userData) => ({
+        url: `${AUTH_URL}/update-details`,
+        method: "PUT",
+        body: userData,
+      }),
+    }),
   }),
 });
 
-export const { useRegisterUserMutation, useLoginUserMutation } = authApi;
+// Export hooks
+export const {
+  useRegisterUserMutation,
+  useLoginUserMutation,
+  useUploadAvatarMutation,
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+} = authApi;

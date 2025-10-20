@@ -148,6 +148,7 @@ export const login = async (req, res, next) => {
         userId: user._id,
         email: user.email,
         username: user.username,
+        avatar: user.avatar,
       },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRY }
@@ -162,6 +163,7 @@ export const login = async (req, res, next) => {
           _id: user._id,
           username: user.username,
           email: user.email,
+          avatar: user.avatar,
         },
       })
     );
@@ -249,11 +251,11 @@ export const updateUserDetails = async (req, res, next) => {
 
     if (!userId) return next(new ErrorHandler("Unauthorized", 401));
 
-    const { name, contact, username } = req.body;
+    const { name, lastname, contact, username } = req.body;
 
     const user = await User.findByIdAndUpdate(
       userId,
-      { $set: { username, name, contact } },
+      { $set: { username, name, contact, lastname } },
       { new: true }
     ).select("-password");
 
@@ -296,9 +298,9 @@ export const uploadAvatar = async (req, res, next) => {
 
 export const getUserDetails = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const userId = req.user.userId
 
-    const user = await User.findById(id).select("-password");
+    const user = await User.findById(userId).select("-password");
     console.log(user);
 
     res

@@ -38,8 +38,8 @@ authRouter.get("/google/callback", googleCallback)
 authRouter.get("/github", githubLogin)
 authRouter.get("/github/callback", githubCallback)
 
-authRouter.put("/update-details/:id", protectedRoute, updateUserDetails);
-authRouter.get("/profile/:id", protectedRoute, getUserDetails);
+authRouter.put("/update-details", protectedRoute, updateUserDetails);
+authRouter.get("/profile", protectedRoute, getUserDetails);
 authRouter.put("/upload-avatar", upload.single("avatar"), protectedRoute, uploadAvatar)
 authRouter.get("/get-all-users", getUsers);
 authRouter.patch("/forget-password/:id", forgetPassword);
