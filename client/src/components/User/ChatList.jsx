@@ -1,37 +1,45 @@
 import React, { useEffect, useState } from "react";
 import { Avatar, Badge, Input, Spin } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { setSelectedUser } from "../../redux/app/chatSlice";
+import { setSelectedUser, setOnlineusers } from "../../redux/app/chatSlice";
 import { useGetChatListQuery } from "../../redux/api/chatsApi";
 import { socket } from "../../socket.io/socketclient";
 
 const ChatList = () => {
   const dispatch = useDispatch();
   const selectedUser = useSelector((state) => state.chat.selectedUser);
+  const onlineUsers = useSelector((state) => state.chat.onlineUsers);
   const authUser = useSelector((state) => state.auth.user);
   const [search, setSearch] = useState("");
 
   const userId = authUser?._id;
 
-  const { data, isLoading, isError } = useGetChatListQuery(userId);
+  const { data, isLoading, isError, refetch } = useGetChatListQuery(userId);
   const userList = data?.statuscode?.data || [];
 
+  // Filter search
   const filteredUsers = userList.filter((user) =>
     user.username?.toLowerCase().includes(search.toLowerCase())
   );
 
   useEffect(() => {
     if (userId) {
-      (socket.auth = { userId: userId }), socket.connect();
+      socket.auth = { userId };
+      socket.connect();
       socket.emit("joinRoom", userId);
-      // console.log("✅ Socket connected for chatList:", userId);
+
+      socket.on("getOnlineUsers", (users) => {
+        dispatch(setOnlineusers(users));
+      });
+
+      socket.on("userStatusChange", () => refetch());
     }
 
     return () => {
+      socket.off("getOnlineUsers");
       socket.disconnect();
-      // console.log("🔌 Socket disconnected");
     };
-  }, [userId]);
+  }, [userId, dispatch]);
 
   if (isLoading) {
     return (
@@ -51,6 +59,7 @@ const ChatList = () => {
 
   return (
     <div className="flex flex-col w-[400px] bg-gray-900 gap-3 rounded-lg shadow-lg overflow-hidden">
+      {/* 🔍 Search Bar */}
       <div className="h-[80px] bg-gray-800 border-b flex items-center justify-center px-4">
         <Input
           placeholder="Search users..."
@@ -61,10 +70,13 @@ const ChatList = () => {
         />
       </div>
 
+      {/* 💬 User List */}
       <div className="flex-1 overflow-y-auto p-3 space-y-2">
         {filteredUsers.length > 0 ? (
           filteredUsers.map((user) => {
             const isSelected = selectedUser?._id === user._id;
+            const isOnline = onlineUsers.includes(user._id);
+
             return (
               <div
                 key={user._id}
@@ -77,7 +89,7 @@ const ChatList = () => {
               >
                 <Badge
                   dot
-                  status={user.status === "online" ? "success" : "default"}
+                  status={isOnline ? "success" : "default"}
                   offset={[-2, 32]}
                 >
                   <Avatar
@@ -87,7 +99,9 @@ const ChatList = () => {
                       "https://cdn.pixabay.com/photo/2023/05/03/10/36/ai-generated-7967242_960_720.png"
                     }
                     className="shadow-md"
-                    style={{ border: "2px solid #00ffff" }}
+                    style={{
+                      border: isOnline ? "2px solid #00ff99" : "2px solid #555",
+                    }}
                   />
                 </Badge>
 
@@ -97,12 +111,10 @@ const ChatList = () => {
                   </h1>
                   <p
                     className={`text-sm ${
-                      user.status === "online"
-                        ? "text-green-400"
-                        : "text-gray-400"
+                      isOnline ? "text-green-400" : "text-gray-400"
                     }`}
                   >
-                    {user.status || "offline"}
+                    {isOnline ? "Online" : "Offline"}
                   </p>
                 </div>
               </div>

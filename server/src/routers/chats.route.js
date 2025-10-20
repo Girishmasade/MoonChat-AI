@@ -22,6 +22,6 @@ chatRouter.delete("/delete-contact/:contactId", protectedRoute, removeContact);
 
 chatRouter.post( "/send-message/:id", protectedRoute, uploadMedia.any(), sendMessage);
 chatRouter.get("/get-message/:contactId", protectedRoute, getAllMessages);
-chatRouter.delete("/delete-message/:receiverId", protectedRoute, clearMessages)
+chatRouter.delete("/delete-messages/:receiverId", protectedRoute, clearMessages)
 
 export default chatRouter;

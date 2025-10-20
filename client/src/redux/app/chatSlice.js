@@ -4,7 +4,8 @@ const savedUser = localStorage.getItem("selectedUser");
 
 const initialState = {
   selectedUser: savedUser ? JSON.parse(savedUser) : null,
-  clearChats: [], // optional, can track cleared chat state
+  clearChats: [], 
+  onlineUsers: []
 };
 
 const chatSlice = createSlice({
@@ -16,21 +17,19 @@ const chatSlice = createSlice({
       localStorage.setItem("selectedUser", JSON.stringify(action.payload));
     },
 
-    // Clear selected user and/or chats
-    clearSelectedUser: (state) => {
+    setClearSelectedUser: (state) => {
       state.selectedUser = null;
       state.clearChats = [];
-      localStorage.removeItem("selectedUser"); // fixed typo
+      localStorage.removeItem("selectedUser"); 
     },
 
-    // Optional: track cleared chats (if needed)
-    setClearChats: (state, action) => {
-      state.clearChats = action.payload;
+    setOnlineusers: (state, action) => {
+      state.onlineUsers = action.payload;
     },
   },
 });
 
-export const { setSelectedUser, clearSelectedUser, setClearChats } =
+export const { setSelectedUser, setClearSelectedUser, setOnlineusers } =
   chatSlice.actions;
 
 export default chatSlice.reducer;

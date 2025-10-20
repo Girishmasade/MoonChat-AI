@@ -11,28 +11,30 @@ const io = new Server(server, {
     origin: ["http://localhost:5173"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
-  }
+  },
 });
 
 app.use(cors());
 app.set("io", io);
 
+// Store online users: userId -> socketId
 const onlineUsers = new Map();
 
 io.on("connection", (socket) => {
   console.log(`User connected: ${socket.id}`);
 
-  const userId = socket.handshake.query.userId;
+  // ✅ FIX: get userId from auth instead of query
+  const userId = socket.handshake.auth?.userId;
+
   if (userId) {
     onlineUsers.set(userId, socket.id);
-    console.log("Online Users Map:", onlineUsers);
+    // console.log("🟢 Online Users Map:", Array.from(onlineUsers.keys()));
   }
 
   io.emit("getOnlineUsers", Array.from(onlineUsers.keys()));
 
   socket.on("disconnect", () => {
-    console.log(`User disconnected: ${socket.id}`);
-    
+    console.log(`🔴 User disconnected: ${socket.id}`);
     for (let [key, value] of onlineUsers.entries()) {
       if (value === socket.id) {
         onlineUsers.delete(key);
@@ -41,6 +43,7 @@ io.on("connection", (socket) => {
     }
 
     io.emit("getOnlineUsers", Array.from(onlineUsers.keys()));
+     io.emit("userStatusChange");
   });
 });
 

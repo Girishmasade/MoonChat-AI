@@ -3,14 +3,22 @@ import { Button, Collapse, Image, message } from "antd";
 import { AiOutlineMore } from "react-icons/ai";
 import UserMessageSection from "./UserMessageSection";
 import { useClearChatsMutation } from "../../redux/api/chatsApi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setClearSelectedUser } from "../../redux/app/chatSlice";
 
 const { Panel } = Collapse;
 
 const UserMessageHeader = () => {
   const [menuOpen, setMenuOpen] = useState(false);
- const selectedUser = useSelector((state) => state.chat.selectedUser);
-  // No user selected view
+  const selectedUser = useSelector((state) => state.chat.selectedUser);
+  const userId = useSelector((state) => state.auth.user);
+  const onlineUsers = useSelector((state) => state.chat.onlineUsers);
+  //  console.log(onlineUsers);
+
+  const isOnline = onlineUsers.includes(selectedUser?._id);
+  //  console.log(isOnline);
+  const [clearChats, { isLoading }] = useClearChatsMutation();
+  const dispatch = useDispatch();
   if (!selectedUser) {
     return (
       <div className="w-full h-full bg-gradient-to-br from-gray-900 to-gray-800 flex flex-col items-center justify-center text-gray-400 text-center px-4">
@@ -41,19 +49,16 @@ const UserMessageHeader = () => {
     );
   }
 
- 
   const receiverId = selectedUser?._id;
   // console.log(receiverId);
-  const [clearChats, { isLoading }] = useClearChatsMutation(receiverId);
 
   // Clear chat handler
   const handleClearChat = async () => {
     try {
-      await clearChats().unwrap();
+      await clearChats(receiverId).unwrap();
       message.success("Chat cleared successfully!");
       setMenuOpen(false);
-      // Optionally, you can add logic to clear local chat messages state here
-      // e.g., dispatch(resetChatMessages()) if using Redux
+      dispatch(setClearSelectedUser());
     } catch (error) {
       console.error("Failed to delete chat:", error);
       message.error("Failed to delete chat.");
@@ -93,12 +98,10 @@ const UserMessageHeader = () => {
               Status:{" "}
               <span
                 className={`font-semibold ${
-                  selectedUser.status === "online"
-                    ? "text-green-400"
-                    : "text-gray-400"
+                  isOnline ? "text-green-400" : "text-gray-400"
                 }`}
               >
-                {selectedUser.status || "offline"}
+                {isOnline ? "Online" : "Offline"}
               </span>
             </p>
           </div>

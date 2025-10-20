@@ -4,7 +4,7 @@ import ErrorHandler from "../utils/errorHadler.js";
 import SuccessHandler from "../utils/successHandler.js";
 import { io, onlineUsers } from "../../socket.js";
 import { geminiai } from "../config/geminiai.config.js";
-import { sendNotification } from "./notification.controller.js";
+// import { sendNotification } from "./notification.controller.js";
 // import mongoose from "mongoose";
 
 export const addContact = async (req, res, next) => {
@@ -55,7 +55,7 @@ export const addContact = async (req, res, next) => {
           lastname: contactUser.lastname,
           username: contactUser.username,
           email: contactUser.email,
-          avatar: contactUser.avatar 
+          avatar: contactUser.avatar,
         },
       })
     );
@@ -66,11 +66,8 @@ export const addContact = async (req, res, next) => {
 
 export const requestContact = async (req, res, next) => {
   try {
-    
-  } catch (error) {
-    
-  }
-} 
+  } catch (error) {}
+};
 
 export const getAllContacts = async (req, res, next) => {
   try {
@@ -125,7 +122,6 @@ export const contactList = async (req, res, next) => {
   }
 };
 
-
 export const removeContact = async (req, res, next) => {
   try {
     const userId = req.user.userId;
@@ -167,39 +163,84 @@ export const sendMessage = async (req, res, next) => {
     const receiverId = req.params.id;
 
     if (!senderId || !receiverId) {
-      return next(new ErrorHandler("SenderId and ReceiverId is required", 400));
+      return next(
+        new ErrorHandler("SenderId and ReceiverId are required", 400)
+      );
     }
 
-    const { messages, media } = req.body;
-    if (!messages && !media) {
-      return next(new ErrorHandler("Messages and media is required", 400));
-    }
-
+    const { message } = req.body; // singular to match frontend
     const mediaFiles = req.files ? req.files.map((file) => file.path) : [];
 
-    if (mediaFiles.length > 0) {
-      console.log("Media files uploaded:", media);
+    if (!message && mediaFiles.length === 0) {
+      return next(new ErrorHandler("Message or media is required", 400));
     }
 
+    // Create new message document
     const newMessage = new Chats({
       senderId,
       receiverId,
-      messages,
+      messages: message || "", // store actual text
       media: mediaFiles,
     });
 
     await newMessage.save();
 
+    // Emit the message to the receiver if online
     const receiverSocketId = onlineUsers.get(receiverId);
     if (receiverSocketId) {
-      io.to(receiverSocketId).emit("newMessage", newMessage);
+      io.to(receiverSocketId).emit("receiveMessage", {
+        _id: newMessage._id,
+        senderId,
+        receiverId,
+        message: newMessage.messages,
+        media: mediaFiles,
+        createdAt: newMessage.createdAt,
+      });
     }
 
-    await sendNotification(senderId, receiverId, "message", messages, io)
+    // Emit to sender (for confirmation)
+    const senderSocketId = onlineUsers.get(senderId);
+    if (senderSocketId) {
+      io.to(senderSocketId).emit("newMessageSent", {
+        _id: newMessage._id,
+        senderId,
+        receiverId,
+        message: newMessage.messages,
+        media: mediaFiles,
+        createdAt: newMessage.createdAt,
+      });
+    }
 
     return res
       .status(200)
       .json(new SuccessHandler(200, "Message sent", { data: newMessage }));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const clearMessages = async (req, res, next) => {
+  try {
+    const senderId = req.user.userId;
+    const { receiverId } = req.params;
+
+    if (!senderId || !receiverId) {
+      return next(new ErrorHandler("SenderId & receiverId is required", 400));
+    }
+
+    await Chats.deleteMany({
+      $or: [
+        { senderId, receiverId },
+        { senderId: receiverId, receiverId: senderId },
+      ],
+    });
+
+    io.to(senderId.toString()).emit("messagesCleared", { receiverId });
+    io.to(receiverId.toString()).emit("messagesCleared", { senderId });
+
+    return res
+      .status(200)
+      .json(200, "Message deleted Successfully", { data: [] });
   } catch (error) {
     next(error);
   }
@@ -219,14 +260,11 @@ export const getAllMessages = async (req, res, next) => {
         { senderId: userId, receiverId: contactId },
         { senderId: contactId, receiverId: userId },
       ],
-    })
-      .sort({ createdAt: 1 })
-      .populate("senderId", "username email")
-      .populate("receiverId", "username email");
+    }).sort({ createdAt: 1 });
 
     return res
       .status(200)
-      .json(new SuccessHandler(200, "All messages", { messages }));
+      .json(new SuccessHandler(200, "All messages fetched", { messages }));
   } catch (error) {
     next(error);
   }
@@ -285,37 +323,6 @@ export const AiMessage = async (req, res, next) => {
   }
 };
 
-export const clearMessages = async (req, res, next) => {
-  try {
-    const senderId = req.user.userId
-    const {receiverId} = req.params
-
-     if (!senderId || !receiverId) {
-      return next(new ErrorHandler("SenderId & receiverId is required", 400));
-    }
-
-    await Chats.deleteMany({
-      $or: [
-        {senderId, receiverId},
-        {senderId: receiverId, receiverId:senderId}
-      ]
-    })
-
-      const updatedChats = await Chats.find({
-      $or: [
-        { senderId, receiverId },
-        { senderId: receiverId, receiverId: senderId },
-      ],
-    }).sort({ createdAt: 1 });
-
-   return res
-      .status(200)
-      .json(200, "Message deleted Successfully", { data: updatedChats });
-  } catch (error) {
-    next(error);
-  }
-}
-
 export const getAiMessages = async (req, res, next) => {
   try {
     const senderId = req.user.userId;
@@ -372,14 +379,3 @@ export const aiClearChat = async (req, res, next) => {
     next(error);
   }
 };
-
-// export const clearSingleChat = async (req, res, next) => {
-//   try {
-//     const {messageId} = req.params
-
-//     const clearChat = await findById(messageId)
-
-//   } catch (error) {
-
-//   }
-// }

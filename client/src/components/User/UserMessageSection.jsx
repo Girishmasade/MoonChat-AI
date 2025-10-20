@@ -3,34 +3,29 @@ import { useGetMessageQuery } from "../../redux/api/chatsApi";
 import { useSelector } from "react-redux";
 import { socket } from "../../socket.io/socketclient";
 import SendUsersMessagesSection from "./SendUsersMessagesSection";
+import { message } from "antd";
 
 const UserMessageSection = () => {
   const user = useSelector((state) => state.auth.user);
-  const [messages, setMessages] = useState([]);
-  
-  const selctedUser = useSelector((state) => state.chat.selectedUser)
-  const reciverId = selctedUser._id
-  const { data, isLoading, isError, refetch } = useGetMessageQuery(reciverId);
-  
+  const selectedUser = useSelector((state) => state.chat.selectedUser);
+  const receiverId = selectedUser?._id;
   const userId = user?._id;
 
-  // const dattta = data?.data?.messages
-  // console.log(dattta);
-  
+  const { data, isLoading, isError, refetch } = useGetMessageQuery(receiverId);
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     if (data?.data?.messages) {
+      // console.log("Fetched messages:", data.data.messages);
       setMessages(data.data.messages);
-      refetch();
     }
   }, [data]);
 
   useEffect(() => {
     if (!userId) return;
 
-    socket.auth = { userId: userId };
+    socket.auth = { userId };
     socket.connect();
-
     socket.emit("joinRoom", userId);
     // console.log("🟢 Joined socket room:", userId);
 
@@ -38,6 +33,14 @@ const UserMessageSection = () => {
       // console.log("📩 New message from socket:", newMessage);
       setMessages((prev) => [...prev, newMessage]);
     };
+
+    if (
+      (userId === userId && receiverId === selectedUser?._id) ||
+      (receiverId === userId && userId === selectedUser?._id)
+    ) {
+      setMessages([]);
+      message.info("Chat cleared");
+    }
 
     socket.on("receiveMessage", handleNewMessage);
 
@@ -53,10 +56,9 @@ const UserMessageSection = () => {
 
   return (
     <div className="flex flex-col bg-gray-900 text-white h-full overflow-y-auto">
-      {/* File Upload */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {messages.map((item, index) => {
-          const isSender = item.senderId === user?._id;
+          const isSender = item.senderId === userId;
 
           return (
             <div
@@ -70,16 +72,13 @@ const UserMessageSection = () => {
                     : "bg-gray-700 rounded-bl-none"
                 }`}
               >
-                {/* Message text */}
-                {item.messages}
+                {item.message || item.messages}
 
-                {/* Media rendering */}
                 {item.media?.length > 0 && (
                   <div className="mt-2 space-y-2">
                     {item.media.map((file, idx) => {
                       const ext = file.split(".").pop().toLowerCase();
                       if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) {
-                        // Image
                         return (
                           <img
                             key={idx}
@@ -89,7 +88,6 @@ const UserMessageSection = () => {
                           />
                         );
                       } else if (["mp4", "webm", "ogg"].includes(ext)) {
-                        // Video
                         return (
                           <video
                             key={idx}
@@ -99,7 +97,6 @@ const UserMessageSection = () => {
                           />
                         );
                       } else if (["mp3", "wav"].includes(ext)) {
-                        // Audio
                         return (
                           <audio
                             key={idx}
@@ -109,7 +106,6 @@ const UserMessageSection = () => {
                           />
                         );
                       } else {
-                        // Other file
                         return (
                           <a
                             key={idx}

@@ -11,15 +11,10 @@ import {
   Avatar,
 } from "antd";
 import { BellFilled } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setSelectedUser } from "../../redux/app/chatSlice";
 
 const { Text, Title } = Typography;
 
 const Notification = () => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
 
   const [notifications, setNotifications] = useState([
@@ -40,14 +35,12 @@ const Notification = () => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === user.id ? { ...n, isRead: true } : n))
     );
-    dispatch(setSelectedUser(user));
     setOpen(false);
-    navigate(`/chats/${user.id}`);
   };
 
   const notificationContent = (
     <Card
-      bordered={false}
+      variant={false}
       style={{
         width: 380,
         background: "linear-gradient(160deg, #0f0f0f, #1a1a1a)",
@@ -57,6 +50,7 @@ const Notification = () => {
         padding: "12px",
       }}
     >
+      {/* Header */}
       <div
         style={{
           display: "flex",
@@ -80,10 +74,13 @@ const Notification = () => {
 
       <Divider style={{ backgroundColor: "#333", margin: "6px 0" }} />
 
+      {/* List */}
       {notifications.length === 0 ? (
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description={<span style={{ color: "white" }}>No new notifications</span>}
+          description={
+            <span style={{ color: "white" }}>No new notifications</span>
+          }
           style={{ margin: "20px 0" }}
         />
       ) : (
@@ -102,7 +99,9 @@ const Notification = () => {
                 padding: "10px",
                 borderRadius: "10px",
                 marginBottom: "6px",
-                background: item.isRead ? "rgba(255, 255, 255, 0.03)" : "rgba(255, 255, 255, 0.08)",
+                background: item.isRead
+                  ? "rgba(255, 255, 255, 0.03)"
+                  : "rgba(255, 255, 255, 0.08)",
                 display: "flex",
                 alignItems: "center",
                 gap: "12px",
@@ -110,7 +109,8 @@ const Notification = () => {
                 cursor: "pointer",
               }}
               onMouseOver={(e) =>
-                (e.currentTarget.style.background = "rgba(255, 255, 255, 0.12)")
+                (e.currentTarget.style.background =
+                  "rgba(255, 255, 255, 0.12)")
               }
               onMouseOut={(e) =>
                 (e.currentTarget.style.background = item.isRead
@@ -126,8 +126,16 @@ const Notification = () => {
                 {item.name.charAt(0)}
               </Avatar>
               <div style={{ flex: 1 }}>
-                <Text style={{ color: "#e6e6e6", fontWeight: item.isRead ? "400" : "600" }}>
-                  New message from <span style={{ color: "#40a9ff" }}>{item.name} {item.lastname}</span>
+                <Text
+                  style={{
+                    color: "#e6e6e6",
+                    fontWeight: item.isRead ? "400" : "600",
+                  }}
+                >
+                  New message from{" "}
+                  <span style={{ color: "#40a9ff" }}>
+                    {item.name} {item.lastname}
+                  </span>
                 </Text>
               </div>
               {!item.isRead && (
@@ -151,7 +159,7 @@ const Notification = () => {
   return (
     <Space size={2}>
       <Dropdown
-        menu={notificationContent}
+        popupRender={() => notificationContent} // ✅ FIXED
         trigger={["click"]}
         open={open}
         onOpenChange={handleOpenChange}
@@ -171,8 +179,12 @@ const Notification = () => {
               cursor: "pointer",
               transition: "transform 0.2s ease",
             }}
-            onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.15)")}
-            onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.transform = "scale(1.15)")
+            }
+            onMouseOut={(e) =>
+              (e.currentTarget.style.transform = "scale(1)")
+            }
           />
         </Badge>
       </Dropdown>

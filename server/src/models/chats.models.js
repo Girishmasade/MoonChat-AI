@@ -12,6 +12,7 @@ const chatsSchema = new Schema(
       ref: "user",
       required: true,
     },
+     messages: [{ type: String }],
     media: {
       type: [String], //includes images, videos, files etc
       default: [],

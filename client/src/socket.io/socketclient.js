@@ -15,6 +15,11 @@ export const connectSocket = (userId) => {
   socket.auth = { userId };
   socket.connect();
   socket.emit("joinRoom", userId);
+
+  socket.on("getOnlineUsers", (users) => {
+    console.log("🟢 Online users:", users);
+    dispatch(setOnlineUsers(users));
+  });
 };
 
 export const disconnectSocket = () => {

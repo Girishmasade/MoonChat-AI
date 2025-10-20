@@ -38,7 +38,7 @@ export const chatApi = apiSlice.injectEndpoints({
     }),
     clearChats: builder.mutation({
       query: (receiverId) => ({
-        url: `${CHAT_URL}/delete-message/${receiverId}`,
+        url: `${CHAT_URL}/delete-messages/${receiverId}`,
         method: "DELETE"
       })
     })

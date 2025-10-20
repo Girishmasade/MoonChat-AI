@@ -1,12 +1,5 @@
 import React, { useState, Suspense } from "react";
-import {
-  Input,
-  Tooltip,
-  Upload,
-  message as AntMessage,
-  Spin,
-  Button,
-} from "antd";
+import { Input, Tooltip, Upload, message as AntMessage, Spin, Button } from "antd";
 import { FaSmile, FaPaperclip, FaLocationArrow } from "react-icons/fa";
 import { useSendMessageMutation } from "../../redux/api/chatsApi";
 import { useSelector } from "react-redux";
@@ -14,7 +7,7 @@ import { socket } from "../../socket.io/socketclient";
 
 const EmojiPicker = React.lazy(() => import("emoji-picker-react"));
 
-const SendUsersMessagesSection = () => {
+const SendUsersMessagesSection = ({ refetchMessages }) => {
   const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [fileList, setFileList] = useState([]);
@@ -31,52 +24,47 @@ const SendUsersMessagesSection = () => {
 
   const [sendMessage, { isLoading }] = useSendMessageMutation();
 
-  const handleSend = ({ refetchMessages }) => {
+  const handleSend = async () => {
     if (!message.trim() && fileList.length === 0) return;
 
     const formData = new FormData();
-    if (user?._id) formData.append("senderId", user._id);
-    if (message.trim()) formData.append("messages", message.trim());
-    fileList.forEach((file) =>
-      formData.append("media", file.originFileObj || file)
-    );
+    if (message.trim()) formData.append("message", message.trim());
+    fileList.forEach((file) => formData.append("media", file.originFileObj || file));
+
+    setSending(true);
 
     try {
-      const response = sendMessage({ id: receiverId, formData });
-      const message = response?.data?.data;
-      // console.log(message);
+      const response = await sendMessage({ id: receiverId, formData });
+      const sentMessage = response?.data?.data;
+      const audio = new Audio('/sound/drop.mp3')
+      audio.play().catch((err) => console.warn("Audio playback failed:", err));
+      // console.log(audio);
+      
 
-      AntMessage.success("Message sent!");
+      if (!sentMessage) throw new Error("Message not sent");
 
-      if (message) {
-        AntMessage.success("Message sent successfully");
+      AntMessage.success("Message sent successfully");
 
-        socket.emit("sendMessage", {
-          senderId: user._id,
-          receiverId: receiverId,
-          messages: message.trim(),
-          media: fileList.map((f) => f.name),
-        });
+      socket.emit("sendMessage", {
+        senderId: user._id,
+        receiverId,
+        message: sentMessage.messages,
+        media: sentMessage.media,
+      });
 
-        socket.emit("newMessage", {
-          senderId: message.senderId,
-          receiverId: message.receiverId,
-          messages: message.messages,
-          media: message.media,
-        });
+      setMessage("");
+      setFileList([]);
+      setShowEmojiPicker(false);
 
-        if (refetchMessages) {
-          refetchMessages();
-        }
-        setMessage("");
-        setFileList([]);
-        setShowEmojiPicker(false);
-        setSending(false);
+      if (typeof refetchMessages === "function") {
+        refetchMessages();
       }
+
     } catch (error) {
       console.error("Send failed", error.message);
       AntMessage.error("Failed to send message");
     } finally {
+      setSending(false);
       setUploading(false);
     }
   };
@@ -87,10 +75,9 @@ const SendUsersMessagesSection = () => {
 
   return (
     <div className="relative flex items-center gap-3 p-3 bg-white rounded-xl shadow-md w-full border border-gray-100">
-      {/* File Upload */}
       <Tooltip title="Attach File">
         <Upload
-        key={fileList.length}
+          key={fileList.length}
           fileList={fileList}
           onChange={handleFileChange}
           beforeUpload={() => false}
@@ -107,7 +94,6 @@ const SendUsersMessagesSection = () => {
         </Upload>
       </Tooltip>
 
-      {/* Emoji Picker */}
       <Tooltip title="Emoji">
         <button
           type="button"
@@ -126,7 +112,6 @@ const SendUsersMessagesSection = () => {
         </div>
       )}
 
-      {/* Message Input */}
       <Input
         value={message}
         onChange={(e) => setMessage(e.target.value)}
@@ -137,7 +122,6 @@ const SendUsersMessagesSection = () => {
         style={{ outline: "none" }}
       />
 
-      {/* Send Button */}
       <SendButton
         onClick={handleSend}
         disabled={isLoading || sending || (!message.trim() && fileList.length === 0)}
@@ -156,11 +140,7 @@ const SendButton = ({ onClick, disabled, loading }) => (
       disabled ? "bg-blue-300" : "bg-blue-500 hover:bg-blue-600"
     } text-white p-3 rounded-full flex items-center justify-center transition`}
   >
-    {loading ? (
-      <Spin size="small" style={{ color: "white" }} />
-    ) : (
-      <FaLocationArrow />
-    )}
+    {loading ? <Spin size="small" style={{ color: "white" }} /> : <FaLocationArrow />}
   </button>
 );
 
