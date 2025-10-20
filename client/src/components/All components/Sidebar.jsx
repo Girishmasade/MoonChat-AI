@@ -10,6 +10,7 @@ import { IoIosLogOut } from "react-icons/io";
 import { PiStarFour } from "react-icons/pi";
 import { Menu } from "antd";
 import { logout } from "../../redux/app/authSlice";
+import { setSelectedUser } from "../../redux/app/chatSlice";
 
 const Sidebar = () => {
   const user = useSelector((state) => state.auth.user);
@@ -39,6 +40,7 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     dispatch(logout());
+    dispatch(setSelectedUser([]))
     localStorage.clear;
     navigate(isAdmin ? "/admin-login" : "/siginin");
   };
