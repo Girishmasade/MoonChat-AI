@@ -149,6 +149,7 @@ export const login = async (req, res, next) => {
         email: user.email,
         username: user.username,
         avatar: user.avatar,
+        createdAt: user.createdAt,
       },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRY }
@@ -164,6 +165,7 @@ export const login = async (req, res, next) => {
           username: user.username,
           email: user.email,
           avatar: user.avatar,
+          createdAt: user.createdAt,
         },
       })
     );
@@ -280,7 +282,7 @@ export const uploadAvatar = async (req, res, next) => {
     if (!req.file) return next(new ErrorHandler("File not found", 404));
 
     const uploadedFile = req.file;
-    console.log(uploadedFile);
+    // console.log(uploadedFile);
 
     user.avatar = uploadedFile.path;
     await user.save();
@@ -298,7 +300,7 @@ export const uploadAvatar = async (req, res, next) => {
 
 export const getUserDetails = async (req, res, next) => {
   try {
-    const userId = req.user.userId
+    const userId = req.user.userId;
 
     const user = await User.findById(userId).select("-password");
     console.log(user);

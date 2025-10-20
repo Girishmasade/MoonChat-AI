@@ -23,7 +23,7 @@ export const authApi = apiSlice.injectEndpoints({
     uploadAvatar: builder.mutation({
       query: (formData) => ({
         url: `${AUTH_URL}/upload-avatar`,
-        method: "PUT",
+        method: "POST",
         body: formData,
       }),
     }),

@@ -1,83 +1,116 @@
 import React, { useState } from "react";
-import { Tabs, Upload, Image } from "antd";
+import { Tabs, Upload, Image, message, Spin } from "antd";
 import { FaCamera } from "react-icons/fa";
-import { InboxOutlined } from "@ant-design/icons";
 import Profile from "../../components/User/Profile";
 import Notification from "../../components/User/Notification";
 import Privacy from "../../components/User/Privacy";
+import { useSelector, useDispatch } from "react-redux";
+import { useUploadAvatarMutation } from "../../redux/api/authApi";
+import { setCredentials } from "../../redux/app/authSlice";
 
 const Settings = () => {
-  const [avatar, setAvatar] = useState(
-    "https://cdn.cgdream.ai/_next/image?url=https%3A%2F%2Fapi.cgdream.ai%2Frails%2Factive_storage%2Fblobs%2Fredirect%2FeyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBNUg0emc9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ%3D%3D--41792ecff90196b3250799db6edfb71a67d0443d%2F3ab99f35-d687-4d63-8178-04b725dc20ea_0.png&w=1080&q=95"
-  );
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
+  // console.log(user);
+  
+  const token = useSelector((state) => state.auth.token);
+  const [avatarPreview, setAvatarPreview] = useState(user?.avatar);
+  const [uploadAvatar, { isLoading }] = useUploadAvatarMutation();
 
-  const handleUpload = (info) => {
-    if (info.file.status === "done" || info.file.status === "uploading") {
-      // Create preview using local URL
-      const reader = new FileReader();
-      reader.onload = () => setAvatar(reader.result);
-      reader.readAsDataURL(info.file.originFileObj);
+  const handleUpload = async (info) => {
+    const file = info.file?.originFileObj || info.file;
+
+    if (!file) {
+      message.warn("No file selected")
+      console.warn("No file selected");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setAvatarPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+
+    try {
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      const response = await uploadAvatar(formData).unwrap();
+      const newAvatar = response?.data?.avatar;
+      dispatch(
+        setCredentials({
+          data: {
+            user: { ...user, avatar: newAvatar },
+            token
+          },
+        })
+      );
+
+      message.success("Avatar updated successfully!");
+    } catch (error) {
+      console.error("Avatar upload failed:", error.message);
+      message.error("Failed to upload avatar");
     }
   };
 
   const uploadProps = {
     showUploadList: false,
-    beforeUpload: () => false, // Prevent auto-upload
+    beforeUpload: () => false,
     onChange: handleUpload,
     accept: "image/*",
   };
 
   const items = [
-    {
-      key: "1",
-      label: "Profile",
-      children: <Profile />,
-    },
-    {
-      key: "2",
-      label: "Notification",
-      children: <Notification />,
-    },
-    {
-      key: "3",
-      label: "Privacy",
-      children: <Privacy />,
-    },
+    { key: "1", label: "Profile", children: <Profile /> },
+    { key: "2", label: "Notification", children: <Notification /> },
+    { key: "3", label: "Privacy", children: <Privacy /> },
   ];
 
   return (
-    <div className="bg-gray-700 w-full rounded-md p-6">
-      <div className="flex items-center bg-gray-500 rounded-lg p-4 gap-6">
-        <div className="relative w-[80px] h-[80px]">
-          <Image
-            src={avatar}
-            preview={true}
-            style={{
-              width: "80px",
-              height: "80px",
-              borderRadius: "50%",
-              objectFit: "cover",
-              border: "3px solid #00ffff",
-            }}
-          />
-
+    <div className="bg-gray-800 text-white w-full rounded-lg p-6 shadow-lg">
+      <div className="flex items-center bg-gray-700 rounded-lg p-5 gap-6">
+        <div className="relative w-[90px] h-[90px]">
+          {isLoading ? (
+            <div className="flex items-center justify-center w-[90px] h-[90px] rounded-full bg-gray-600">
+              <Spin />
+            </div>
+          ) : (
+            <Image
+              src={avatarPreview || user?.avatar || "https://cdn.pixabay.com/photo/2023/06/02/15/46/ai-generated-8035998_1280.png"}
+              preview={false}
+              style={{
+                width: "90px",
+                height: "90px",
+                borderRadius: "50%",
+                objectFit: "cover",
+                border: "3px solid #00FFFF",
+              }}
+            />
+          )}
           <Upload {...uploadProps} className="absolute bottom-0 right-0">
-            <div className="bg-white p-1 rounded-full cursor-pointer shadow hover:bg-gray-200">
-              <FaCamera className="text-blue-600 text-lg" />
+            <div className="bg-gray-900 p-2 rounded-full cursor-pointer shadow-md hover:bg-gray-600 transition">
+              <FaCamera className="text-cyan-400 text-lg" />
             </div>
           </Upload>
         </div>
 
-        <div className="flex flex-col justify-center">
-          <h2 className="text-xl font-bold text-black">Girish M</h2>
-          <p className="text-sm italic text-black">girishm@gmail.com</p>
-          <p className="text-sm text-gray-800">
-            Member Since <span className=" font-semibold">January 2024</span>
+        <div>
+          <h2 className="text-xl font-semibold">{user?.username}</h2>
+          <p className="text-sm text-gray-300">{user?.email}</p>
+          <p className="text-sm text-gray-400 mt-1">
+            Member Since{" "}
+            <span className="font-semibold text-gray-200">
+              {new Date(user?.createdAt).toLocaleString("default", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+            </span>
           </p>
         </div>
       </div>
 
-      <div className="mt-8 bg-gray-800 rounded-lg p-4">
+      <div className="mt-8 bg-gray-700 rounded-lg p-4">
         <Tabs
           defaultActiveKey="1"
           items={items}

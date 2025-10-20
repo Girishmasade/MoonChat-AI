@@ -40,7 +40,7 @@ authRouter.get("/github/callback", githubCallback)
 
 authRouter.put("/update-details", protectedRoute, updateUserDetails);
 authRouter.get("/profile", protectedRoute, getUserDetails);
-authRouter.put("/upload-avatar", upload.single("avatar"), protectedRoute, uploadAvatar)
+authRouter.post("/upload-avatar", upload.single("avatar"), protectedRoute, uploadAvatar)
 authRouter.get("/get-all-users", getUsers);
 authRouter.patch("/forget-password/:id", forgetPassword);
 authRouter.delete("/delete-user", deleteUser);
