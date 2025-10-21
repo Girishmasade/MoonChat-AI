@@ -4,6 +4,8 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+import { useEffect } from "react";
+
 import Dashboard from "./pages/Commondashboard/Dashboard";
 import UserLogin from "./pages/Auth/UserLogin";
 import SignUp from "./pages/Auth/SignUp";
@@ -17,75 +19,90 @@ import Contacts from "./pages/UserPages/Contacts";
 import Settings from "./pages/UserPages/Settings";
 import OAuthSuccess from "./pages/Auth/OAuthSuccess/OAuthSuccess";
 
+import "./index.css";
+
 function App() {
+  // Dynamic document title
+  useEffect(() => {
+    const titles = ["NovaChat-AI 🤖", "Smart Conversations 💬"];
+    let index = 0;
+    const interval = setInterval(() => {
+      document.title = titles[index % titles.length];
+      index++;
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Navigate to={"/dashboard"} />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route
-          path="/siginin"
-          element={
-            <PublicRoute>
-              <UserLogin />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/signup"
-          element={
-            <PublicRoute>
-              <SignUp />
-            </PublicRoute>
-          }
-        />
+    <div style={{ fontFamily: "'Orbitron', sans-serif" }}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" />} />
+          <Route path="/dashboard" element={<Dashboard />} />
 
-        <Route path="/oauth-success" element={<OAuthSuccess/>} />
+          <Route
+            path="/signin"
+            element={
+              <PublicRoute>
+                <UserLogin />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <PublicRoute>
+                <SignUp />
+              </PublicRoute>
+            }
+          />
+          <Route path="/oauth-success" element={<OAuthSuccess />} />
 
-        <Route element={<MainLayout />}>
-          <Route
-            path="/chat-dashboard"
-            element={
-              <ProtectedRoutes>
-                <UserDashboard />
-              </ProtectedRoutes>
-            }
-          />
-          <Route
-            path="/novachat"
-            element={
-              <ProtectedRoutes>
-                <AiChatting />
-              </ProtectedRoutes>
-            }
-          />
-          <Route
-            path="/chats"
-            element={
-              <ProtectedRoutes>
-                <Chats />
-              </ProtectedRoutes>
-            }
-          />
-          <Route
-            path="/contacts"
-            element={
-              <ProtectedRoutes>
-                <Contacts />
-              </ProtectedRoutes>
-            }
-          />
-           <Route
-            path="/settings"
-            element={
-              <ProtectedRoutes>
-                <Settings />
-              </ProtectedRoutes>
-            }
-          />
-        </Route>
-      </Routes>
-    </Router>
+          <Route element={<MainLayout />}>
+            <Route
+              path="/chat-dashboard"
+              element={
+                <ProtectedRoutes>
+                  <UserDashboard />
+                </ProtectedRoutes>
+              }
+            />
+            <Route
+              path="/novachat"
+              element={
+                <ProtectedRoutes>
+                  <AiChatting />
+                </ProtectedRoutes>
+              }
+            />
+            <Route
+              path="/chats"
+              element={
+                <ProtectedRoutes>
+                  <Chats />
+                </ProtectedRoutes>
+              }
+            />
+            <Route
+              path="/contacts"
+              element={
+                <ProtectedRoutes>
+                  <Contacts />
+                </ProtectedRoutes>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoutes>
+                  <Settings />
+                </ProtectedRoutes>
+              }
+            />
+          </Route>
+        </Routes>
+      </Router>
+    </div>
   );
 }
 

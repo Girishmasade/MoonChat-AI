@@ -43,10 +43,10 @@ const HeaderComponent = () => {
 
         <div className="flex flex-col">
           <h1
-            className="bg-gradient-to-tr from-blue-700 to-blue-500 text-transparent bg-clip-text text-lg font-semibold"
+            className="text-transparent bg-clip-text bg-gradient-to-tr from-cyan-400 to-blue-600 font-orbitron text-xl tracking-widest"
             style={{
               textShadow:
-                "0 0 8px rgba(59,130,246,0.8), 0 0 16px rgba(59,130,246,0.6)",
+                "0 0 8px rgba(0,255,255,0.8), 0 0 16px rgba(0,255,255,0.6)",
             }}
           >
             NovaChat-AI

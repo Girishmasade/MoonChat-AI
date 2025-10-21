@@ -1,7 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 
 :root {
   --bg-color: #ffffff;
@@ -13,19 +14,32 @@
   --text-color: #ffffff;
 }
 
+.app-title {
+  font-family: "Orbitron", sans-serif;
+  font-weight: 700;
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+  letter-spacing: 2px;
+  font-size: 2rem;
+}
+
 body {
+ font-family: "Orbitron", sans-serif;
+  letter-spacing: 0.5px;
   background-color: var(--bg-color);
   color: var(--text-color);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+
 @layer utilities {
   @keyframes blinkBg {
-    0%, 100% {
+    0%,
+    100% {
       background-color: transparent;
     }
     50% {
-      background-color: #c4b5fd; 
+      background-color: #c4b5fd;
     }
   }
 
@@ -46,14 +60,14 @@ body {
 }
 
 .custom-dark-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #38bdf8 !important; 
+  color: #38bdf8 !important;
 }
 
 .custom-dark-tabs .ant-tabs-ink-bar {
   background-color: #38bdf8 !important;
 }
 
-.custom-dark-color  {
+.custom-dark-color {
   color: rgb(248, 55, 55) !important;
 }
 
