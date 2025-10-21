@@ -134,7 +134,7 @@ export const clearNotification = async (req, res, next) => {
     }
 
     const clearMessages = await Notification.deleteMany({ receiverId: userId });
-    console.log(clearMessages);
+    // console.log(clearMessages);
 
     return res
       .status(200)

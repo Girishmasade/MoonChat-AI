@@ -21,7 +21,7 @@ app.set("io", io);
 const onlineUsers = new Map();
 
 io.on("connection", (socket) => {
-  console.log(`User connected: ${socket.id}`);
+  // console.log(`User connected: ${socket.id}`);
 
   // ✅ FIX: get userId from auth instead of query
   const userId = socket.handshake.auth?.userId;
