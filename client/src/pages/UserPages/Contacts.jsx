@@ -6,40 +6,44 @@ import {
   Tooltip,
   Empty,
   Spin,
+  Popconfirm,
+  message,
 } from "antd";
-import {
-  AiOutlineSearch,
-  AiOutlineMessage,
-} from "react-icons/ai";
+import { AiOutlineSearch, AiOutlineMessage, AiOutlineDelete } from "react-icons/ai";
 import AddContactButton from "../../components/User/AddContactButton";
 import { useDispatch } from "react-redux";
 import { setSelectedUser } from "../../redux/app/chatSlice";
 import { useNavigate } from "react-router-dom";
-import { useGetContactsQuery } from "../../redux/api/chatsApi";
+import { useGetContactsQuery, useRemoveContactMutation } from "../../redux/api/chatsApi";
 
 const Contacts = () => {
   const [search, setSearch] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { data, isLoading } = useGetContactsQuery();
+  const { data, isLoading, refetch } = useGetContactsQuery();
+  const [removeContact] = useRemoveContactMutation();
 
-  const contactsData = data?.data?.contacts || []
-  // console.log(contactsData);
-  
+  const contactsData = data?.data?.contacts || [];
 
-const handleFilter = contactsData.filter((item) =>
-  (item.username || item.name || "")
-    .toLowerCase()
-    .includes(search.toLowerCase())
-);
-
-  // const handleFilter = contacts
+  const handleFilter = contactsData.filter((item) =>
+    (item.username || item.name || "").toLowerCase().includes(search.toLowerCase())
+  );
 
   const chatWithContact = (contact) => {
     dispatch(setSelectedUser(contact));
-    // console.log("contact added in a list", contact);
-    navigate(`/chats`); // Optional
+    navigate(`/chats`);
+  };
+
+ const handleDelete = async (contactId) => {
+    try {
+      await removeContact(contactId).unwrap();
+      message.success("Contact removed successfully");
+      await refetch(); // Update contacts list instantly
+    } catch (error) {
+      message.error(error?.data?.message || "Failed to delete contact");
+      console.error(error);
+    }
   };
 
   if (isLoading) {
@@ -50,12 +54,11 @@ const handleFilter = contactsData.filter((item) =>
     );
   }
 
-
   return (
     <div className="bg-gradient-to-br from-gray-900 to-gray-800 flex flex-col w-full h-full rounded-xl p-6 md:px-20 text-white">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-extrabold tracking-wide">Contacts</h1>
-        <AddContactButton />
+        <AddContactButton onAdd={refetch} />
       </div>
 
       <div className="bg-gray-700/50 backdrop-blur-md p-4 rounded-xl flex items-center shadow-inner">
@@ -125,6 +128,21 @@ const handleFilter = contactsData.filter((item) =>
                       icon={<AiOutlineMessage className="text-xl text-white" />}
                     />
                   </Tooltip>
+
+                  <Popconfirm
+                    title="Are you sure to delete this contact?"
+                    onConfirm={() => handleDelete(item._id)}
+                    okText="Yes"
+                    cancelText="No"
+                  >
+                    <Tooltip title="Delete Contact">
+                      <Button
+                        shape="circle"
+                        className="bg-red-500 hover:bg-red-600 text-white border-none flex items-center justify-center"
+                        icon={<AiOutlineDelete />}
+                      />
+                    </Tooltip>
+                  </Popconfirm>
                 </div>
               </div>
             ))}

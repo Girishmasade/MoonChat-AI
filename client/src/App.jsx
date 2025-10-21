@@ -41,7 +41,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
 
           <Route
-            path="/signin"
+            path="/siginin"
             element={
               <PublicRoute>
                 <UserLogin />

@@ -31,7 +31,7 @@ const ChatList = () => {
       socket.on("getOnlineUsers", (users) => {
         dispatch(setOnlineusers(users));
       });
-
+      refetch()
       socket.on("userStatusChange", () => refetch());
     }
 
@@ -65,7 +65,7 @@ const ChatList = () => {
           placeholder="Search users..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="rounded-full bg-gray-700 text-white border-none placeholder-gray-400"
+          className="rounded-full bg-gray-700 text-black border-none placeholder-gray-400"
           style={{ height: "45px" }}
         />
       </div>

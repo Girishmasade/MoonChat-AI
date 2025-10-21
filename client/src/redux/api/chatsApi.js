@@ -17,6 +17,14 @@ export const chatApi = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+
+      removeContact: builder.mutation({
+      query: (contactId) => ({
+        url: `${CHAT_URL}/delete-contact/${contactId}`,
+        method: "DELETE",
+      }),
+    }),
+
     getChatList: builder.query({
       query: (listId) => ({
         url: `${CHAT_URL}/contact-list/${listId}`,
@@ -48,6 +56,7 @@ export const chatApi = apiSlice.injectEndpoints({
 export const {
   useAddContactMutation,
   useGetContactsQuery,
+  useRemoveContactMutation,
   useGetChatListQuery,
   useSendMessageMutation,
   useGetMessageQuery,

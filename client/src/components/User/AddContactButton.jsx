@@ -1,9 +1,9 @@
-import { Button, Form, Input, message, Modal, Spin } from "antd";
+import { Button, Form, Input, message, Modal } from "antd";
 import { useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { useAddContactMutation } from "../../redux/api/chatsApi";
 
-const AddContactButton = () => {
+const AddContactButton = ({ onAdd }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [form] = Form.useForm();
   const [addContact, { isLoading }] = useAddContactMutation();
@@ -11,12 +11,13 @@ const AddContactButton = () => {
   const handleFinish = async (values) => {
     try {
       const response = await addContact(values).unwrap();
-      // console.log(response.contactUser);
-
       message.success("Contact added successfully");
 
       form.resetFields();
       setIsOpen(false);
+
+      // Call parent's refetch to update contacts list instantly
+      if (onAdd) await onAdd();
     } catch (error) {
       const errorMsg =
         error?.message || error?.data?.message || "Something went wrong";
@@ -59,7 +60,7 @@ const AddContactButton = () => {
             label="Username"
             rules={[{ required: true, message: "Username is required" }]}
           >
-            <Input placeholder="Enter Username"/>
+            <Input placeholder="Enter Username" />
           </Form.Item>
 
           <Form.Item
