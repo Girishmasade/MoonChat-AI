@@ -11,24 +11,23 @@ import { setCredentials } from "../../redux/app/authSlice";
 const Settings = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
-  // console.log(user);
-  
   const token = useSelector((state) => state.auth.token);
+
   const [avatarPreview, setAvatarPreview] = useState(user?.avatar);
   const [uploadAvatar, { isLoading }] = useUploadAvatarMutation();
 
+  // Handle avatar upload
   const handleUpload = async (info) => {
     const file = info.file?.originFileObj || info.file;
 
     if (!file) {
-      message.warn("No file selected")
-      console.warn("No file selected");
+      message.warn("No file selected");
       return;
     }
+
+    // Preview image immediately
     const reader = new FileReader();
-    reader.onload = () => {
-      setAvatarPreview(reader.result);
-    };
+    reader.onload = () => setAvatarPreview(reader.result);
     reader.readAsDataURL(file);
 
     try {
@@ -37,27 +36,35 @@ const Settings = () => {
 
       const response = await uploadAvatar(formData).unwrap();
       const newAvatar = response?.data?.avatar;
+
+      // Update Redux state for immediate UI update
       dispatch(
         setCredentials({
-          data: {
-            user: { ...user, avatar: newAvatar },
-            token
-          },
+          user: { ...user, avatar: newAvatar },
+          token,
         })
       );
 
       message.success("Avatar updated successfully!");
     } catch (error) {
-      console.error("Avatar upload failed:", error.message);
+      console.error("Avatar upload failed:", error?.message || error);
       message.error("Failed to upload avatar");
     }
   };
 
+  // Upload props with validation
   const uploadProps = {
     showUploadList: false,
-    beforeUpload: () => false,
+    beforeUpload: (file) => {
+      const isImage = file.type.startsWith("image/");
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isImage) message.error("You can only upload image files!");
+      if (!isLt2M) message.error("Image must be smaller than 2MB!");
+      return false; // manual upload
+    },
     onChange: handleUpload,
     accept: "image/*",
+    disabled: isLoading,
   };
 
   const items = [
@@ -68,6 +75,7 @@ const Settings = () => {
 
   return (
     <div className="bg-gray-800 text-white w-full rounded-lg p-6 shadow-lg">
+      {/* User info */}
       <div className="flex items-center bg-gray-700 rounded-lg p-5 gap-6">
         <div className="relative w-[90px] h-[90px]">
           {isLoading ? (
@@ -76,7 +84,11 @@ const Settings = () => {
             </div>
           ) : (
             <Image
-              src={avatarPreview || user?.avatar || "https://cdn.pixabay.com/photo/2023/06/02/15/46/ai-generated-8035998_1280.png"}
+              src={
+                avatarPreview ||
+                user?.avatar ||
+                "https://cdn.pixabay.com/photo/2023/06/02/15/46/ai-generated-8035998_1280.png"
+              }
               preview={false}
               style={{
                 width: "90px",
@@ -95,27 +107,31 @@ const Settings = () => {
         </div>
 
         <div>
-          <h2 className="text-xl font-semibold">{user?.username}</h2>
-          <p className="text-sm text-gray-300">{user?.email}</p>
+          <h2 className="text-xl font-semibold">{user?.username || "-"}</h2>
+          <p className="text-sm text-gray-300">{user?.email || "-"}</p>
           <p className="text-sm text-gray-400 mt-1">
             Member Since{" "}
             <span className="font-semibold text-gray-200">
-              {new Date(user?.createdAt).toLocaleString("default", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
+              {user?.createdAt
+                ? new Date(user.createdAt).toLocaleDateString("default", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })
+                : "-"}
             </span>
           </p>
         </div>
       </div>
 
+      {/* Tabs */}
       <div className="mt-8 bg-gray-700 rounded-lg p-4">
         <Tabs
           defaultActiveKey="1"
           items={items}
           tabBarGutter={32}
           centered
+          destroyOnHidden
           className="custom-dark-tabs"
         />
       </div>

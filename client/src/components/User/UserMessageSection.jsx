@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { socket } from "../../socket.io/socketclient";
 import SendUsersMessagesSection from "./SendUsersMessagesSection";
 import { message } from "antd";
+import { useMarkAsReadMutation, useGetNotificationQuery } from "../../redux/api/notificationApi";
 
 const UserMessageSection = () => {
   const user = useSelector((state) => state.auth.user);
@@ -14,40 +15,64 @@ const UserMessageSection = () => {
   const { data, isLoading, isError, refetch } = useGetMessageQuery(receiverId);
   const [messages, setMessages] = useState([]);
 
+  // Notifications data
+  const { data: notificationData } = useGetNotificationQuery();
+  const [notificationsData, setNotificationsData] = useState([]);
+  const [markAsRead] = useMarkAsReadMutation();
+
+  // Sync messages from API
   useEffect(() => {
     if (data?.data?.messages) {
-      // console.log("Fetched messages:", data.data.messages);
       setMessages(data.data.messages);
     }
   }, [data]);
 
+  // Sync notifications from API
+  useEffect(() => {
+    if (notificationData?.data?.notifications) {
+      setNotificationsData(notificationData.data.notifications);
+    }
+  }, [notificationData]);
+
+  // Mark notifications as read when opening a chat
+  useEffect(() => {
+    if (!receiverId || !notificationsData.length) return;
+
+    const unreadNotifications = notificationsData.filter(
+      (n) => !n.isRead && n.senderId?._id === receiverId
+    );
+
+    unreadNotifications.forEach((n) => {
+      markAsRead(n._id)
+        .unwrap()
+        .then(() => {
+          setNotificationsData((prev) =>
+            prev.map((notif) =>
+              notif._id === n._id ? { ...notif, isRead: true } : notif
+            )
+          );
+        })
+        .catch((err) => console.error("Failed to mark as read", err));
+    });
+  }, [receiverId, notificationsData, markAsRead]);
+
+  // Socket setup
   useEffect(() => {
     if (!userId) return;
 
     socket.auth = { userId };
     socket.connect();
     socket.emit("joinRoom", userId);
-    // console.log("🟢 Joined socket room:", userId);
 
     const handleNewMessage = (newMessage) => {
-      // console.log("📩 New message from socket:", newMessage);
       setMessages((prev) => [...prev, newMessage]);
     };
-
-    if (
-      (userId === userId && receiverId === selectedUser?._id) ||
-      (receiverId === userId && userId === selectedUser?._id)
-    ) {
-      setMessages([]);
-      message.info("Chat cleared");
-    }
 
     socket.on("receiveMessage", handleNewMessage);
 
     return () => {
       socket.off("receiveMessage", handleNewMessage);
       socket.disconnect();
-      // console.log("🔌 Socket disconnected from MessageSection");
     };
   }, [userId]);
 

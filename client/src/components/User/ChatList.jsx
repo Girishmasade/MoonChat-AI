@@ -59,7 +59,7 @@ const ChatList = () => {
 
   return (
     <div className="flex flex-col w-[400px] bg-gray-900 gap-3 rounded-lg shadow-lg overflow-hidden">
-      {/* 🔍 Search Bar */}
+ 
       <div className="h-[80px] bg-gray-800 border-b flex items-center justify-center px-4">
         <Input
           placeholder="Search users..."
@@ -70,7 +70,6 @@ const ChatList = () => {
         />
       </div>
 
-      {/* 💬 User List */}
       <div className="flex-1 overflow-y-auto p-3 space-y-2">
         {filteredUsers.length > 0 ? (
           filteredUsers.map((user) => {

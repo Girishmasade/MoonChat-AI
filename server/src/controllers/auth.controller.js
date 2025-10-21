@@ -177,11 +177,10 @@ export const login = async (req, res, next) => {
 // Google OAuth google login and callback
 
 export const googleLogin = (req, res, next) => {
-  passport.authenticate("google", { scope: ["profile", "email"], prompt: "select_account", })(
-    req,
-    res,
-    next
-  );
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+    prompt: "select_account",
+  })(req, res, next);
 };
 
 export const googleCallback = (req, res, next) => {
@@ -200,7 +199,7 @@ export const googleCallback = (req, res, next) => {
           avatar: user.avatar,
         },
         process.env.JWT_SECRET,
-        { expiresIn: "7d" } 
+        { expiresIn: "7d" }
       );
 
       // Redirect to frontend with token
@@ -254,14 +253,19 @@ export const updateUserDetails = async (req, res, next) => {
     const user = await User.findByIdAndUpdate(
       userId,
       { $set: { username, name, contact, lastname } },
-      { new: true }
+      { new: true, runValidators: true }
     ).select("-password");
 
-    res.status(200).json({
-      status: true,
-      message: "Profile Updated Successfully.",
-      user,
-    });
+    // res.status(200).json({
+    //   status: true,
+    //   message: "Profile Updated Successfully.",
+    //   user,
+    // });
+    return res
+      .status(200)
+      .json(
+        new SuccessHandler(200, "Profile Updated Successfully.", { data: user })
+      );
   } catch (error) {
     next(error);
   }
@@ -272,7 +276,7 @@ export const uploadAvatar = async (req, res, next) => {
     const userId = req.user?.userId;
 
     const user = await User.findById(userId);
-    console.log(user);
+    // console.log(user);
     if (!user) return next(new ErrorHandler("User not found", 404));
 
     if (!req.file) return next(new ErrorHandler("File not found", 404));
@@ -299,7 +303,7 @@ export const getUserDetails = async (req, res, next) => {
     const userId = req.user.userId;
 
     const user = await User.findById(userId).select("-password");
-    console.log(user);
+    // console.log(user);
 
     res
       .status(200)
@@ -326,7 +330,7 @@ export const forgetPassword = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log(hashedPassword);
+    // console.log(hashedPassword);
 
     user.password = hashedPassword;
     await user.save();

@@ -3,52 +3,66 @@ import ErrorHandler from "../utils/errorHadler.js";
 import { io, onlineUsers } from "../../socket.js";
 import SuccessHandler from "../utils/successHandler.js";
 
-export const sendNotification = async (
-  senderId,
-  receiverId,
-  type,
-  content,
-  io
-) => {
-  try {
-    if (!senderId) throw new ErrorHandler("SenderId is required", 400);
-    if (!receiverId) throw new ErrorHandler("ReceiverId is required", 400);
+// export const sendNotification = async (
+//   senderId,
+//   receiverId,
+//   type,
+//   content,
+//   ioInstance
+// ) => {
+//   try {
+//     if (!senderId || !receiverId) {
+//       throw new ErrorHandler("SenderId and ReceiverId are required", 400);
+//     }
 
-    const newNotify = await Notification.create({
-      senderId,
-      receiverId,
-      content,
-      type: type || "message",
-      isRead: false,
-    });
+//     const safeContent =
+//       content && content.trim() !== ""
+//         ? content
+//         : "You have a new notification";
 
-    const receiverSocketId = global.onlineUsers?.get(receiverId);
-    if (receiverSocketId && io) {
-      io.to(receiverSocketId).emit("newNotification", newNotify);
-    }
+//     const notification = await Notification.create({
+//       senderId,
+//       receiverId,
+//       type: type || "message",
+//       content: safeContent,
+//       isRead: false,
+//     });
 
-    return newNotify;
-  } catch (error) {
-    console.error("Error in sendNotification:", error.message);
-  }
-};
+//     const io = ioInstance || global.io;
+//     const receiverSocketId = onlineUsers.get(receiverId);
 
+//     if (receiverSocketId && io) {
+//       io.to(receiverSocketId).emit("newNotification", notification);
+//     }
+
+//     return notification;
+//   } catch (err) {
+//     console.error("sendNotification error:", err.message);
+//     return null; // safe fallback
+//   }
+// };
 export const sendNotificationRoute = async (req, res, next) => {
   try {
-    const senderId = req.user.userId;
-    const { receiverId, type, content } = req.body;
+    const { senderId, receiverId, type, content } = req.body;
     const io = req.app.get("io");
 
-    const notification = await sendNotification(
+    const notification = await Notification.create({
       senderId,
       receiverId,
-      type,
-      content,
-      io
-    );
+      type: type || "message",
+      content: "ypu have new Notification",
+    });
+    if (!notification) {
+      return next(new ErrorHandler("Failed to send notification", 500));
+    }
+
+    io.to(receiverId.toString()).emit("newNotification", notification);
+
     res
       .status(200)
-      .json(new SuccessHandler(200, "Notification sent", { notification }));
+      .json(
+        new SuccessHandler(200, "Notification sent", { data: notification })
+      );
   } catch (error) {
     next(error);
   }
@@ -63,7 +77,7 @@ export const getNotification = async (req, res, next) => {
       .populate("senderId", "username email avatar")
       .sort({ createdAt: -1 });
 
-    console.log(notifications);
+    // console.log(notifications);
 
     return res
       .status(200)
@@ -105,6 +119,52 @@ export const isRead = async (req, res, next) => {
     return res.status(200).json(
       new SuccessHandler(200, "Notification marked as read", {
         notification: updatedNotification,
+      })
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const clearNotification = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    if (!userId) {
+      return next(new ErrorHandler("User ID is required", 400));
+    }
+
+    const clearMessages = await Notification.deleteMany({ receiverId: userId });
+    console.log(clearMessages);
+
+    return res
+      .status(200)
+      .json(
+        new SuccessHandler(200, "All messages successfully deleted", {
+          data: clearMessages,
+        })
+      );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const clearSingleNotification = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return next(new ErrorHandler("Notification ID is required", 400));
+    }
+
+    const clearMessageSingle = await Notification.findByIdAndDelete(id);
+
+    if (!clearMessageSingle) {
+      return next(new ErrorHandler("Notification not found", 404));
+    }
+
+    return res.status(200).json(
+      new SuccessHandler(200, "Notification deleted successfully", {
+        data: clearMessageSingle,
       })
     );
   } catch (error) {

@@ -1,5 +1,7 @@
 import { Router } from "express";
 import {
+  clearNotification,
+  clearSingleNotification,
   getNotification,
   isRead,
   sendNotificationRoute,
@@ -17,5 +19,8 @@ notificationRouter.post(
 notificationRouter.get("/get-notification", protectedRoute, getNotification);
 notificationRouter.put("/is-read/:id", protectedRoute, isRead);
 notificationRouter.patch("/stop-notification", protectedRoute, stopNotification);
+
+notificationRouter.delete("/clear", protectedRoute, clearNotification)
+notificationRouter.delete("/clear/:id", protectedRoute, clearSingleNotification)
 
 export default notificationRouter;

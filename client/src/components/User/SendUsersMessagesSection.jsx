@@ -1,9 +1,17 @@
 import React, { useState, Suspense } from "react";
-import { Input, Tooltip, Upload, message as AntMessage, Spin, Button } from "antd";
+import {
+  Input,
+  Tooltip,
+  Upload,
+  message as AntMessage,
+  Spin,
+  Button,
+} from "antd";
 import { FaSmile, FaPaperclip, FaLocationArrow } from "react-icons/fa";
 import { useSendMessageMutation } from "../../redux/api/chatsApi";
 import { useSelector } from "react-redux";
 import { socket } from "../../socket.io/socketclient";
+import { useSendNotificationMutation } from "../../redux/api/notificationApi";
 
 const EmojiPicker = React.lazy(() => import("emoji-picker-react"));
 
@@ -23,23 +31,25 @@ const SendUsersMessagesSection = ({ refetchMessages }) => {
   const receiverId = selectedUser?._id;
 
   const [sendMessage, { isLoading }] = useSendMessageMutation();
+  const [sendNotification] = useSendNotificationMutation();
 
   const handleSend = async () => {
     if (!message.trim() && fileList.length === 0) return;
 
     const formData = new FormData();
     if (message.trim()) formData.append("message", message.trim());
-    fileList.forEach((file) => formData.append("media", file.originFileObj || file));
+    fileList.forEach((file) =>
+      formData.append("media", file.originFileObj || file)
+    );
 
     setSending(true);
 
     try {
       const response = await sendMessage({ id: receiverId, formData });
       const sentMessage = response?.data?.data;
-      const audio = new Audio('/sound/drop.mp3')
+      const audio = new Audio("/sounds/drop.mp3");
       audio.play().catch((err) => console.warn("Audio playback failed:", err));
       // console.log(audio);
-      
 
       if (!sentMessage) throw new Error("Message not sent");
 
@@ -52,6 +62,25 @@ const SendUsersMessagesSection = ({ refetchMessages }) => {
         media: sentMessage.media,
       });
 
+      const notificationResponse = await sendNotification({
+        senderId: user._id,
+        receiverId: receiverId,
+        type: "message",
+        content: sentMessage.messages,
+      });
+
+      const notification = notificationResponse?.data?.data?.notification;
+      // console.log(notification);
+
+      if (notification) {
+        socket.emit("newNotification", {
+          senderId: user._id,
+          receiverId: receiverId,
+          content: "",
+          notification,
+        });
+      }
+
       setMessage("");
       setFileList([]);
       setShowEmojiPicker(false);
@@ -59,7 +88,6 @@ const SendUsersMessagesSection = ({ refetchMessages }) => {
       if (typeof refetchMessages === "function") {
         refetchMessages();
       }
-
     } catch (error) {
       console.error("Send failed", error.message);
       AntMessage.error("Failed to send message");
@@ -124,7 +152,9 @@ const SendUsersMessagesSection = ({ refetchMessages }) => {
 
       <SendButton
         onClick={handleSend}
-        disabled={isLoading || sending || (!message.trim() && fileList.length === 0)}
+        disabled={
+          isLoading || sending || (!message.trim() && fileList.length === 0)
+        }
         loading={isLoading || sending}
       />
     </div>
@@ -140,7 +170,11 @@ const SendButton = ({ onClick, disabled, loading }) => (
       disabled ? "bg-blue-300" : "bg-blue-500 hover:bg-blue-600"
     } text-white p-3 rounded-full flex items-center justify-center transition`}
   >
-    {loading ? <Spin size="small" style={{ color: "white" }} /> : <FaLocationArrow />}
+    {loading ? (
+      <Spin size="small" style={{ color: "white" }} />
+    ) : (
+      <FaLocationArrow />
+    )}
   </button>
 );
 

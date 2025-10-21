@@ -4,6 +4,7 @@ import ErrorHandler from "../utils/errorHadler.js";
 import SuccessHandler from "../utils/successHandler.js";
 import { io, onlineUsers } from "../../socket.js";
 import { geminiai } from "../config/geminiai.config.js";
+import Notification from "../models/notification.model.js";
 // import { sendNotification } from "./notification.controller.js";
 // import mongoose from "mongoose";
 
@@ -161,6 +162,7 @@ export const sendMessage = async (req, res, next) => {
   try {
     const senderId = req.user.userId;
     const receiverId = req.params.id;
+    const io = req.app.get("io"); 
 
     if (!senderId || !receiverId) {
       return next(
@@ -210,6 +212,17 @@ export const sendMessage = async (req, res, next) => {
         createdAt: newMessage.createdAt,
       });
     }
+
+     const sender = await User.findById(senderId).select("username");
+
+    const notification = await Notification.create({
+      senderId,
+      receiverId,
+      type: "message",
+      content: `${sender.username} sent you a message`,
+    });
+
+    io.to(receiverId.toString()).emit("newNotification", notification);
 
     return res
       .status(200)

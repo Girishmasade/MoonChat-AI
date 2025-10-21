@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Badge,
   Button,
@@ -10,37 +10,64 @@ import {
   Divider,
   Avatar,
 } from "antd";
-import { BellFilled } from "@ant-design/icons";
+import { BellFilled, DeleteOutlined } from "@ant-design/icons";
+import {
+  useGetNotificationQuery,
+  useClearNotificationMutation,
+  useClearSingleNotificationMutation,
+} from "../../redux/api/notificationApi";
 
 const { Text, Title } = Typography;
 
 const Notification = () => {
   const [open, setOpen] = useState(false);
+  const [notificationsData, setNotificationsData] = useState([]);
 
-  const [notifications, setNotifications] = useState([
-    { id: 1, name: "Harsh", lastname: "Lambhe", avatar: "", isRead: false },
-    { id: 2, name: "Amit", lastname: "Sharma", avatar: "", isRead: false },
-    { id: 3, name: "Priya", lastname: "Verma", avatar: "", isRead: true },
-    { id: 4, name: "Rahul", lastname: "Sachdev", avatar: "", isRead: false },
-    { id: 5, name: "Rohan", lastname: "Chide", avatar: "", isRead: false },
-  ]);
+  const { data, isLoading, isError } = useGetNotificationQuery();
+  const [clearNotification] = useClearNotificationMutation();
+  const [clearSingleNotification] = useClearSingleNotificationMutation();
+
+  useEffect(() => {
+    if (data?.data?.notifications) {
+      const audio = new Audio("/sounds/notification.mp3")
+      audio.play().catch(error => console.log("error in notification", error))
+      setNotificationsData(data.data.notifications);
+    }
+  }, [data]);
 
   const handleOpenChange = (flag) => setOpen(flag);
 
   const handleMarkAllRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    setNotificationsData((prev) => prev.map((n) => ({ ...n, isRead: true })));
   };
 
-  const handleNotificationClick = (user) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === user.id ? { ...n, isRead: true } : n))
+  const handleClearAll = async () => {
+    try {
+      await clearNotification().unwrap();
+      setNotificationsData([]);
+    } catch (error) {
+      console.error("Failed to clear all notifications", error);
+    }
+  };
+
+  const handleClearSingle = async (id) => {
+    try {
+      await clearSingleNotification(id).unwrap();
+      setNotificationsData((prev) => prev.filter((n) => n._id !== id));
+    } catch (error) {
+      console.error("Failed to clear notification", error);
+    }
+  };
+
+  const handleNotificationClick = (item) => {
+    setNotificationsData((prev) =>
+      prev.map((n) => (n._id === item._id ? { ...n, isRead: true } : n))
     );
     setOpen(false);
   };
 
   const notificationContent = (
     <Card
-      variant={false}
       style={{
         width: 380,
         background: "linear-gradient(160deg, #0f0f0f, #1a1a1a)",
@@ -50,7 +77,6 @@ const Notification = () => {
         padding: "12px",
       }}
     >
-      {/* Header */}
       <div
         style={{
           display: "flex",
@@ -62,39 +88,33 @@ const Notification = () => {
         <Title level={5} style={{ color: "#fff", margin: 0 }}>
           🔔 Notifications
         </Title>
-        <Button
-          size="small"
-          type="text"
-          style={{ color: "#40a9ff" }}
-          onClick={handleMarkAllRead}
-        >
-          Mark all read
-        </Button>
+        <div className="flex gap-2">
+          <Button size="small" type="text" style={{ color: "#40a9ff" }} onClick={handleClearAll}>
+            Clear All
+          </Button>
+          <Button size="small" type="text" style={{ color: "#40a9ff" }} onClick={handleMarkAllRead}>
+            Mark all read
+          </Button>
+        </div>
       </div>
 
       <Divider style={{ backgroundColor: "#333", margin: "6px 0" }} />
 
-      {/* List */}
-      {notifications.length === 0 ? (
+      {isLoading ? (
+        <Text style={{ color: "#ccc" }}>Loading...</Text>
+      ) : isError ? (
+        <Text style={{ color: "red" }}>Failed to load notifications</Text>
+      ) : notificationsData.length === 0 ? (
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description={
-            <span style={{ color: "white" }}>No new notifications</span>
-          }
+          description={<span style={{ color: "white" }}>No new notifications</span>}
           style={{ margin: "20px 0" }}
         />
       ) : (
-        <div
-          style={{
-            maxHeight: 260,
-            overflowY: "auto",
-            paddingRight: "4px",
-          }}
-        >
-          {notifications.map((item) => (
+        <div style={{ maxHeight: 260, overflowY: "auto", paddingRight: "4px" }}>
+          {notificationsData.map((item) => (
             <div
-              key={item.id}
-              onClick={() => handleNotificationClick(item)}
+              key={item._id}
               style={{
                 padding: "10px",
                 borderRadius: "10px",
@@ -108,10 +128,8 @@ const Notification = () => {
                 transition: "all 0.25s ease",
                 cursor: "pointer",
               }}
-              onMouseOver={(e) =>
-                (e.currentTarget.style.background =
-                  "rgba(255, 255, 255, 0.12)")
-              }
+              onClick={() => handleNotificationClick(item)}
+              onMouseOver={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0.12)")}
               onMouseOut={(e) =>
                 (e.currentTarget.style.background = item.isRead
                   ? "rgba(255, 255, 255, 0.03)"
@@ -120,35 +138,40 @@ const Notification = () => {
             >
               <Avatar
                 size={40}
-                src={item.avatar || ""}
+                src={item.senderId?.avatar || ""}
                 style={{ backgroundColor: "#1677ff", color: "#fff" }}
               >
-                {item.name.charAt(0)}
+                {item.senderId?.username?.charAt(0)?.toUpperCase()}
               </Avatar>
               <div style={{ flex: 1 }}>
-                <Text
-                  style={{
-                    color: "#e6e6e6",
-                    fontWeight: item.isRead ? "400" : "600",
-                  }}
-                >
-                  New message from{" "}
-                  <span style={{ color: "#40a9ff" }}>
-                    {item.name} {item.lastname}
-                  </span>
+                <Text style={{ color: "#e6e6e6", fontWeight: item.isRead ? "400" : "600" }}>
+                  {item.content}
+                </Text>
+                <br />
+                <Text style={{ color: "#888", fontSize: "12px" }}>
+                  From: {item.senderId?.username}
                 </Text>
               </div>
-              {!item.isRead && (
-                <span
-                  style={{
-                    width: "10px",
-                    height: "10px",
-                    borderRadius: "50%",
-                    backgroundColor: "#40a9ff",
-                    flexShrink: 0,
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                {!item.isRead && (
+                  <span
+                    style={{
+                      width: "10px",
+                      height: "10px",
+                      borderRadius: "50%",
+                      backgroundColor: "#40a9ff",
+                      flexShrink: 0,
+                    }}
+                  />
+                )}
+                <DeleteOutlined
+                  style={{ color: "#ff4d4f", cursor: "pointer" }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleClearSingle(item._id);
                   }}
-                ></span>
-              )}
+                />
+              </div>
             </div>
           ))}
         </div>
@@ -159,7 +182,7 @@ const Notification = () => {
   return (
     <Space size={2}>
       <Dropdown
-        popupRender={() => notificationContent} // ✅ FIXED
+        popupRender={() => notificationContent}
         trigger={["click"]}
         open={open}
         onOpenChange={handleOpenChange}
@@ -167,7 +190,7 @@ const Notification = () => {
         arrow
       >
         <Badge
-          count={notifications.filter((n) => !n.isRead).length}
+          count={notificationsData.filter((n) => !n.isRead).length}
           size="small"
           offset={[-2, 4]}
           style={{ backgroundColor: "#1677ff" }}
@@ -179,12 +202,8 @@ const Notification = () => {
               cursor: "pointer",
               transition: "transform 0.2s ease",
             }}
-            onMouseOver={(e) =>
-              (e.currentTarget.style.transform = "scale(1.15)")
-            }
-            onMouseOut={(e) =>
-              (e.currentTarget.style.transform = "scale(1)")
-            }
+            onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.15)")}
+            onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
           />
         </Badge>
       </Dropdown>

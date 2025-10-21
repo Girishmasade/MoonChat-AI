@@ -15,10 +15,9 @@ const { Header, Sider, Content } = Layout;
 
 const MainLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const user = useSelector(state => state.auth.user)
+  const user = useSelector((state) => state.auth.user);
   return (
     <Layout style={{}}>
-      {/* Sidebar */}
       <Sider
         trigger={null}
         collapsible
@@ -41,7 +40,7 @@ const MainLayout = () => {
           color: "#fff",
           display: "flex",
           flexDirection: "column",
-          minHeight: "100vh", // ✅ Ensures the layout fills full height
+          minHeight: "100vh", 
         }}
       >
         {/* Header */}
@@ -70,18 +69,16 @@ const MainLayout = () => {
           />
 
           <div className="flex gap-5 pr-5 items-center">
-            <NotificationButton/>
+            <NotificationButton />
 
             <Space size={24}>
               <Avatar
-                src={user?.avatar}
+                src={user?.avatar || "...fallback..."}
                 shape="circle"
                 size="large"
                 icon={<UserOutlined />}
-                style={{
-                  backgroundColor: "#1677ff",
-                  cursor: "pointer",
-                }}
+                style={{ cursor: "pointer" }}
+                onClick={() => navigate("/settings")}
               />
             </Space>
           </div>
