@@ -47,8 +47,12 @@ const SendUsersMessagesSection = ({ refetchMessages }) => {
     try {
       const response = await sendMessage({ id: receiverId, formData });
       const sentMessage = response?.data?.data;
-      const audio = new Audio("/sounds/drop.mp3");
-      audio.play().catch((err) => console.warn("Audio playback failed:", err));
+      if (sentMessage) {
+        const audio = new Audio("/sounds/drop.mp3");
+        audio
+          .play()
+          .catch((err) => console.warn("Audio playback failed:", err));
+      } 
       // console.log(audio);
 
       if (!sentMessage) throw new Error("Message not sent");

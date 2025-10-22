@@ -23,7 +23,7 @@ const Notification = () => {
   const [open, setOpen] = useState(false);
   const [notificationsData, setNotificationsData] = useState([]);
 
-  const { data, isLoading, isError } = useGetNotificationQuery();
+  const { data, isLoading, isError, refetch } = useGetNotificationQuery();
   const [clearNotification] = useClearNotificationMutation();
   const [clearSingleNotification] = useClearSingleNotificationMutation();
 
@@ -32,6 +32,7 @@ const Notification = () => {
       const audio = new Audio("/sounds/notification.mp3")
       audio.play().catch(error => console.log("error in notification", error))
       setNotificationsData(data.data.notifications);
+      refetch()
     }
   }, [data]);
 
