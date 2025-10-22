@@ -13,7 +13,7 @@ const ChatList = () => {
   const [search, setSearch] = useState("");
 
   const userId = authUser?._id;
-  console.log(userId);
+  // console.log(userId);
   
 
   const { data, isLoading, isError, refetch } = useGetChatListQuery(userId);

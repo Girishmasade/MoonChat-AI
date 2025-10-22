@@ -33,19 +33,15 @@ const OAuthSuccess = () => {
             },
           }
         );
-        console.log(response);
+        // console.log(response);
 
         const user = response.data?.data?.user;
 
         if (user) {
           dispatch(setCredentials({ data: { user, token } }));
           localStorage.setItem("userInfo", JSON.stringify(user));
-
-          console.log("User and token saved in localStorage:", user);
+          // console.log("User and token saved in localStorage:", user);
           navigate("/chat-dashboard");
-        } else {
-          console.warn("User data missing in response");
-          navigate("/signin");
         }
       } catch (error) {
         console.error("Error fetching profile:", error);

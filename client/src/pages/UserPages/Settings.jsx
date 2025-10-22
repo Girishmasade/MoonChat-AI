@@ -11,7 +11,7 @@ import { setCredentials } from "../../redux/app/authSlice";
 const Settings = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
-  console.log(user);
+  // console.log(user);
   
   const token = useSelector((state) => state.auth.token);
 
