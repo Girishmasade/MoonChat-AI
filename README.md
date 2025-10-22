@@ -10,19 +10,6 @@ With dark mode support, neon-styled UI elements, and responsive design, NovaChat
 
 - [@girishmasade](https://www.github.com/octokatherine)
 
-
-## 🛠 Skills
-Javascript, MongoDB, Express, React, Node, scocket.io, OAuth, passport.js, ant-design, Gemini-AI
-
-
-## Screenshots
-
-![Ui dashboard Screenshot](file:///home/lenovo/Pictures/ai%20chat%20sys/Screenshot%20from%202025-10-17%2001-07-17.png)
-
-![contact Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
-
-![login Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
-
 ## Tech Stack
 
 **Client:** React, Redux, TailwindCSS, AntDesign
