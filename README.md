@@ -1,35 +1,93 @@
-🚀 AI-Powered Real-Time Chat App (MERN + Python + Gemini AI) 📌 Overview
 
-A modern AI-powered chat application built using MERN stack + Python + Gemini AI. This app enables real-time messaging, emojis, file uploads, and AI-powered smart features such as summarization, document Q&A, and intelligent reply suggestions.
+# AI Chat System [NovaChat-AI]
 
-🔑 Features
+**NovaChat-AI** is a full-stack, AI-powered chat system designed to provide **smart, real-time conversations** in a sleek and futuristic interface. Built using the **MERN stack (MongoDB, Express.js, React.js, Node.js)**, it combines modern front-end design with robust back-end functionality. The platform supports **user authentication, profile management, real-time messaging, and an admin dashboard** for analytics and user management.  
 
-🔐 Authentication & Roles (JWT/Auth0/Clerk)
+With dark mode support, neon-styled UI elements, and responsive design, NovaChat-AI offers a highly engaging and modern chat experience.  
 
-💬 Real-time Chat with Socket.IO
 
-😀 Emoji Picker & Reactions
+## Authors
 
-📂 File & Document Uploads (PDFs, images) with inline previews
+- [@girishmasade](https://www.github.com/octokatherine)
 
-🤖 Gemini AI Assistant for:
 
-Chat summaries
+## 🛠 Skills
+Javascript, MongoDB, Express, React, Node, scocket.io, OAuth, passport.js, ant-design, Gemini-AI
 
-Document Q&A
 
-Smart reply suggestions
+## Screenshots
 
-📊 Admin Dashboard with analytics & user management
+![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
 
-🔔 Notifications (push/email)
+![mern Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
 
-🧠 Gemini AI Integration
+![react Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+## Tech Stack
 
-Chatbot Assistant → AI answers questions in real-time.
+**Client:** React, Redux, TailwindCSS, AntDesign
 
-Document Q&A → Upload a PDF and ask questions.
+**Server:** Node, Express
 
-Summarization → Summarizes chats or documents.
+**Database:** MongoDB
 
-Smart Replies → AI-powered quick reply suggestions.
+**Authantication:** JWT, OAuth, Passport.js
+
+## Documentation
+
+[Documentation](https://linktodocumentation)
+
+
+
+## Feedback
+
+If you have any feedback, please reach out to us at girishmasade22@gmail.com
+
+
+## Installation
+
+Install my-project with npm
+
+```bash
+  git clone https://github.com/Girishmasade/Ai-Chat-System-using-js.git
+```
+## Install frontend
+
+```bash
+  npm Install
+  npm run dev
+```
+
+## Install backend
+
+```bash
+  npm Install
+  npm start
+```
+    
+
+## Run Locally
+
+Clone the project
+
+```bash
+  git clone https://github.com/Girishmasade/Ai-Chat-System-using-js.git
+```
+
+Go to the project directory
+
+```bash
+  cd my-project
+```
+
+Install dependencies
+
+```bash
+  npm install
+```
+
+Start the server
+
+```bash
+  npm start
+```
+
