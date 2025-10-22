@@ -14,7 +14,6 @@ const ChatList = () => {
 
   const userId = authUser?._id;
   // console.log(userId);
-  
 
   const { data, isLoading, isError, refetch } = useGetChatListQuery(userId);
   const userList = data?.statuscode?.data || [];
@@ -33,8 +32,10 @@ const ChatList = () => {
       socket.on("getOnlineUsers", (users) => {
         dispatch(setOnlineusers(users));
       });
-      refetch()
-      socket.on("userStatusChange", () => refetch());
+      if (refetch) refetch();
+      socket.on("userStatusChange", () => {
+        if (refetch) refetch();
+      });
     }
 
     return () => {
@@ -61,7 +62,6 @@ const ChatList = () => {
 
   return (
     <div className="flex flex-col w-[400px] bg-gray-900 gap-3 rounded-lg shadow-lg overflow-hidden">
- 
       <div className="h-[80px] bg-gray-800 border-b flex items-center justify-center px-4">
         <Input
           placeholder="Search users..."

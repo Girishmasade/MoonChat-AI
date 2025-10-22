@@ -49,7 +49,7 @@ const SendUsersMessagesSection = ({ refetchMessages }) => {
       const sentMessage = response?.data?.data;
       if (sentMessage) {
         const audio = new Audio("/sounds/drop.mp3");
-        audio
+        await audio
           .play()
           .catch((err) => console.warn("Audio playback failed:", err));
       } 
