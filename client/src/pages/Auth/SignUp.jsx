@@ -34,7 +34,7 @@ const Signup = () => {
       .then((response) => {
         // console.log("Registration successful:", response);
         // dispatch(setCredentials(response));
-        navigate("/siginin");
+        navigate("/signin");
       })
       .catch((error) => {
         console.error("Registration failed:", error);
@@ -251,7 +251,7 @@ const Signup = () => {
           <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
             <Text style={{ color: "#aaa" }}>Already have an account?</Text>{" "}
             <Link
-              href="/siginin"
+              href="/signin"
               style={{ color: "#3b82f6", fontWeight: "500" }}
             >
               Sign in

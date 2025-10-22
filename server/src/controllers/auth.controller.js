@@ -202,12 +202,13 @@ export const googleCallback = (req, res, next) => {
         { expiresIn: "7d" }
       );
 
-      // Redirect to frontend with token
-      res.redirect(`${process.env.FRONTEND_URL}/oauth-success?token=${token}`);
+      return res.redirect(
+        `${process.env.FRONTEND_URL}/oauth-success?token=${token}`
+      );
     }
+
   )(req, res, next);
 };
-
 // GitHub OAuth github login and callback
 
 export const githubLogin = async (req, res, next) => {
@@ -217,7 +218,7 @@ export const githubLogin = async (req, res, next) => {
 export const githubCallback = async (req, res, next) => {
   passport.authenticate(
     "github",
-    { failureRedirect: "/siginin" },
+    { failureRedirect: "/signin" },
     (err, user) => {
       if (err || !user)
         return next(new ErrorHandler("Authentication Failed", 400));
@@ -303,7 +304,7 @@ export const getUserDetails = async (req, res, next) => {
     const userId = req.user.userId;
 
     const user = await User.findById(userId).select("-password");
-    // console.log(user);
+    if (!user) return next(new ErrorHandler("User not found", 404));
 
     res
       .status(200)

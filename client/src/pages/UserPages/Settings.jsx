@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Tabs, Upload, Image, message, Spin } from "antd";
 import { FaCamera } from "react-icons/fa";
 import Profile from "../../components/User/Profile";
@@ -11,21 +11,26 @@ import { setCredentials } from "../../redux/app/authSlice";
 const Settings = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
+  console.log(user);
+  
   const token = useSelector((state) => state.auth.token);
 
   const [avatarPreview, setAvatarPreview] = useState(user?.avatar);
   const [uploadAvatar, { isLoading }] = useUploadAvatarMutation();
 
+  // Sync avatarPreview when user changes (important for OAuth login)
+  useEffect(() => {
+    setAvatarPreview(user?.avatar);
+  }, [user?.avatar]);
+
   // Handle avatar upload
   const handleUpload = async (info) => {
     const file = info.file?.originFileObj || info.file;
-
     if (!file) {
       message.warn("No file selected");
       return;
     }
 
-    // Preview image immediately
     const reader = new FileReader();
     reader.onload = () => setAvatarPreview(reader.result);
     reader.readAsDataURL(file);
@@ -52,7 +57,6 @@ const Settings = () => {
     }
   };
 
-  // Upload props with validation
   const uploadProps = {
     showUploadList: false,
     beforeUpload: (file) => {

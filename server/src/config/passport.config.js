@@ -4,12 +4,12 @@ import { Strategy as GithubStrategy } from "passport-github2";
 import User from "../models/user.models.js";
 
 passport.serializeUser((user, done) => {
-    done(null, user);
+    done(null, user.id);
 })
 
-passport.deserializeUser((id, done) => {
+passport.deserializeUser(async (id, done) => {
     try {
-        const user = User.findById(id);
+        const user = await  User.findById(id);
         done(null, user);
     } catch (error) {
         done(error, null);
@@ -32,14 +32,14 @@ passport.use(
                 // console.log(user);
                 
                 if(!user){
-                    user = await new User({
+                    user = new User({
                         username: profile.displayName,
                         googleId: profile.id,
                         email: profile.emails[0].value,
                         avatar: profile.photos[0].value,
-                        password: profile.id
+                        password: ""
                     })
-                    user.save();
+                   await user.save();
                 }
                 return done(null, user);
             } catch (error) {
@@ -65,14 +65,14 @@ passport.use(
                 // console.log(user);
 
                 if (!user) {
-                    user = await User.create({
+                    user =  User.create({
                         username: profile.username,
                         githubId: profile.id,
                         email: profile.emails[0].value,
                         avatar: profile.photos[0].value,
-                        password: profile.id
+                        password: ""
                     })
-                    user.save();
+                   await user.save();
                 }
                 return done(null, user);
             } catch (error) {

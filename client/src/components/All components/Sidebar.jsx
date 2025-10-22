@@ -42,7 +42,7 @@ const Sidebar = () => {
     dispatch(logout());
     dispatch(setSelectedUser([]))
     localStorage.clear;
-    navigate(isAdmin ? "/admin-login" : "/siginin");
+    navigate(isAdmin ? "/admin-login" : "/signin");
   };
 
   const menuItems = navLinks.map((link) => ({

@@ -82,7 +82,7 @@ const AppHeader = () => {
           type="primary"
           style={{ background: "#9254de", border: "none" }}
         >
-          <Link to={"/siginin"}>Login</Link>
+          <Link to={"/signin"}>Login</Link>
         </Button>
       </div>
     </Header>

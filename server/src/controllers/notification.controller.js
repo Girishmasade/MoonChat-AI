@@ -2,45 +2,8 @@ import Notification from "../models/notification.model.js";
 import ErrorHandler from "../utils/errorHadler.js";
 import { io, onlineUsers } from "../../socket.js";
 import SuccessHandler from "../utils/successHandler.js";
+import User from "../models/user.models.js";
 
-// export const sendNotification = async (
-//   senderId,
-//   receiverId,
-//   type,
-//   content,
-//   ioInstance
-// ) => {
-//   try {
-//     if (!senderId || !receiverId) {
-//       throw new ErrorHandler("SenderId and ReceiverId are required", 400);
-//     }
-
-//     const safeContent =
-//       content && content.trim() !== ""
-//         ? content
-//         : "You have a new notification";
-
-//     const notification = await Notification.create({
-//       senderId,
-//       receiverId,
-//       type: type || "message",
-//       content: safeContent,
-//       isRead: false,
-//     });
-
-//     const io = ioInstance || global.io;
-//     const receiverSocketId = onlineUsers.get(receiverId);
-
-//     if (receiverSocketId && io) {
-//       io.to(receiverSocketId).emit("newNotification", notification);
-//     }
-
-//     return notification;
-//   } catch (err) {
-//     console.error("sendNotification error:", err.message);
-//     return null; // safe fallback
-//   }
-// };
 export const sendNotificationRoute = async (req, res, next) => {
   try {
     const { senderId, receiverId, type, content } = req.body;
@@ -70,19 +33,28 @@ export const sendNotificationRoute = async (req, res, next) => {
 
 export const getNotification = async (req, res, next) => {
   try {
-    const userId = req.user.userId;
-    if (!userId) return next(new ErrorHandler("User ID is required", 400));
+    const user = req.user;
 
-    const notifications = await Notification.find({ receiverId: userId })
+    if (!user || !user.userId) {
+      return next(new ErrorHandler("User ID is required", 400));
+    }
+    let userType = "normal";
+    if (user.googleId) userType = "google";
+    else if (user.githubId) userType = "github";
+
+    // console.log(`Fetching notifications for ${userType} user: ${user.username} (${user.email})`);
+
+    const notifications = await Notification.find({ receiverId: user.userId })
       .populate("senderId", "username email avatar")
       .sort({ createdAt: -1 });
 
-    // console.log(notifications);
-
     return res
       .status(200)
-      .json(new SuccessHandler(200, "Notification fetched", { notifications }));
+      .json(
+        new SuccessHandler(200, "Notifications fetched", { notifications })
+      );
   } catch (error) {
+    console.error("Error fetching notifications:", error);
     next(error);
   }
 };
@@ -136,13 +108,11 @@ export const clearNotification = async (req, res, next) => {
     const clearMessages = await Notification.deleteMany({ receiverId: userId });
     // console.log(clearMessages);
 
-    return res
-      .status(200)
-      .json(
-        new SuccessHandler(200, "All messages successfully deleted", {
-          data: clearMessages,
-        })
-      );
+    return res.status(200).json(
+      new SuccessHandler(200, "All messages successfully deleted", {
+        data: clearMessages,
+      })
+    );
   } catch (error) {
     next(error);
   }

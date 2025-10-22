@@ -17,13 +17,14 @@ import {
 } from "../controllers/auth.controller.js";
 import { protectedRoute } from "../middlewares/protectedRoute.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
+import { googleProtectedRoute } from "../middlewares/google.middleware.js";
 
 const authRouter = Router();
 
 // admin routes
 
 authRouter.post("/admin/register", adminRegister);
-authRouter.post("/admin/siginin", adminLogin)
+authRouter.post("/admin/signin", adminLogin)
 // Public Routes
 
 authRouter.post("/signup", register);
@@ -41,6 +42,8 @@ authRouter.get("/github/callback", githubCallback)
 authRouter.put("/update-details", protectedRoute, updateUserDetails);
 authRouter.get("/profile", protectedRoute, getUserDetails);
 authRouter.post("/upload-avatar", upload.single("avatar"), protectedRoute, uploadAvatar)
+
+// admin routes
 authRouter.get("/get-all-users", getUsers);
 authRouter.patch("/forget-password/:id", forgetPassword);
 authRouter.delete("/delete-user", deleteUser);

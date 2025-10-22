@@ -42,7 +42,6 @@ const userSchema = new Schema(
       type: [mongoose.Schema.Types.ObjectId],
       ref: "user",
     },
-
     password: {
       type: String,
       required: true,

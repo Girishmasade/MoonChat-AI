@@ -8,6 +8,7 @@ import {
   stopNotification,
 } from "../controllers/notification.controller.js";
 import { protectedRoute } from "../middlewares/protectedRoute.middleware.js";
+import { googleProtectedRoute } from "../middlewares/google.middleware.js";
 
 const notificationRouter = Router();
 
