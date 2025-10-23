@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import passport from "passport";
 import ErrorHandler from "../utils/errorHadler.js";
 import SuccessHandler from "../utils/successHandler.js";
+import { sendWelcomeEmail, transporter } from "../services/email.Services.js";
 
 // Admin Registration and Login (for testing purpose only, can be removed later)
 
@@ -157,6 +158,8 @@ export const login = async (req, res, next) => {
 
     // console.log(token);
 
+    await sendWelcomeEmail(user.email, user.username);
+
     return res.status(200).json(
       new SuccessHandler(200, "LoggedIn Successfully", {
         token,
@@ -206,7 +209,6 @@ export const googleCallback = (req, res, next) => {
         `${process.env.FRONTEND_URL}/oauth-success?token=${token}`
       );
     }
-
   )(req, res, next);
 };
 // GitHub OAuth github login and callback

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to MoonChat-AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet" />
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0a0a0f;
+      color: #ffffff;
+      font-family: "Orbitron", sans-serif;
+      letter-spacing: 0.8px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 25px;
+      background: rgba(10, 10, 20, 0.9);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      border-radius: 16px;
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
+      text-align: center;
+    }
+
+    .glow-title {
+      font-size: 32px;
+      color: #00ffff;
+      text-shadow: 0 0 8px #00ffff, 0 0 16px #00ffff;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .username {
+      font-size: 24px;
+      color: #f1c40f;
+      text-shadow: 0 0 6px #f1c40f, 0 0 12px #f1c40f;
+    }
+
+    .message {
+      margin: 30px 0;
+      font-size: 16px;
+      color: #d1d1d1;
+      line-height: 1.6;
+    }
+
+    .features {
+      text-align: left;
+      margin-top: 20px;
+      color: #a3f7ff;
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .cta {
+      display: inline-block;
+      margin-top: 25px;
+      padding: 12px 28px;
+      background: linear-gradient(135deg, #00ffff, #0077ff);
+      color: #000;
+      font-weight: 700;
+      text-decoration: none;
+      border-radius: 30px;
+      box-shadow: 0 0 12px rgba(0, 255, 255, 0.6);
+      transition: all 0.3s ease-in-out;
+    }
+
+    .cta:hover {
+      background: linear-gradient(135deg, #00cccc, #0055ff);
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.9);
+      transform: scale(1.05);
+    }
+
+    .footer {
+      margin-top: 40px;
+      font-size: 13px;
+      color: #888;
+    }
+
+    .footer a {
+      color: #00ffff;
+      text-decoration: none;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 25px 15px;
+      }
+      .glow-title {
+        font-size: 26px;
+      }
+      .username {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="glow-title">Welcome to NovaChat-AI 🤖</h1>
+    <h2 class="username">{{username}} 👋</h2>
+
+    <div class="message">
+      We're thrilled to have you on board! NovaChat-AI empowers you to chat with intelligence, creativity, and emotion — all in one place.
+    </div>
+
+    <div class="features">
+      💬 Smart, human-like conversations.<br />
+      ⚡ Real-time responses powered by AI.<br />
+      🌌 Sleek dashboards and personalization.<br />
+      🔒 Secure, private, and lightning fast.
+    </div>
+
+    <a href="https://novachat-ai.vercel.app" class="cta" target="_blank">Launch NovaChat-AI</a>
+
+    <div class="footer">
+      <p>If you have any questions, just reply to this email — we’re here to help.</p>
+      <p>
+        © 2025 NovaChat-AI | Crafted by Girish <br />
+        <a href="#">Unsubscribe</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>
