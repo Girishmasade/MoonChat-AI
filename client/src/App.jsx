@@ -24,7 +24,7 @@ import "./index.css";
 function App() {
   // Dynamic document title
   useEffect(() => {
-    const titles = ["NovaChat-AI 🤖", "Smart Conversations 💬"];
+    const titles = ["MoonChat-AI 🤖", "Smart Conversations 💬"];
     let index = 0;
     const interval = setInterval(() => {
       document.title = titles[index % titles.length];

@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { Typography, Card, Row, Col } from "antd";
+import { Typography, Card, Row, Col, Image } from "antd";
 import Globe from "react-globe.gl";
 import * as THREE from "three";
 import { useSelector } from "react-redux";
@@ -15,21 +15,21 @@ const UserDashboard = () => {
   const [dimensions, setDimensions] = useState({ width: 800, height: 500 });
   const [arcsData, setArcsData] = useState([]);
 
-  const userId = user?._id
+  const userId = user?._id;
 
-   useEffect(() => {
-    if(userId){
-      socket.auth = {userId: userId}
-      socket.connect()
-      socket.emit("joinRoom", userId)
+  useEffect(() => {
+    if (userId) {
+      socket.auth = { userId: userId };
+      socket.connect();
+      socket.emit("joinRoom", userId);
       // console.log("✅ Socket connected for:", userId);
     }
-  
+
     return () => {
-      socket.disconnect()
-        // console.log("🔌 Socket disconnected");
-    }
-  }, [userId])
+      socket.disconnect();
+      // console.log("🔌 Socket disconnected");
+    };
+  }, [userId]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -129,20 +129,12 @@ const UserDashboard = () => {
       className="relative min-h-screen flex flex-col items-center justify-start overflow-hidden rounded-lg"
       style={{ backgroundColor: "#0a1f44" }}
     >
-      <div className="pt-10 px-4 text-center z-10 w-full max-w-screen-md">
-        <Title
-          level={1}
-          style={{
-            color: "#00ffff",
-            fontSize: "2.5rem",
-            fontWeight: "bold",
-            textShadow: "0 0 25px #00ffff, 0 0 40px #00ffff",
-            letterSpacing: "2px",
-          }}
-        >
-          NovaChat AI
-        </Title>
-
+      <div className="pt-10 px-4 text-center w-full max-w-screen-md">
+        <Image
+        preview={false}
+        width={400}
+        alt="Logo"
+        src="/image.png" />
         <Paragraph
           style={{
             color: "#ffffffcc",
@@ -150,8 +142,8 @@ const UserDashboard = () => {
             textShadow: "0 0 10px #00ffff66",
           }}
         >
-          “Connecting minds, transcending distances — welcome to the
-          intelligence of tomorrow.”
+        <p className="pt-5">  “Connecting minds, transcending distances — welcome to the
+          intelligence of tomorrow.”</p>
         </Paragraph>
 
         <Title
@@ -167,8 +159,7 @@ const UserDashboard = () => {
           Welcome back,{" "}
           <span style={{ color: "#00ffff" }}>
             {user?.username
-              ? user.username.charAt(0).toUpperCase() +
-                user.username.slice(1)
+              ? user.username.charAt(0).toUpperCase() + user.username.slice(1)
               : "User"}
           </span>{" "}
           👋

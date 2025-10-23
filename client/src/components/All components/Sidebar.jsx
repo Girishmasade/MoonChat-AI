@@ -7,7 +7,7 @@ import { IoIosSettings } from "react-icons/io";
 import { FaUserFriends } from "react-icons/fa";
 import { RiDashboardFill } from "react-icons/ri";
 import { IoIosLogOut } from "react-icons/io";
-import { PiStarFour } from "react-icons/pi";
+import { AiOutlineMoon } from "react-icons/ai";
 import { Menu } from "antd";
 import { logout } from "../../redux/app/authSlice";
 import { setSelectedUser } from "../../redux/app/chatSlice";
@@ -19,7 +19,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
 
   const userLinks = [
-    { path: "/novachat", label: "Novachat", icon: <PiStarFour /> },
+    { path: "/novachat", label: "MoonChat", icon: <AiOutlineMoon /> },
     { path: "/chats", label: "Chats", icon: <LuMessageCircleMore /> },
     { path: "/contacts", label: "Contacts", icon: <MdPermContactCalendar /> },
     { path: "/settings", label: "Settings", icon: <IoIosSettings /> },
@@ -53,15 +53,19 @@ const Sidebar = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <div className="relative left-12 sm:left-8 w-full flex justify-center items-center py-4">
-        <Link to="/chat-dashboard">
-          <img
-            src="/Logo.png"
-            alt="NovaChat AI"
-            className="w-1/2 max-w-xs transition-all duration-300 drop-shadow-[0_0_6px_rgba(0,255,255,0.6)]"
-          />
-        </Link>
-      </div>
+    <div className="flex justify-center items-center py-4">
+  <Link
+    to="/chat-dashboard"
+    className="flex justify-center items-center w-full"
+  >
+    <img
+      src="/Logo.png"
+      alt="MoonChat-AI"
+      className="w-2/3 sm:w-1/2 md:w-[180px] lg:w-[200px] transition-all duration-300 drop-shadow-[0_0_10px_rgba(0,255,255,0.7)] hover:scale-110"
+    />
+  </Link>
+</div>
+
       <Menu
         mode="inline"
         theme="dark"
