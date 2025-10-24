@@ -7,11 +7,11 @@ const Footer = () => {
       <div className="px-8 py-10 grid lg:grid-cols-4 lg:justify-center lg:text-center">
         <div className="space-y-3">
           <div className="flex items-center gap-1">
-            <p className="inline-flex h-8 w-12 items-center justify-center rounded-md bg-gradient-to-br from-violet-500 to-violet-500 text-primary-foreground font-bold">
-              Nova
+            <p className="inline-flex h-8 w-[60px] items-center justify-center rounded-md bg-gradient-to-br from-violet-500 to-violet-500 text-primary-foreground font-bold">
+              Moon
             </p>
             <h1 className="text-lg font-semibold tracking-tight text-violet-300">
-              Chatt
+              Chatt-AI
             </h1>
           </div>
           <p className="mt-2 text-gray-400 text-start">
@@ -24,13 +24,13 @@ const Footer = () => {
           <h1 className=" text-xl font-semibold mb-3">Company</h1>
           <ul>
             <li className="mt-2">
-              <a href="#" className="hover:dark:text-gray-400 text-gray-600">About</a>
+              <a href="/about" className="hover:dark:text-gray-400 text-gray-600">About</a>
             </li>
             <li className="mt-2">
-              <a href="#"  className="hover:dark:text-gray-400 text-gray-600">Privacy</a>
+              <a href="/privacy"  className="hover:dark:text-gray-400 text-gray-600">Privacy</a>
             </li>
             <li className="mt-2">
-              <a href="#"  className="hover:dark:text-gray-400 text-gray-600">Terms</a>
+              <a href="/terms"  className="hover:dark:text-gray-400 text-gray-600">Terms</a>
             </li>
           </ul>
         </div>

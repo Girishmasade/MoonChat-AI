@@ -60,16 +60,16 @@ const AppHeader = () => {
             color: "#fff",
             fontWeight: "bold",
             borderRadius: "6px",
-            width: "52px",
+            width: "60px",
             height: "32px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          Nova
+          Moon
         </div>
-        Chatt
+        Chatt-AI
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
         <Button

@@ -20,6 +20,9 @@ import Settings from "./pages/UserPages/Settings";
 import OAuthSuccess from "./pages/Auth/OAuthSuccess/OAuthSuccess";
 
 import "./index.css";
+import About from "./pages/Commondashboard/About";
+import Privacy from "./pages/Commondashboard/Privacy";
+import Terms from "./pages/Commondashboard/Terms";
 
 function App() {
   // Dynamic document title
@@ -39,6 +42,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" />} />
           <Route path="/dashboard" element={<Dashboard />} />
+           <Route path="/about" element={<About />} />
+            <Route path="/privacy" element={<Privacy />} />
+             <Route path="/terms" element={<Terms />} />
 
           <Route
             path="/signin"
