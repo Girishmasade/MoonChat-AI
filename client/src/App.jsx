@@ -23,6 +23,7 @@ import "./index.css";
 import About from "./pages/Commondashboard/About";
 import Privacy from "./pages/Commondashboard/Privacy";
 import Terms from "./pages/Commondashboard/Terms";
+import ForgetPassword from "./pages/Auth/ForgetPassword";
 
 function App() {
   // Dynamic document title
@@ -45,7 +46,7 @@ function App() {
            <Route path="/about" element={<About />} />
             <Route path="/privacy" element={<Privacy />} />
              <Route path="/terms" element={<Terms />} />
-
+            <Route path="/forget-password" element={<ForgetPassword/>}/>
           <Route
             path="/signin"
             element={

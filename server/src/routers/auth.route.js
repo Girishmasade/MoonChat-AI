@@ -45,7 +45,7 @@ authRouter.post("/upload-avatar", upload.single("avatar"), protectedRoute, uploa
 
 // admin routes
 authRouter.get("/get-all-users", getUsers);
-authRouter.patch("/forget-password/:id", forgetPassword);
+authRouter.patch("/forget-password", forgetPassword);
 authRouter.delete("/delete-user", deleteUser);
 
 export default authRouter;

@@ -49,7 +49,7 @@ const HeaderComponent = () => {
                 "0 0 8px rgba(0,255,255,0.8), 0 0 16px rgba(0,255,255,0.6)",
             }}
           >
-            NovaChat-AI
+            MoonChat-AI
           </h1>
           <p className="text-sm font-normal text-gray-600">
             Real Time Chatting

@@ -42,6 +42,29 @@ const UserLogin = () => {
     window.open(`${import.meta.env.VITE_BACKEND_URL}/auth/github`, "_self");
   };
 
+  if (isLoading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          background:
+            "radial-gradient(circle at top left, #0a0a0a 0%, #121212 40%, #000000 100%)",
+          color: "#fff",
+        }}
+      >
+        <Spin
+          size="large"
+          tip={<Text style={{ color: "#3b82f6", fontSize: "18px" }}>Updating Password...</Text>}
+          style={{ marginBottom: "1rem" }}
+        />
+      </div>
+    );
+  }
+
   return (
     <>
       <style>
@@ -154,6 +177,17 @@ const UserLogin = () => {
                 }
               />
             </Form.Item>
+
+            <div style={{ textAlign: "right", marginBottom: "1rem" }}>
+              <Link
+                href="/forget-password"
+                style={{
+                  color: "#3b82f6",
+                }}
+              >
+                Forgot password?
+              </Link>
+            </div>
 
             <Form.Item>
               <Button

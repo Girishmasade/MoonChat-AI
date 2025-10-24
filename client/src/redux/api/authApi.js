@@ -46,6 +46,14 @@ export const authApi = apiSlice.injectEndpoints({
         body: userData,
       }),
     }),
+
+    forgetPass: builder.mutation({
+      query: (body) => ({
+        url: `${AUTH_URL}/forget-password`,
+        method: "PATCH",
+        body
+      }),
+    }),
   }),
 });
 
@@ -57,4 +65,5 @@ export const {
   useUploadAvatarMutation,
   useGetProfileQuery,
   useUpdateProfileMutation,
+  useForgetPassMutation
 } = authApi;

@@ -188,17 +188,6 @@ const Signup = () => {
               />
             </Form.Item>
 
-            <div style={{ textAlign: "right", marginBottom: "1rem" }}>
-              <Link
-                href="#"
-                style={{
-                  color: "#3b82f6",
-                }}
-              >
-                Forgot password?
-              </Link>
-            </div>
-
             <Form.Item>
               <Button
                 type="primary"

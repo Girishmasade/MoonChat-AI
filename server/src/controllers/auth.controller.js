@@ -116,6 +116,7 @@ export const register = async (req, res, next) => {
     // console.log(newUser);
 
     await newUser.save();
+    await sendWelcomeEmail(newUser.email, newUser.username);
 
     return res
       .status(200)
@@ -157,9 +158,6 @@ export const login = async (req, res, next) => {
     );
 
     // console.log(token);
-
-    await sendWelcomeEmail(user.email, user.username);
-
     return res.status(200).json(
       new SuccessHandler(200, "LoggedIn Successfully", {
         token,
