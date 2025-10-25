@@ -17,14 +17,8 @@ import {
 } from "../controllers/auth.controller.js";
 import { protectedRoute } from "../middlewares/protectedRoute.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
-import { googleProtectedRoute } from "../middlewares/google.middleware.js";
 
 const authRouter = Router();
-
-// admin routes
-
-authRouter.post("/admin/register", adminRegister);
-authRouter.post("/admin/signin", adminLogin)
 // Public Routes
 
 authRouter.post("/signup", register);

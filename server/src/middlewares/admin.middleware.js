@@ -1,7 +1,7 @@
 import User from "../models/user.models.js";
 import ErrorHandler from "../utils/errorHadler.js";
 
-export const adminRoute = async (req, res, next) => {
+export const adminMiddleware = async (req, res, next) => {
   try {
     if (!req.user || !req.user.userId) {
       return next(new ErrorHandler("Unauthorized. Please login first.", 401));
