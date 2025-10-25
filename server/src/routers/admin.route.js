@@ -4,7 +4,7 @@ import { adminMiddleware } from "../middlewares/admin.middleware.js";
 
 const adminRoutes = Router()
 
-authRouter.post("/signup", adminMiddleware, adminRegister);
-authRouter.post("/signin", adminMiddleware, adminLogin)
+adminRoutes.post("/signup", adminRegister);
+adminRoutes.post("/signin", adminLogin)
 
 export default adminRoutes
