@@ -24,29 +24,21 @@ import About from "./pages/Commondashboard/About";
 import Privacy from "./pages/Commondashboard/Privacy";
 import Terms from "./pages/Commondashboard/Terms";
 import ForgetPassword from "./pages/Auth/ForgetPassword";
+import AdminDashboard from "./pages/AdminPages/AdminDashboard";
+import AdminSignup from "./pages/Auth/Admin/AdminSignup";
+import AdminSignin from "./pages/Auth/Admin/AdminSignin";
 
 function App() {
-  // Dynamic document title
-  useEffect(() => {
-    const titles = ["MoonChat-AI 🤖", "Smart Conversations 💬"];
-    let index = 0;
-    const interval = setInterval(() => {
-      document.title = titles[index % titles.length];
-      index++;
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <div style={{ fontFamily: "'Orbitron', sans-serif" }}>
       <Router>
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" />} />
           <Route path="/dashboard" element={<Dashboard />} />
-           <Route path="/about" element={<About />} />
-            <Route path="/privacy" element={<Privacy />} />
-             <Route path="/terms" element={<Terms />} />
-            <Route path="/forget-password" element={<ForgetPassword/>}/>
+          <Route path="/about" element={<About />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/forget-password" element={<ForgetPassword />} />
           <Route
             path="/signin"
             element={
@@ -107,6 +99,12 @@ function App() {
               }
             />
           </Route>
+
+          {/* Admin Routes */}
+
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/admin-signup" element={<AdminSignup />} />
+          <Route path="/admin-signin" element={<AdminSignin />} />
         </Routes>
       </Router>
     </div>
