@@ -1,19 +1,30 @@
 import React, { useState } from "react";
 import { Form, Input, Button, Typography } from "antd";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { useAdminSignupMutation } from "../../../redux/api/adminApi";
 
 const { Title, Text } = Typography;
 
 const AdminSignup = () => {
-  const [adminName, setAdminName] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [secretKey, setSecretKey] = useState("");
+  const form = Form.useForm();
 
+  const OnChange = (e) => {
+    const [name, values] = e.target;
+    if (name === "name") setName(values);
+    if (name === "email") setEmail(values);
+    if (name === "password") setPassword(values);
+    if (name === "secretKey") setSecretKey(values);
+  };
 
-  const handleSubmit = () => {
-    console.log("Admin Data:", { adminName, email, password, secretKey });
-    alert("Admin registered! (UI only, no backend)");
+  const [adminSignup, { isLoading }] = useAdminSignupMutation();
+
+  const handleSubmit = (values) => {
+    console.log("Admin Data:", values);
+    // alert("Admin registered! (UI only, no backend)");
   };
 
   return (
@@ -79,12 +90,13 @@ const AdminSignup = () => {
           <Form layout="vertical" onFinish={handleSubmit}>
             <Form.Item
               label={<span style={{ color: "#ddd" }}>Admin Name</span>}
-              name="adminName"
+              name="name"
               rules={[{ required: true, message: "Enter admin name!" }]}
             >
               <Input
-                value={adminName}
-                onChange={(e) => setAdminName(e.target.value)}
+                value={name}
+                name="name"
+                onChange={OnChange}
                 placeholder="Enter admin name"
                 style={{
                   backgroundColor: "#1f1f1f",
@@ -101,7 +113,8 @@ const AdminSignup = () => {
             >
               <Input
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                name="email"
+                onChange={OnChange}
                 placeholder="Enter your email"
                 style={{
                   backgroundColor: "#1f1f1f",
@@ -118,7 +131,8 @@ const AdminSignup = () => {
             >
               <Input.Password
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                name="password"
+                onChange={OnChange}
                 placeholder="Enter password"
                 style={{
                   backgroundColor: "#1f1f1f",
@@ -142,7 +156,8 @@ const AdminSignup = () => {
             >
               <Input
                 value={secretKey}
-                onChange={(e) => setSecretKey(e.target.value)}
+                name="secretKey"
+                onChange={OnChange}
                 placeholder="Enter secret key"
                 style={{
                   backgroundColor: "#1f1f1f",
@@ -178,7 +193,10 @@ const AdminSignup = () => {
             }}
           >
             Already have an admin account?{" "}
-            <a href="/admin-signin" style={{ color: "#f97316", fontWeight: "500" }}>
+            <a
+              href="/admin-signin"
+              style={{ color: "#f97316", fontWeight: "500" }}
+            >
               Sign in
             </a>
           </div>

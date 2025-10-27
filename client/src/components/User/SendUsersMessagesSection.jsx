@@ -73,8 +73,8 @@ const SendUsersMessagesSection = ({ refetchMessages }) => {
         content: sentMessage.messages,
       });
 
-      const notification = notificationResponse?.data?.data?.notification;
-      // console.log(notification);
+      const notification = notificationResponse?.data?.data
+      console.log(notification);
 
       if (notification) {
         socket.emit("newNotification", {

@@ -9,55 +9,65 @@ export const sendNotificationRoute = async (req, res, next) => {
     const { senderId, receiverId, type, content } = req.body;
     const io = req.app.get("io");
 
+    if (!senderId || !receiverId) {
+      return next(new ErrorHandler("Sender and Receiver IDs are required", 400));
+    }
+
     const notification = await Notification.create({
       senderId,
       receiverId,
       type: type || "message",
-      content: "ypu have new Notification",
+      content: content || "You have a new notification",
     });
+
     if (!notification) {
       return next(new ErrorHandler("Failed to send notification", 500));
     }
 
-    io.to(receiverId.toString()).emit("newNotification", notification);
+    io.to(receiverId.toString()).emit("newNotification", notification.toObject());
 
-    res
-      .status(200)
-      .json(
-        new SuccessHandler(200, "Notification sent", { data: notification })
-      );
+    res.status(200).json(
+      new SuccessHandler(200, "Notification sent successfully", {
+        notification,
+      })
+    );
   } catch (error) {
-    next(error);
+    console.error("Error sending notification:", error);
+    next(new ErrorHandler("Failed to send notification", 500));
   }
 };
+
 
 export const getNotification = async (req, res, next) => {
   try {
     const user = req.user;
+    const receiverId = user?.userId || user?._id;
+    console.log(receiverId);
+    
 
-    if (!user || !user.userId) {
-      return next(new ErrorHandler("User ID is required", 400));
+    if (!receiverId) {
+      return next(new ErrorHandler("reciver ID is required", 400));
     }
-    let userType = "normal";
-    if (user.googleId) userType = "google";
-    else if (user.githubId) userType = "github";
 
-    // console.log(`Fetching notifications for ${userType} user: ${user.username} (${user.email})`);
+    const notifications = await Notification.find( {receiverId} )
+      // .populate("senderId", "username email avatar")
+      // .sort({ createdAt: -1 });
 
-    const notifications = await Notification.find({ receiverId: user.userId })
-      .populate("senderId", "username email avatar")
-      .sort({ createdAt: -1 });
+      console.log(notifications);
+      
 
-    return res
-      .status(200)
-      .json(
-        new SuccessHandler(200, "Notifications fetched", { notifications })
-      );
+    res.status(200).json(
+      new SuccessHandler(200, "Notifications fetched successfully", {
+        count: notifications.length,
+        notifications,
+      })
+    );
   } catch (error) {
     console.error("Error fetching notifications:", error);
-    next(error);
+    next(new ErrorHandler("Failed to fetch notifications", 500));
   }
 };
+
 
 export const isRead = async (req, res, next) => {
   try {
