@@ -7,10 +7,23 @@ const { Title, Text } = Typography;
 const AdminSignin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  // const [showPassword, setShowPassword] = useState(false);
+  const [form] = Form.useForm()
+  const [formData, setFormData] = useState({
+    email: "",
+    password: ""
+  })
 
-  const handleSubmit = () => {
-    console.log("Admin Signin:", { email, password });
+  console.log(formData);
+  
+
+  const OnChange = (e) => {
+    const {name, value} = e.target;
+    setFormData((prev) => ({...prev, [name]: value}))
+  }
+
+  const handleSubmit = (values) => {
+    console.log("Admin Signin:", values);
     alert("Admin sign-in attempted! (UI only)");
   };
 
@@ -74,15 +87,21 @@ const AdminSignin = () => {
             Access your admin account
           </Text>
 
-          <Form layout="vertical" onFinish={handleSubmit}>
+          <Form
+          form={form} 
+          layout="vertical" 
+          onFinish={handleSubmit}
+           autoComplete="off"
+          >
             <Form.Item
               label={<span style={{ color: "#ddd" }}>Email</span>}
               name="email"
               rules={[{ required: true, message: "Enter email!" }]}
             >
               <Input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                name="email"
+                value={formData.email}
+                onChange={OnChange}
                 placeholder="Enter your email"
                 style={{
                   backgroundColor: "#1f1f1f",
@@ -98,8 +117,9 @@ const AdminSignin = () => {
               rules={[{ required: true, message: "Enter password!" }]}
             >
               <Input.Password
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                name="password"
+                value={formData.password}
+                onChange={OnChange}
                 placeholder="Enter password"
                 style={{
                   backgroundColor: "#1f1f1f",
@@ -142,7 +162,10 @@ const AdminSignin = () => {
             }}
           >
             Don't have an admin account?{" "}
-            <a href="/admin-signup" style={{ color: "#f97316", fontWeight: "500" }}>
+            <a
+              href="/admin-signup"
+              style={{ color: "#f97316", fontWeight: "500" }}
+            >
               Sign up
             </a>
           </div>

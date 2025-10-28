@@ -6,7 +6,7 @@ import ErrorHandler from "../utils/errorHadler.js";
 
 export const adminRegister = async (req, res, next) => {
   try {
-    const { username, email, password, name, secretKey } = req.body;
+    const { username, email, password, secretKey } = req.body;
     if (!username || !email || !password || !secretKey)
       return next(new ErrorHandler("All fields are required", 400));
 
@@ -22,7 +22,6 @@ export const adminRegister = async (req, res, next) => {
     const newUser = new User({
       username,
       email,
-      name,
       password: hashedPassword,
       isAdmin: true,
     });

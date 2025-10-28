@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Input, Button, Typography, Divider, message } from "antd";
+import { Form, Input, Button, Typography, Divider, message, Spin } from "antd";
 import { GoogleOutlined, GithubOutlined } from "@ant-design/icons";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../../redux/app/authSlice";
@@ -58,7 +58,6 @@ const UserLogin = () => {
       >
         <Spin
           size="large"
-          tip={<Text style={{ color: "#3b82f6", fontSize: "18px" }}>Updating Password...</Text>}
           style={{ marginBottom: "1rem" }}
         />
       </div>

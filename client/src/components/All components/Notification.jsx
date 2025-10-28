@@ -23,11 +23,14 @@ const { Text, Title } = Typography;
 const Notification = () => {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
-  console.log(notifications);
+  // console.log(notifications);
 
   const { data, isLoading, isError } = useGetNotificationQuery();
   const [clearNotification] = useClearNotificationMutation();
   const [clearSingleNotification] = useClearSingleNotificationMutation();
+
+console.log(data.data);
+
 
   useEffect(() => {
     if (data?.data?.notifications) {
