@@ -10,7 +10,14 @@ export const adminApi = apiSlice.injectEndpoints({
                 method: "POST",
                 body: formData
             })
+        }),
+        adminSignin: builder.mutation({
+            query: (formData) => ({
+                url: `${ADMIN_URI}/signin`,
+                method: "POST",
+                body: formData
+            })
         })
     })
 })
-export const {useAdminSignupMutation} = adminApi
+export const {useAdminSignupMutation, useAdminSigninMutation} = adminApi

@@ -29,12 +29,12 @@ const Notification = () => {
   const [clearNotification] = useClearNotificationMutation();
   const [clearSingleNotification] = useClearSingleNotificationMutation();
 
-console.log(data.data);
+console.log(data?.data);
 
 
   useEffect(() => {
     if (data?.data?.notifications) {
-      setNotifications(data.data.notifications);
+      setNotifications(data?.data?.notifications);
     }
   }, [data]);
 

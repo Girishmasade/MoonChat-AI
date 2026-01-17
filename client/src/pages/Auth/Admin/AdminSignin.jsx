@@ -1,30 +1,37 @@
 import React, { useState } from "react";
-import { Form, Input, Button, Typography } from "antd";
+import { Form, Input, Button, Typography, message } from "antd";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
+import { useAdminSigninMutation } from "../../../redux/api/adminApi";
 
 const { Title, Text } = Typography;
 
 const AdminSignin = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  // const [showPassword, setShowPassword] = useState(false);
   const [form] = Form.useForm()
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     email: "",
     password: ""
   })
 
   console.log(formData);
-  
+  const [adminSignin, {isLoading}] = useAdminSigninMutation()
 
   const OnChange = (e) => {
     const {name, value} = e.target;
     setFormData((prev) => ({...prev, [name]: value}))
   }
 
-  const handleSubmit = (values) => {
+  const handleSubmit = async(values) => {
+    try {
+        const response = await adminSignin(values).unwrap()
+    console.log(response);
     console.log("Admin Signin:", values);
-    alert("Admin sign-in attempted! (UI only)");
+    // navigate("/admin-dashboard")
+    } catch (error) {
+      console.log(error);
+      message.error(error.message)
+    }
   };
 
   return (
