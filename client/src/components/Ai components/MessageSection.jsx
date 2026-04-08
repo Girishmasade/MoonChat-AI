@@ -3,40 +3,37 @@ import SendMessageSection from "./SendMessageSection";
 import { useGetChatQuery } from "../../redux/api/aiChatApi";
 import { useSelector } from "react-redux";
 import { socket } from "../../socket.io/socketclient";
+
 const MessageSection = () => {
   const user = useSelector((state) => state.auth.user);
-  const { data, isLoading, isError, refetch } = useGetChatQuery();
+  const { data, isLoading, isError } = useGetChatQuery();
 
   const [messages, setMessages] = useState([]);
   const userId = user?._id;
 
+  // ✅ Load initial messages (NO refetch loop)
   useEffect(() => {
     if (data?.data?.messages) {
       setMessages(data.data.messages);
-      refetch();
     }
   }, [data]);
 
+  // ✅ Socket setup (REAL-TIME)
   useEffect(() => {
     if (!userId) return;
 
-    socket.auth = { userId: userId };
     socket.connect();
-
     socket.emit("joinRoom", userId);
-    // console.log("🟢 Joined socket room:", userId);
 
     const handleNewMessage = (newMessage) => {
-      // console.log("📩 New message from socket:", newMessage);
       setMessages((prev) => [...prev, newMessage]);
     };
 
-    socket.on("receiveMessage", handleNewMessage);
+    // ✅ Correct event name
+    socket.on("newAiMessage", handleNewMessage);
 
     return () => {
-      socket.off("receiveMessage", handleNewMessage);
-      socket.disconnect();
-      // console.log("🔌 Socket disconnected from MessageSection");
+      socket.off("newAiMessage", handleNewMessage);
     };
   }, [userId]);
 
@@ -61,16 +58,14 @@ const MessageSection = () => {
                     : "bg-gray-700 rounded-bl-none"
                 }`}
               >
-                {/* Message text */}
                 {item.messages}
 
-                {/* Media rendering */}
                 {item.media?.length > 0 && (
                   <div className="mt-2 space-y-2">
                     {item.media.map((file, idx) => {
                       const ext = file.split(".").pop().toLowerCase();
+
                       if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) {
-                        // Image
                         return (
                           <img
                             key={idx}
@@ -80,7 +75,6 @@ const MessageSection = () => {
                           />
                         );
                       } else if (["mp4", "webm", "ogg"].includes(ext)) {
-                        // Video
                         return (
                           <video
                             key={idx}
@@ -90,7 +84,6 @@ const MessageSection = () => {
                           />
                         );
                       } else if (["mp3", "wav"].includes(ext)) {
-                        // Audio
                         return (
                           <audio
                             key={idx}
@@ -100,7 +93,6 @@ const MessageSection = () => {
                           />
                         );
                       } else {
-                        // Other file
                         return (
                           <a
                             key={idx}
@@ -122,7 +114,7 @@ const MessageSection = () => {
         })}
       </div>
 
-      <SendMessageSection refetchMessages={refetch} />
+      <SendMessageSection setMessages={setMessages} />
     </div>
   );
 };

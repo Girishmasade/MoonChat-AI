@@ -1,10 +1,13 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+// config/groq.js
+import Groq from "groq-sdk";
 import dotenv from "dotenv";
+
 dotenv.config();
 
-if (!process.env.GEMINI_API_KEY) {
-  throw new Error("❌ Missing GEMINI_API_KEY in .env file");
+if (!process.env.GROQ_API_KEY) {
+  throw new Error("❌ Missing GROQ_API_KEY in .env file");
 }
 
-export const geminiai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-// console.log("Gemini key:", process.env.GEMINI_API_KEY);
+export const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});

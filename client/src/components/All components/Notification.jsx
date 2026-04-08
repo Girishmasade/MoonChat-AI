@@ -207,6 +207,7 @@ console.log(data?.data);
         >
           <BellFilled
             style={{
+              paddingTop: "1px",
               fontSize: "26px",
               color: "#fff",
               cursor: "pointer",

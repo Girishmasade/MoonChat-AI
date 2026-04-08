@@ -3,7 +3,7 @@ import User from "../models/user.models.js";
 import ErrorHandler from "../utils/errorHadler.js";
 import SuccessHandler from "../utils/successHandler.js";
 import { io, onlineUsers } from "../../socket.js";
-import { geminiai } from "../config/geminiai.config.js";
+import { groq } from "../config/geminiai.config.js";
 import Notification from "../models/notification.model.js";
 // import { sendNotification } from "./notification.controller.js";
 // import mongoose from "mongoose";
@@ -287,51 +287,124 @@ export const AiMessage = async (req, res, next) => {
   try {
     const senderId = req.user.userId;
     const receiverId = process.env.AI_USER_ID;
-    const { messages, media } = req.body;
+    const { messages } = req.body;
     const io = req.app.get("io");
 
     if (!senderId || !receiverId) {
       return next(new ErrorHandler("SenderId and ReceiverId is required", 400));
     }
 
-    if (!messages && (!media || media.length === 0)) {
-      return next(new ErrorHandler("Messages and Media is required", 400));
+    if (!messages) {
+      return next(new ErrorHandler("Message is required", 400));
     }
 
-    const modal = geminiai.getGenerativeModel({ model: "gemini-2.5-pro" });
-    const result = await modal.generateContent(messages);
-    const aiResponse = result.response.text();
+    // Ensure user message is string
+    const userMessage = String(messages).trim();
+
+    // Fetch last 15 messages (better than 20 for limits)
+    const previousChats = await Chats.find({
+      $or: [
+        { senderId: senderId, receiverId: receiverId },
+        { senderId: receiverId, receiverId: senderId },
+      ],
+    })
+      .sort({ createdAt: 1 })
+      .limit(15);
+
+    // CLEAN + SAFE chat history
+    const chatHistory = previousChats
+      .filter(
+        (chat) =>
+          chat.messages &&
+          typeof chat.messages === "string" &&
+          chat.messages.trim() !== ""
+      )
+      .map((chat) => ({
+        role:
+          chat.senderId.toString() === senderId.toString()
+            ? "user"
+            : "assistant",
+        content: String(chat.messages).trim(),
+      }));
+
+    // System message
+    const systemMessage = {
+      role: "system",
+      content: `You are a helpful, smart, and friendly AI assistant like ChatGPT.
+- Be natural and conversational
+- Keep answers clear
+- Short for simple questions
+- Detailed for complex ones`,
+    };
+
+    // Final messages (SAFE)
+    const finalMessages = [
+      systemMessage,
+      ...chatHistory,
+      { role: "user", content: userMessage },
+    ];
+
+    let aiResponse = "⚠️ AI not available";
+
+    try {
+      const completion = await groq.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: finalMessages,
+        temperature: 0.7,
+      });
+
+      aiResponse =
+        completion.choices?.[0]?.message?.content || "No response";
+    } catch (err) {
+      console.error("Groq Error:", err);
+
+      // Fallback model (VERY IMPORTANT)
+      try {
+        const fallback = await groq.chat.completions.create({
+          model: "llama-3.1-8b-instant",
+          messages: finalMessages,
+        });
+
+        aiResponse =
+          fallback.choices?.[0]?.message?.content ||
+          "AI fallback failed";
+      } catch (fallbackErr) {
+        console.error("Fallback Error:", fallbackErr);
+        aiResponse = "AI is busy, try again later.";
+      }
+    }
 
     const mediaFiles = req.files ? req.files.map((file) => file.path) : [];
 
-    const userMessage = new Chats({
+    await Chats.create({
       senderId,
       receiverId,
-      messages,
+      messages: userMessage,
       media: mediaFiles,
     });
-    await userMessage.save();
 
-    const AiMessage = new Chats({
+    const aiMessage = await Chats.create({
       senderId: receiverId,
       receiverId: senderId,
       messages: aiResponse,
-      media: mediaFiles,
+      media: [],
       ttlForSender: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
-    await AiMessage.save();
 
     io.to(senderId).emit("newAiMessage", {
       senderId: receiverId,
       receiverId: senderId,
       messages: aiResponse,
-      media: mediaFiles,
+      media: [],
     });
 
-    return res
-      .status(200)
-      .json(new SuccessHandler(200, "AI Message Sent", { AiMessage }));
+    return res.status(200).json(
+      new SuccessHandler(200, "AI Message Sent", {
+        message: aiMessage,
+      })
+    );
   } catch (error) {
+    console.error("AI ERROR:", error);
     next(error);
   }
 };

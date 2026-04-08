@@ -31,9 +31,17 @@ const ChatInput = ({ refetchMessages }) => {
   const handleSend = async () => {
     if (!message.trim() && fileList.length === 0) return;
 
+    // Snapshot before clearing
+    const currentMessage = message.trim();
+
+    // Clear input immediately for snappy UX
+    setMessage("");
+    setFileList([]);
+    setShowEmojiPicker(false);
+
     const formData = new FormData();
     if (user?._id) formData.append("senderId", user._id);
-    if (message.trim()) formData.append("messages", message.trim());
+    if (currentMessage) formData.append("messages", currentMessage);
     fileList.forEach((file) =>
       formData.append("media", file.originFileObj || file)
     );
@@ -50,28 +58,29 @@ const ChatInput = ({ refetchMessages }) => {
         socket.emit("sendMessage", {
           senderId: user._id,
           receiverId: receiverId,
-          messages: message.trim(),
+          messages: currentMessage,
           media: fileList.map((f) => f.name),
         });
 
+        // Emit AI reply so chat window receives it instantly (no reload needed)
         socket.emit("newAiMessage", {
           senderId: aiMessage.senderId,
           receiverId: aiMessage.receiverId,
           messages: aiMessage.messages,
           media: aiMessage.media,
         });
-        
-        if (refetchMessages) {
-          refetchMessages();
-        }
 
-        setMessage("");
-        setFileList([]);
-        setShowEmojiPicker(false);
+        // Refetch to sync server state into RTK Query cache
+        if (typeof refetchMessages === "function") {
+          await refetchMessages();
+        }
       }
     } catch (error) {
       console.log("Send chat error:", error);
       AntMessage.error(error?.data?.message || "Failed to send message");
+
+      // Restore message on failure so user doesn't lose their text
+      setMessage(currentMessage);
     } finally {
       setUploading(false);
     }
