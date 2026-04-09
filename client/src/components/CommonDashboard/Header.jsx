@@ -37,14 +37,12 @@ const AppHeader = () => {
         zIndex: 1000,
         backdropFilter: "blur(10px)",
         WebkitBackdropFilter: "blur(10px)",
-        background: isDark
-          ? "rgba(20,20,20,0.7)"
-          : "rgba(255,255,255,0.7)",
+        background: "rgba(20,20,20,0.7)",
         borderBottom: "1px solid #e8e8e8",
       }}
     >
       {/* Left Logo */}
-      <div
+      {/* <div
         style={{
           display: "flex",
           alignItems: "center",
@@ -70,20 +68,28 @@ const AppHeader = () => {
           Moon
         </div>
         Chatt-AI
+      </div> */}
+
+      <div>
+        <img
+          src="/Logo.png"
+          alt="Chatt-AI Logo"
+          style={{ height: "90px", width: "auto" }}
+        />
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-        <Button
+        {/* <Button
           type="text"
           icon={isDark ? <SunOutlined /> : <MoonOutlined />}
           onClick={toggleTheme}
           style={{ fontSize: "20px", color: isDark ? "#fff" : "#000" }}
-        />
-        <Button
+        /> */}
+        {/* <Button
           type="primary"
           style={{ background: "#9254de", border: "none" }}
         >
           <Link to={"/signin"}>Login</Link>
-        </Button>
+        </Button> */}
       </div>
     </Header>
   );

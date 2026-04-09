@@ -16,7 +16,7 @@ export const FeaturesData = [
     },
        {
         emoji: "💬",
-        title: "Group & private chats",
+        title: "private chats",
         description: "Create channels or direct messages for focused discussions."
     },
        {

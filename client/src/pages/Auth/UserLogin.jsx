@@ -6,6 +6,7 @@ import { setCredentials } from "../../redux/app/authSlice";
 import { useNavigate } from "react-router-dom";
 import { useLoginUserMutation } from "../../redux/api/authApi";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import Loader from "../../components/All components/Loader";
 
 const { Title, Text, Link } = Typography;
 
@@ -43,25 +44,7 @@ const UserLogin = () => {
   };
 
   if (isLoading) {
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          background:
-            "radial-gradient(circle at top left, #0a0a0a 0%, #121212 40%, #000000 100%)",
-          color: "#fff",
-        }}
-      >
-        <Spin
-          size="large"
-          style={{ marginBottom: "1rem" }}
-        />
-      </div>
-    );
+    return <Loader text="Logging in..." />;
   }
 
   return (

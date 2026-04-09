@@ -10,14 +10,14 @@ import Dashboard from "./pages/Commondashboard/Dashboard";
 import UserLogin from "./pages/Auth/UserLogin";
 import SignUp from "./pages/Auth/SignUp";
 import UserDashboard from "./pages/UserPages/UserDashboard";
-import ProtectedRoutes from "./components/Protected & Public Route/ProtectedRoutes";
-import PublicRoute from "./components/Protected & Public Route/PublicRoute";
 import MainLayout from "./components/All components/MainLayout";
 import AiChatting from "./pages/AIchatting/AiChatting";
 import Chats from "./pages/UserPages/Chats";
 import Contacts from "./pages/UserPages/Contacts";
 import Settings from "./pages/UserPages/Settings";
 import OAuthSuccess from "./pages/Auth/OAuthSuccess/OAuthSuccess";
+import ProtectedRoutes from "./components/Protected & Public Route/ProtectedRoutes";
+import PublicRoute from "./components/Protected & Public Route/PublicRoute";
 
 import "./index.css";
 import About from "./pages/Commondashboard/About";
@@ -30,7 +30,7 @@ import AdminSignin from "./pages/Auth/Admin/AdminSignin";
 
 function App() {
   return (
-    <div style={{ fontFamily: "'Orbitron', sans-serif" }}>
+    <div style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
       <Router>
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" />} />

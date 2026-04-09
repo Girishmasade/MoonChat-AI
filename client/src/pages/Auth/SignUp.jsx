@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setCredentials } from "../../redux/app/authSlice";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import Loader from "../../components/All components/Loader";
 
 const { Title, Text, Link } = Typography;
 
@@ -27,14 +28,14 @@ const Signup = () => {
     else if (name === "password") setPassword(value);
   };
 
-  const onSubmit = () => {
+  const onSubmit = async() => {
     const userData = { username, email, password };
-    registerUser(userData)
+   await registerUser(userData)
       .unwrap()
-      .then((response) => {
+      .then(async (response) => {
         // console.log("Registration successful:", response);
         // dispatch(setCredentials(response));
-        navigate("/signin");
+        await navigate("/signin");
       })
       .catch((error) => {
         console.error("Registration failed:", error);
@@ -50,9 +51,7 @@ const Signup = () => {
   };
 
   if (isLoading)
-    return (
-      <div className="text-center mt-20 text-lg text-white">Loading...</div>
-    );
+    return <Loader text="Creating account..." />;
 
   return (
     <>

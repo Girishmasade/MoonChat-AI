@@ -53,7 +53,7 @@ export const getNotification = async (req, res, next) => {
       // .populate("senderId", "username email avatar")
       // .sort({ createdAt: -1 });
 
-      console.log(notifications);
+      // console.log(notifications);
       
 
     res.status(200).json(

@@ -8,7 +8,7 @@ import Footer from '../../components/CommonDashboard/Footer'
 
 const Dashboard = () => {
   return (
-    <div className=''>
+    <div>
       <AppHeader/>
       <HeroSection/>
       <Features/>
