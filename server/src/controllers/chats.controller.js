@@ -3,8 +3,10 @@ import User from "../models/user.models.js";
 import ErrorHandler from "../utils/errorHadler.js";
 import SuccessHandler from "../utils/successHandler.js";
 import { io, onlineUsers } from "../../socket.js";
-import { groq } from "../config/geminiai.config.js";
 import Notification from "../models/notification.model.js";
+import { generateAIResponse } from "../services/AI/ai.service.js";
+import { getChatHistory } from "../services/AI/memory.service.js";
+import { retrieveContext } from "../services/AI/rag.service.js";
 // import { sendNotification } from "./notification.controller.js";
 // import mongoose from "mongoose";
 
@@ -18,7 +20,7 @@ export const addContact = async (req, res, next) => {
     }
 
     const contactUser = await User.findOne({ email }).select(
-      "name lastname username email avatar"
+      "name lastname username email avatar",
     );
 
     if (!contactUser) {
@@ -27,7 +29,7 @@ export const addContact = async (req, res, next) => {
 
     if (contactUser._id.toString() === userId) {
       return next(
-        new ErrorHandler("You cannot add yourself as a contact", 400)
+        new ErrorHandler("You cannot add yourself as a contact", 400),
       );
     }
 
@@ -38,7 +40,7 @@ export const addContact = async (req, res, next) => {
     }
 
     const alreadyInContacts = currentUser.contacts.some(
-      (contactId) => contactId.toString() === contactUser._id.toString()
+      (contactId) => contactId.toString() === contactUser._id.toString(),
     );
 
     if (alreadyInContacts) {
@@ -58,7 +60,7 @@ export const addContact = async (req, res, next) => {
           email: contactUser.email,
           avatar: contactUser.avatar,
         },
-      })
+      }),
     );
   } catch (error) {
     next(error);
@@ -78,7 +80,7 @@ export const getAllContacts = async (req, res, next) => {
       .select("-password -googleId -githubId -isAdmin -createdAt -updatedAt")
       .populate(
         "contacts",
-        "-password -googleId -githubId -isAdmin -createdAt -updatedAt"
+        "-password -googleId -githubId -isAdmin -createdAt -updatedAt",
       );
 
     // console.log(users);
@@ -90,7 +92,7 @@ export const getAllContacts = async (req, res, next) => {
     return res
       .status(200)
       .json(
-        new SuccessHandler(200, "All contacts", { contacts: users.contacts })
+        new SuccessHandler(200, "All contacts", { contacts: users.contacts }),
       );
   } catch (error) {
     next(error);
@@ -116,7 +118,7 @@ export const contactList = async (req, res, next) => {
       new SuccessHandler({
         message: "Contacts fetched successfully",
         data: user.contacts,
-      })
+      }),
     );
   } catch (error) {
     next(error);
@@ -139,7 +141,7 @@ export const removeContact = async (req, res, next) => {
     }
 
     const contactExists = user.contacts.some(
-      (id) => id.toString() === contactId
+      (id) => id.toString() === contactId,
     );
 
     if (!contactExists) {
@@ -162,69 +164,35 @@ export const sendMessage = async (req, res, next) => {
   try {
     const senderId = req.user.userId;
     const receiverId = req.params.id;
-    const io = req.app.get("io"); 
+    const io = req.app.get("io");
 
-    if (!senderId || !receiverId) {
-      return next(
-        new ErrorHandler("SenderId and ReceiverId are required", 400)
-      );
-    }
-
-    const { message } = req.body; // singular to match frontend
-    const mediaFiles = req.files ? req.files.map((file) => file.path) : [];
+    const message = req.body.message;
+    const mediaFiles = req.files ? req.files.map((f) => f.path) : [];
 
     if (!message && mediaFiles.length === 0) {
       return next(new ErrorHandler("Message or media is required", 400));
     }
 
-    // Create new message document
-    const newMessage = new Chats({
+    const conversationId = [senderId, receiverId].sort().join("_");
+
+    const newMessage = await Chats.create({
+      conversationId,
       senderId,
       receiverId,
-      messages: message || "", // store actual text
+      role: "user",
+      content: message || "",
       media: mediaFiles,
     });
 
-    await newMessage.save();
-
-    // Emit the message to the receiver if online
     const receiverSocketId = onlineUsers.get(receiverId);
+
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("receiveMessage", {
-        _id: newMessage._id,
-        senderId,
-        receiverId,
-        message: newMessage.messages,
-        media: mediaFiles,
-        createdAt: newMessage.createdAt,
+        ...newMessage.toObject(),
       });
     }
 
-    // Emit to sender (for confirmation)
-    const senderSocketId = onlineUsers.get(senderId);
-    if (senderSocketId) {
-      io.to(senderSocketId).emit("newMessageSent", {
-        _id: newMessage._id,
-        senderId,
-        receiverId,
-        message: newMessage.messages,
-        media: mediaFiles,
-        createdAt: newMessage.createdAt,
-      });
-    }
-
-     const sender = await User.findById(senderId).select("username");
-
-    const notification = await Notification.create({
-      senderId,
-      receiverId,
-      type: "message",
-      content: `${sender.username} sent you a message`,
-    });
-
-    io.to(receiverId.toString()).emit("newNotification", notification);
-
-    return res
+    res
       .status(200)
       .json(new SuccessHandler(200, "Message sent", { data: newMessage }));
   } catch (error) {
@@ -287,149 +255,102 @@ export const AiMessage = async (req, res, next) => {
   try {
     const senderId = req.user.userId;
     const receiverId = process.env.AI_USER_ID;
-    const { messages } = req.body;
-    const io = req.app.get("io");
 
-    if (!senderId || !receiverId) {
-      return next(new ErrorHandler("SenderId and ReceiverId is required", 400));
+    const message = req.body.message || req.body.text || req.body.prompt;
+
+    if (!message) {
+      return res.status(400).json({ error: "Message is required" });
     }
 
-    if (!messages) {
-      return next(new ErrorHandler("Message is required", 400));
-    }
+    const conversationId = [senderId, receiverId].sort().join("_");
 
-    // Ensure user message is string
-    const userMessage = String(messages).trim();
-
-    // Fetch last 15 messages (better than 20 for limits)
-    const previousChats = await Chats.find({
-      $or: [
-        { senderId: senderId, receiverId: receiverId },
-        { senderId: receiverId, receiverId: senderId },
-      ],
-    })
-      .sort({ createdAt: 1 })
-      .limit(15);
-
-    // CLEAN + SAFE chat history
-    const chatHistory = previousChats
-      .filter(
-        (chat) =>
-          chat.messages &&
-          typeof chat.messages === "string" &&
-          chat.messages.trim() !== ""
-      )
-      .map((chat) => ({
-        role:
-          chat.senderId.toString() === senderId.toString()
-            ? "user"
-            : "assistant",
-        content: String(chat.messages).trim(),
-      }));
-
-    // System message
-    const systemMessage = {
-      role: "system",
-      content: `You are a helpful, smart, and friendly AI assistant like ChatGPT.
-- Be natural and conversational
-- Keep answers clear
-- Short for simple questions
-- Detailed for complex ones`,
-    };
-
-    // Final messages (SAFE)
-    const finalMessages = [
-      systemMessage,
-      ...chatHistory,
-      { role: "user", content: userMessage },
-    ];
-
-    let aiResponse = "⚠️ AI not available";
-
-    try {
-      const completion = await groq.chat.completions.create({
-        model: "llama-3.3-70b-versatile",
-        messages: finalMessages,
-        temperature: 0.7,
-      });
-
-      aiResponse =
-        completion.choices?.[0]?.message?.content || "No response";
-    } catch (err) {
-      console.error("Groq Error:", err);
-
-      // Fallback model (VERY IMPORTANT)
-      try {
-        const fallback = await groq.chat.completions.create({
-          model: "llama-3.1-8b-instant",
-          messages: finalMessages,
-        });
-
-        aiResponse =
-          fallback.choices?.[0]?.message?.content ||
-          "AI fallback failed";
-      } catch (fallbackErr) {
-        console.error("Fallback Error:", fallbackErr);
-        aiResponse = "AI is busy, try again later.";
-      }
-    }
-
-    const mediaFiles = req.files ? req.files.map((file) => file.path) : [];
-
+    // SAVE USER MESSAGE FIRST
     await Chats.create({
+      conversationId,
       senderId,
       receiverId,
-      messages: userMessage,
-      media: mediaFiles,
+      role: "user",
+      content: message,
     });
 
-    const aiMessage = await Chats.create({
+    const history = await getChatHistory(conversationId);
+    const { context, sources } = await retrieveContext(message);
+
+    const aiResponse = await generateAIResponse({
+      message,
+      history,
+      context,
+    });
+
+    const aiMsg = await Chats.create({
+      conversationId,
       senderId: receiverId,
       receiverId: senderId,
-      messages: aiResponse,
-      media: [],
-      ttlForSender: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      role: "assistant",
+      content: aiResponse,
+      sources,
     });
 
-    io.to(senderId).emit("newAiMessage", {
-      senderId: receiverId,
-      receiverId: senderId,
-      messages: aiResponse,
-      media: [],
+    res.status(200).json({
+      success: true,
+      data: aiMsg,
     });
-
-    return res.status(200).json(
-      new SuccessHandler(200, "AI Message Sent", {
-        message: aiMessage,
-      })
-    );
-  } catch (error) {
-    console.error("AI ERROR:", error);
-    next(error);
+  } catch (err) {
+    console.error("AI ERROR:", err);
+    next(err);
   }
 };
+
+// export const getAiMessages = async (req, res, next) => {
+//   try {
+//     const senderId = req.user.userId;
+//     const receiverId = process.env.AI_USER_ID; // Gemini AI User ID
+
+//     if (!senderId || !receiverId) {
+//       return next(new ErrorHandler("SenderId and ReceiverId is required", 400));
+//     }
+
+//     const messages = await Chats.find({
+//       $or: [
+//         { senderId: senderId, receiverId: receiverId },
+//         { senderId: receiverId, receiverId: senderId },
+//       ],
+//     }).sort({ createdAt: 1 });
+
+//     // console.log(messages);
+
+//     return res
+//       .status(200)
+//       .json(new SuccessHandler(200, "All AI messages", { messages }));
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 export const getAiMessages = async (req, res, next) => {
   try {
     const senderId = req.user.userId;
-    const receiverId = process.env.AI_USER_ID; // Gemini AI User ID
+    const receiverId = process.env.AI_USER_ID;
 
     if (!senderId || !receiverId) {
       return next(new ErrorHandler("SenderId and ReceiverId is required", 400));
     }
 
-    const messages = await Chats.find({
-      $or: [
-        { senderId: senderId, receiverId: receiverId },
-        { senderId: receiverId, receiverId: senderId },
-      ],
-    }).sort({ createdAt: 1 });
+    const conversationId = [senderId, receiverId].sort().join("_");
 
-    // console.log(messages);
+    const { page = 1, limit = 20 } = req.query;
 
-    return res
-      .status(200)
-      .json(new SuccessHandler(200, "All AI messages", { messages }));
+    const messages = await Chats.find({ conversationId })
+      .sort({ createdAt: -1 }) // latest first
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    return res.status(200).json(
+      new SuccessHandler(200, "All AI messages", {
+        messages,
+        page: Number(page),
+      })
+    );
   } catch (error) {
     next(error);
   }
@@ -458,9 +379,11 @@ export const aiClearChat = async (req, res, next) => {
       ],
     }).sort({ createdAt: 1 });
 
-    return res
-      .status(200)
-      .json(200, "Message deleted Successfully", { data: updatedChats });
+    return res.status(200).json({
+      success: true,
+      message: "Messages deleted successfully",
+      data: [],
+    });
   } catch (error) {
     next(error);
   }

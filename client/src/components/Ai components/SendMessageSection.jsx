@@ -41,7 +41,7 @@ const ChatInput = ({ refetchMessages }) => {
 
     const formData = new FormData();
     if (user?._id) formData.append("senderId", user._id);
-    if (currentMessage) formData.append("messages", currentMessage);
+    if (currentMessage) formData.append("message", currentMessage);
     fileList.forEach((file) =>
       formData.append("media", file.originFileObj || file)
     );
@@ -49,7 +49,7 @@ const ChatInput = ({ refetchMessages }) => {
     try {
       setUploading(true);
       const response = await sendChat(formData).unwrap();
-      const aiMessage = response?.data?.AiMessage;
+      const aiMessage = response?.data;
 
       if (aiMessage) {
         AntMessage.success("Message sent successfully");
@@ -58,7 +58,7 @@ const ChatInput = ({ refetchMessages }) => {
         socket.emit("sendMessage", {
           senderId: user._id,
           receiverId: receiverId,
-          messages: currentMessage,
+          content: currentMessage,
           media: fileList.map((f) => f.name),
         });
 
@@ -66,7 +66,7 @@ const ChatInput = ({ refetchMessages }) => {
         socket.emit("newAiMessage", {
           senderId: aiMessage.senderId,
           receiverId: aiMessage.receiverId,
-          messages: aiMessage.messages,
+          content: aiMessage.content,
           media: aiMessage.media,
         });
 

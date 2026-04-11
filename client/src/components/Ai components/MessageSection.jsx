@@ -8,17 +8,19 @@ const MessageSection = () => {
   const user = useSelector((state) => state.auth.user);
   const { data, isLoading, isError } = useGetChatQuery();
 
+  // console.log("Fetched chat data:", data);
+
   const [messages, setMessages] = useState([]);
+
+  // console.log("messages :", messages)
   const userId = user?._id;
 
-  // ✅ Load initial messages (NO refetch loop)
   useEffect(() => {
     if (data?.data?.messages) {
       setMessages(data.data.messages);
     }
   }, [data]);
 
-  // ✅ Socket setup (REAL-TIME)
   useEffect(() => {
     if (!userId) return;
 
@@ -58,7 +60,7 @@ const MessageSection = () => {
                     : "bg-gray-700 rounded-bl-none"
                 }`}
               >
-                {item.messages}
+                {item.content}
 
                 {item.media?.length > 0 && (
                   <div className="mt-2 space-y-2">

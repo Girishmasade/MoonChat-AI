@@ -1,0 +1,112 @@
+{
+  "project": {
+    "name": "MoonChat-AI",
+    "type": "Generative AI Chat Platform",
+    "description": "A real-time chat application powered by Groq AI with memory, RAG, and intelligent response generation."
+  },
+
+  "architecture": {
+    "frontend": {
+      "framework": "React",
+      "features": [
+        "Real-time chat UI",
+        "Streaming responses",
+        "Message history",
+        "User interaction"
+      ]
+    },
+
+    "backend": {
+      "framework": "Node.js (Express)",
+      "features": [
+        "Authentication",
+        "Chat controller",
+        "Socket.io real-time communication",
+        "AI orchestration"
+      ]
+    },
+
+    "database": {
+      "type": "MongoDB",
+      "collections": [
+        "users",
+        "chats",
+        "notifications"
+      ]
+    }
+  },
+
+  "ai_system": {
+    "model_provider": "Groq",
+    "models": {
+      "primary": "llama-3.3-70b-versatile",
+      "fallback": "llama-3.1-8b-instant"
+    },
+
+    "components": {
+      "memory": {
+        "type": "short-term",
+        "source": "MongoDB",
+        "limit": 10
+      },
+
+      "rag": {
+        "enabled": true,
+        "vector_store": "Chroma",
+        "embedding_model": "OpenAI Embeddings",
+        "top_k": 4
+      },
+
+      "prompting": {
+        "system_prompt": "You are an advanced AI assistant. Use context strictly. Avoid hallucination.",
+        "structure": [
+          "System",
+          "Context",
+          "History",
+          "User Input"
+        ]
+      }
+    }
+  },
+
+  "data_flow": [
+    "User sends message",
+    "Backend receives request",
+    "Fetch chat history from MongoDB",
+    "Convert message into embedding",
+    "Search vector database for relevant documents",
+    "Combine history + context",
+    "Send to Groq model",
+    "Generate response",
+    "Save response in database",
+    "Send response to frontend"
+  ],
+
+  "chat_schema": {
+    "conversationId": "string",
+    "senderId": "string",
+    "receiverId": "string",
+    "role": "user | assistant",
+    "content": "string",
+    "media": ["string"],
+    "model": "string",
+    "sources": ["string"],
+    "createdAt": "date"
+  },
+
+  "services": {
+    "ai_service": "Handles AI response generation",
+    "memory_service": "Fetches previous chat history",
+    "rag_service": "Retrieves relevant documents",
+    "vector_store": "Stores embeddings",
+    "embeddings": "Converts text to vectors"
+  },
+
+  "future_features": [
+    "Streaming responses",
+    "AI agents",
+    "Chat with PDFs",
+    "User personalization",
+    "Multi-model support"
+  ]
+}

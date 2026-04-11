@@ -11,3 +11,6 @@ if (!process.env.GROQ_API_KEY) {
 export const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
+
+export const MODEL = "llama-3.3-70b-versatile"; // the ai use this model
+export const FALLBACK_MODEL = "llama-3.1-8b-instant"; // this is the falback model
