@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
+import { mongo_url } from "../env/envImportFile.js";
 
 const connectDB = () => {
     try {
-     const connection = mongoose.connect(process.env.MONGO_URI)
+     const connection = mongoose.connect(mongo_url)
      if (connection) {
         console.log("Database Connected Successfully");
      }

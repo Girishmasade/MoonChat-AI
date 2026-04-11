@@ -1,15 +1,13 @@
 // config/groq.js
 import Groq from "groq-sdk";
-import dotenv from "dotenv";
+import { groq_api_key } from "../env/envImportFile.js";
 
-dotenv.config();
-
-if (!process.env.GROQ_API_KEY) {
+if (!groq_api_key) {
   throw new Error("❌ Missing GROQ_API_KEY in .env file");
 }
 
 export const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
+  apiKey: groq_api_key,
 });
 
 export const MODEL = "llama-3.3-70b-versatile"; // the ai use this model

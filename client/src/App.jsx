@@ -27,6 +27,7 @@ import ForgetPassword from "./pages/Auth/ForgetPassword";
 import AdminDashboard from "./pages/AdminPages/AdminDashboard";
 import AdminSignup from "./pages/Auth/Admin/AdminSignup";
 import AdminSignin from "./pages/Auth/Admin/AdminSignin";
+import NotFound from "./pages/UserPages/NotFound";
 
 function App() {
   return (
@@ -98,7 +99,9 @@ function App() {
                 </ProtectedRoutes>
               }
             />
+
           </Route>
+            <Route path="*" element={<NotFound />} />
 
           {/* Admin Routes */}
 

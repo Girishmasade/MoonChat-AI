@@ -5,6 +5,7 @@ import passport from "passport";
 import ErrorHandler from "../utils/errorHadler.js";
 import SuccessHandler from "../utils/successHandler.js";
 import { sendWelcomeEmail } from "../services/email.Services.js";
+import { jwt_exp, jwt_secret } from "../env/envImportFile.js";
 // User Registration and Login
 
 export const register = async (req, res, next) => {
@@ -65,8 +66,8 @@ export const login = async (req, res, next) => {
         avatar: user.avatar,
         createdAt: user.createdAt,
       },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRY }
+      jwt_secret,
+      { expiresIn: jwt_exp }
     );
 
     // console.log(token);
@@ -111,7 +112,7 @@ export const googleCallback = (req, res, next) => {
           username: user.username,
           avatar: user.avatar,
         },
-        process.env.JWT_SECRET,
+        jwt_secret,
         { expiresIn: "7d" }
       );
 
@@ -142,8 +143,8 @@ export const githubCallback = async (req, res, next) => {
           username: user.username,
           avatar: user.avatar,
         },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRY }
+        jwt_secret,
+        { expiresIn: jwt_exp }
       );
 
       return res.redirect(

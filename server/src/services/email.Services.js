@@ -2,6 +2,7 @@ import nodemailer from "nodemailer";
 import path from "path";
 import fs from "fs";
 import dotenv from "dotenv";
+import { smtp_pass, smtp_user } from "../env/envImportFile.js";
 dotenv.config();
 
 const __dirname = path.resolve();
@@ -12,8 +13,8 @@ export const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: smtp_user,
+    pass: smtp_pass,
   },
 });
 
@@ -27,7 +28,7 @@ export const sendWelcomeEmail = async (toEmail, username) => {
 
     
     const info = await transporter.sendMail({
-      from: `"MoonChat-AI" <${process.env.SMTP_USER}>`,
+      from: `"MoonChat-AI" <${smtp_user}>`,
       to: toEmail,
       subject: `Welcome to MoonChat-AI, ${username}! 🌙`,
       html: htmlContent,

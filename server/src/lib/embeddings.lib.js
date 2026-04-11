@@ -3,19 +3,19 @@ import { OpenAIEmbeddings } from "@langchain/openai";
 import { configDotenv } from "dotenv";
 import { HuggingFaceInferenceEmbeddings } 
 from "@langchain/community/embeddings/hf";
-// import { HuggingFaceTransformersEmbeddings } from "@langchain/community/embeddings/hf_transformers";
+import {openai_api_key, huggingface_api_key} from '../env/envImportFile.js'
 
 configDotenv({
     path: "./.env"
 })
 
 // export const embeddings = new OpenAIEmbeddings({
-//   apiKey: process.env.OPENAI_API_KEY,
+//   apiKey: openai_api_key,
 // });
 
 
 // export const embeddings = new HuggingFaceInferenceEmbeddings({
-//   apiKey: process.env.HUGGINGFACE_API_KEY,
+//   apiKey: huggingface_api_key,
 //   model: "sentence-transformers/all-MiniLM-L6-v2",
 // });
 

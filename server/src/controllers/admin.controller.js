@@ -3,6 +3,7 @@ import SuccessHandler from "../utils/successHandler.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import ErrorHandler from "../utils/errorHadler.js";
+import { jwt_secret } from "../env/envImportFile.js";
 
 export const adminRegister = async (req, res, next) => {
   try {
@@ -10,7 +11,7 @@ export const adminRegister = async (req, res, next) => {
     if (!username || !email || !password || !secretKey)
       return next(new ErrorHandler("All fields are required", 400));
 
-    if (secretKey !== process.env.SECRET_KEY)
+    if (secretKey !== secretKey)
       return next(new ErrorHandler("Invalid secret key", 400));
 
     const existingUser = await User.findOne({ email });
@@ -64,8 +65,8 @@ export const adminLogin = async (req, res, next) => {
         username: user.username,
         isAdmin: user.isAdmin,
       },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRY }
+      jwt_secret,
+      { expiresIn: jwt_exp}
     );
 
     const adminData = {

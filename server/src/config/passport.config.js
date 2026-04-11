@@ -2,6 +2,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as GithubStrategy } from "passport-github2";
 import User from "../models/user.models.js";
+import { github_client_id, github_client_secret, google_client_id, google_client_secret } from "../env/envImportFile.js";
 
 passport.serializeUser((user, done) => {
     done(null, user.id);
@@ -21,8 +22,8 @@ passport.deserializeUser(async (id, done) => {
 passport.use(
     new GoogleStrategy(
         {
-            clientID: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            clientID: google_client_id,
+            clientSecret: google_client_secret,
             callbackURL: "http://localhost:8800/api/v1/auth/google/callback"
         },
 
@@ -55,8 +56,8 @@ passport.use(
 passport.use(
     new GithubStrategy(
         {
-            clientID: process.env.GITHUB_CLIENT_ID,
-            clientSecret: process.env.GITHUB_CLIENT_SECRET,
+            clientID: github_client_id,
+            clientSecret: github_client_secret,
             callbackURL: "http://localhost:8800/api/v1/auth/github/callback"
         },
        async (accessToken, refreshToken, profile, done) => {

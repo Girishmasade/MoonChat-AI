@@ -7,6 +7,7 @@ import Notification from "../models/notification.model.js";
 import { generateAIResponse } from "../services/AI/ai.service.js";
 import { getChatHistory } from "../services/AI/memory.service.js";
 import { retrieveContext } from "../services/AI/rag.service.js";
+import { groq_user_id } from "../env/envImportFile.js";
 // import { sendNotification } from "./notification.controller.js";
 // import mongoose from "mongoose";
 
@@ -254,7 +255,7 @@ export const getAllMessages = async (req, res, next) => {
 export const AiMessage = async (req, res, next) => {
   try {
     const senderId = req.user.userId;
-    const receiverId = process.env.AI_USER_ID;
+    const receiverId = groq_user_id;
 
     const message = req.body.message || req.body.text || req.body.prompt;
 
@@ -304,7 +305,7 @@ export const AiMessage = async (req, res, next) => {
 // export const getAiMessages = async (req, res, next) => {
 //   try {
 //     const senderId = req.user.userId;
-//     const receiverId = process.env.AI_USER_ID; // Gemini AI User ID
+//     const receiverId = groq_user_id; // Gemini AI User ID
 
 //     if (!senderId || !receiverId) {
 //       return next(new ErrorHandler("SenderId and ReceiverId is required", 400));
@@ -330,7 +331,7 @@ export const AiMessage = async (req, res, next) => {
 export const getAiMessages = async (req, res, next) => {
   try {
     const senderId = req.user.userId;
-    const receiverId = process.env.AI_USER_ID;
+    const receiverId = groq_user_id;
 
     if (!senderId || !receiverId) {
       return next(new ErrorHandler("SenderId and ReceiverId is required", 400));
@@ -359,7 +360,7 @@ export const getAiMessages = async (req, res, next) => {
 export const aiClearChat = async (req, res, next) => {
   try {
     const senderId = req.user.userId;
-    const receiverId = process.env.AI_USER_ID;
+    const receiverId = groq_user_id;
 
     if (!senderId || !receiverId) {
       return next(new ErrorHandler("SenderId & receiverId is required", 400));

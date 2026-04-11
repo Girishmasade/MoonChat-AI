@@ -9,22 +9,33 @@ import "./src/config/passport.config.js";
 import { app, server } from "./socket.js";
 import { errorMiddleware } from "./src/middlewares/error.middleware.js";
 import cors from "cors";
+import { dev_frontend_url, port, prod_frontend_url } from "./src/env/envImportFile.js";
 
 config({
   path: "./.env",
 });
 
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  })
-);
+const allowedOrigins = [
+  dev_frontend_url,
+  prod_frontend_url
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // console.log("Origin:", origin); 
+
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.error("Blocked by CORS:", origin);
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-const port = process.env.PORT || 8000;
 
 app.use(
   session({
@@ -47,7 +58,7 @@ app.get("/", (req, res) => {
   res.send("Server is runing");
 });
 
-server.listen("8800", () => {
+server.listen(port, () => {
   console.log(
     `server is successfully runing on the port: http://localhost:${port}/`
   );

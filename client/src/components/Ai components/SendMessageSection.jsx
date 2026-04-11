@@ -91,7 +91,7 @@ const ChatInput = ({ refetchMessages }) => {
   };
 
   return (
-    <div className="relative flex items-center gap-3 p-3 bg-white rounded-xl shadow-md w-full max-w-3xl mx-auto border border-gray-100">
+    <div className="relative flex items-center gap-3 p-3 bg-gray-300 rounded-xl shadow-md w-full max-w-3xl mx-auto border border-gray-100">
       <Tooltip title="Attach File">
         <Upload
           key={fileList.length}
@@ -156,7 +156,7 @@ const SendButton = ({ onClick, disabled, loading }) => (
     onClick={onClick}
     disabled={disabled}
     className={`${
-      disabled ? "bg-blue-300" : "bg-blue-500 hover:bg-blue-600"
+      disabled ? "bg-blue-500 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
     } text-white p-3 rounded-full flex items-center justify-center transition`}
   >
     {loading ? <Spin size="small" style={{ color: "white" }} /> : <FaLocationArrow />}

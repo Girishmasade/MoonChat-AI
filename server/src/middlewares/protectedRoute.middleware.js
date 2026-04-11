@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.models.js";
+import { jwt_secret } from "../env/envImportFile.js";
 
 export const protectedRoute = async (req, res, next) => {
   try {
@@ -13,7 +14,7 @@ export const protectedRoute = async (req, res, next) => {
 
     let decode;
     try {
-      decode = jwt.verify(token, process.env.JWT_SECRET);
+      decode = jwt.verify(token, jwt_secret);
     } catch (err) {
       return res.status(401).json({ message: "Invalid or expired token" });
     }

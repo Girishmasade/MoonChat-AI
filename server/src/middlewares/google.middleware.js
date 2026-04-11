@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import ErrorHandler from "../utils/errorHadler.js";
 import User from "../models/user.models.js";
+import { jwt_secret } from "../env/envImportFile.js";
 
 export const googleProtectedRoute = async (req, res, next) => {
   try {
@@ -15,7 +16,7 @@ export const googleProtectedRoute = async (req, res, next) => {
       return next(new ErrorHandler("Unautharized access", 401));
     }
 
-    const decode = jwt.verify(token, process.env.JWT_SECRET);
+    const decode = jwt.verify(token, jwt_secret);
 
     const user = User.findById(decode.userId).select("-password");
 
