@@ -11,6 +11,7 @@ import { FaSmile, FaPaperclip, FaLocationArrow } from "react-icons/fa";
 import { useSendChatMutation } from "../../redux/api/aiChatApi";
 import { useSelector } from "react-redux";
 import { socket } from "../../socket.io/socketclient";
+import DOMPurify from "dompurify"; 
 
 const EmojiPicker = React.lazy(() => import("emoji-picker-react"));
 
@@ -66,7 +67,7 @@ const ChatInput = ({ refetchMessages }) => {
         socket.emit("newAiMessage", {
           senderId: aiMessage.senderId,
           receiverId: aiMessage.receiverId,
-          content: aiMessage.content,
+          content: DOMPurify.sanitize(aiMessage.content), 
           media: aiMessage.media,
         });
 
