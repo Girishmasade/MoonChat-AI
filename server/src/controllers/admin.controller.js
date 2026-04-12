@@ -3,7 +3,9 @@ import SuccessHandler from "../utils/successHandler.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import ErrorHandler from "../utils/errorHadler.js";
-import { jwt_secret } from "../env/envImportFile.js";
+import { jwt_exp, jwt_secret } from "../env/envImportFile.js";
+
+// Admin Register API
 
 export const adminRegister = async (req, res, next) => {
   try {
@@ -32,12 +34,14 @@ export const adminRegister = async (req, res, next) => {
     return res.status(200).json(
       new SuccessHandler(200, "Admin Registered Successfully", {
         user: newUser,
-      })
+      }),
     );
   } catch (error) {
     next(error);
   }
 };
+
+// Admin Login API
 
 export const adminLogin = async (req, res, next) => {
   try {
@@ -66,7 +70,7 @@ export const adminLogin = async (req, res, next) => {
         isAdmin: user.isAdmin,
       },
       jwt_secret,
-      { expiresIn: jwt_exp}
+      { expiresIn: jwt_exp },
     );
 
     const adminData = {
@@ -82,10 +86,56 @@ export const adminLogin = async (req, res, next) => {
       new SuccessHandler(200, "Admin LoggedIn Successfully", {
         token,
         user: adminData,
-      })
+      }),
     );
   } catch (error) {
     next(error);
   }
 };
 
+// Admin Profile API
+
+export const adminProfile = async (req, res, next) => {
+  try {
+    const userId = req.userId;
+
+    const user = await User.findOne({ userId, isAdmin: true }).select(
+      "-password -googleId -githubId -contacts",
+    );
+
+    if (!user) return next(new ErrorHandler("User not found", 404));
+
+    return res.status(200).json(
+      new SuccessHandler(200, "Admin Profile", {
+        user,
+      }),
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Update Admin Profile API
+
+export const updateAdminProfile = async (req, res, next) => {
+  try {
+    const userId = req.userId;
+
+    const updateAdminProfile = await User.findByIdAndUpdate(userId, req.body, {
+      new: true,
+    }).select(
+      "-password -googleId -githubId -contacts",
+    );
+
+    if (!updateAdminProfile)
+      return next(new ErrorHandler("User not found", 404));
+
+    return res.status(200).json(
+      new SuccessHandler(200, "Admin Profile Updated Successfully", {
+        user: updateAdminProfile,
+      }),
+    );
+  } catch (error) {
+    next(error);
+  }
+};

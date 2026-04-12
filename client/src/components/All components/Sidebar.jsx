@@ -3,11 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LuMessageCircleMore } from "react-icons/lu";
 import { MdPermContactCalendar } from "react-icons/md";
-import { IoIosSettings } from "react-icons/io";
+import { IoIosSettings, IoIosLogOut } from "react-icons/io";
 import { FaUserFriends } from "react-icons/fa";
 import { RiDashboardFill } from "react-icons/ri";
-import { IoIosLogOut } from "react-icons/io";
 import { AiOutlineMoon } from "react-icons/ai";
+import { MdAnalytics } from "react-icons/md";
+import { MdAttachMoney } from "react-icons/md";
 import { Menu } from "antd";
 import { logout } from "../../redux/app/authSlice";
 import { setSelectedUser } from "../../redux/app/chatSlice";
@@ -18,31 +19,31 @@ const Sidebar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const isAdmin = user?.isAdmin;
+
   const userLinks = [
-    { path: "/novachat", label: "MoonChat", icon: <AiOutlineMoon /> },
-    { path: "/chats", label: "Chats", icon: <LuMessageCircleMore /> },
-    { path: "/contacts", label: "Contacts", icon: <MdPermContactCalendar /> },
-    { path: "/settings", label: "Settings", icon: <IoIosSettings /> },
+    { path: "/novachat",  label: "MoonChat", icon: <AiOutlineMoon /> },
+    { path: "/chats",     label: "Chats",    icon: <LuMessageCircleMore /> },
+    { path: "/contacts",  label: "Contacts", icon: <MdPermContactCalendar /> },
+    { path: "/settings",  label: "Settings", icon: <IoIosSettings /> },
   ];
 
   const adminLinks = [
-    { path: "/admin-dashboard", label: "Dashboard", icon: <RiDashboardFill /> },
-    { path: "/users", label: "Users", icon: <FaUserFriends /> },
-    { path: "/chats", label: "Chats", icon: <LuMessageCircleMore /> },
-    { path: "/files", label: "Files", icon: <MdPermContactCalendar /> },
-    { path: "/settings", label: "Settings", icon: <IoIosSettings /> },
+    { path: "/admin/dashboard", label: "Dashboard",    icon: <RiDashboardFill /> },
+    { path: "/admin/users",     label: "Users",        icon: <FaUserFriends /> },
+    { path: "/admin/chats",     label: "Chats",        icon: <LuMessageCircleMore /> },
+    { path: "/admin/analytics", label: "Analytics",    icon: <MdAnalytics /> },
+    { path: "/admin/billing",   label: "Billing",      icon: <MdAttachMoney /> },
+    { path: "/admin/settings",  label: "Settings",     icon: <IoIosSettings /> },
   ];
-
-  const isAdmin = user?.isAdmin;
-  // console.log(isAdmin);
 
   const navLinks = isAdmin ? adminLinks : userLinks;
 
   const handleLogout = () => {
     dispatch(logout());
-    dispatch(setSelectedUser([]))
-    localStorage.clear;
-    navigate(isAdmin ? "/admin-login" : "/signin");
+    dispatch(setSelectedUser([]));
+    localStorage.clear();
+    navigate(isAdmin ? "/admin-signin" : "/login");
   };
 
   const menuItems = navLinks.map((link) => ({
@@ -53,40 +54,44 @@ const Sidebar = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-    <div className="flex justify-center items-center py-4">
-  <Link
-    to="/chat-dashboard"
-    className="flex justify-center items-center w-full"
-  >
-    <img
-      src="/Logo.png"
-      alt="MoonChat-AI"
-      className="w-2/3 sm:w-1/2 md:w-[180px] lg:w-[200px] transition-all duration-300 drop-shadow-[0_0_10px_rgba(0,255,255,0.7)] hover:scale-110"
-    />
-  </Link>
-</div>
 
+      {/* Logo */}
+      <div className="flex justify-center items-center py-4">
+       {
+        isAdmin ? (
+          <div className="text-white text-2xl font-bold">Admin</div>
+        ) :(
+           <Link
+          to={isAdmin ? "/admin/dashboard" : "/chat-dashboard"}
+          className="flex justify-center items-center w-full"
+        >
+          <img
+            src="/Logo.png"
+            alt="MoonChat-AI"
+            className="w-2/3 sm:w-1/2 md:w-[180px] lg:w-[200px] transition-all duration-300 drop-shadow-[0_0_10px_rgba(0,255,255,0.7)] hover:scale-110"
+          />
+        </Link>
+        )
+       }
+      </div>
+
+      {/* Nav links */}
       <Menu
         mode="inline"
         theme="dark"
         selectedKeys={[location.pathname]}
         onClick={({ key }) => {
-          if (key === "logout") {
-            handleLogout();
-          } else {
-            navigate(key);
-          }
+          if (key !== "logout") navigate(key);
         }}
         items={menuItems}
         style={{
           fontSize: 15,
           flex: 1,
           borderRight: 0,
-          alignItems: "center",
-          justifyContent: "center",
         }}
       />
 
+      {/* Logout */}
       <Menu
         mode="inline"
         theme="dark"
@@ -97,12 +102,13 @@ const Sidebar = () => {
         items={[
           {
             key: "logout",
-            icon: <IoIosLogOut className="custom-dark-color" />,
+            icon: <IoIosLogOut />,
             label: <span className="text-red-500 font-medium">Logout</span>,
           },
         ]}
-        style={{ borderTop: "1px solid #333"}}
+        style={{ borderTop: "1px solid #333" }}
       />
+
     </div>
   );
 };

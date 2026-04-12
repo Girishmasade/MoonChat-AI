@@ -3,34 +3,42 @@ import { Form, Input, Button, Typography, message } from "antd";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import { useAdminSigninMutation } from "../../../redux/api/adminApi";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "../../../redux/app/authSlice";
+import Loader from "../../../components/All components/Loader";
 
 const { Title, Text } = Typography;
 
 const AdminSignin = () => {
-  const [form] = Form.useForm()
-  const navigate = useNavigate()
+  const [form] = Form.useForm();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
-  })
+    password: "",
+  });
 
   console.log(formData);
-  const [adminSignin, {isLoading}] = useAdminSigninMutation()
+  const [adminSignin, { isLoading }] = useAdminSigninMutation();
 
   const OnChange = (e) => {
-    const {name, value} = e.target;
-    setFormData((prev) => ({...prev, [name]: value}))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-  const handleSubmit = async(values) => {
+  const handleSubmit = async (values) => {
     try {
-        const response = await adminSignin(values).unwrap()
-    console.log(response);
-    console.log("Admin Signin:", values);
-    // navigate("/admin-dashboard")
+      if (isLoading) {
+        return <Loader />;
+      }
+      const response = await adminSignin(values).unwrap();
+      // console.log(response);
+      dispatch(setCredentials(response));
+      // console.log("Admin Signin:", values);
+      navigate("/admin-dashboard");
     } catch (error) {
       console.log(error);
-      message.error(error.message)
+      message.error(error.message);
     }
   };
 
@@ -95,10 +103,10 @@ const AdminSignin = () => {
           </Text>
 
           <Form
-          form={form} 
-          layout="vertical" 
-          onFinish={handleSubmit}
-           autoComplete="off"
+            form={form}
+            layout="vertical"
+            onFinish={handleSubmit}
+            autoComplete="off"
           >
             <Form.Item
               label={<span style={{ color: "#ddd" }}>Email</span>}

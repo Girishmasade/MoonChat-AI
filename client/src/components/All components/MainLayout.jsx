@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, Navigate } from "react-router-dom";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -15,12 +15,11 @@ const { Header, Sider, Content } = Layout;
 const MainLayout = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
+  const isAdmin = user?.isAdmin;
 
-  // Desktop: collapsed/expanded | Mobile: drawer open/closed
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  // Detect mobile via window width (simple, no extra dep)
   const isMobile = () => window.innerWidth < 768;
 
   const handleMenuToggle = () => {
@@ -30,6 +29,11 @@ const MainLayout = () => {
       setCollapsed((prev) => !prev);
     }
   };
+
+  // If not an admin, redirect to home
+  if (!isAdmin) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <Layout className="min-h-screen">
@@ -77,7 +81,6 @@ const MainLayout = () => {
           display: "flex",
           flexDirection: "column",
           minHeight: "100vh",
-          // Prevent content from going under a fixed sidebar on desktop
           transition: "margin-left 0.2s",
         }}
       >
@@ -96,7 +99,6 @@ const MainLayout = () => {
             height: "56px",
           }}
         >
-          {/* Hamburger / collapse toggle */}
           <Button
             type="text"
             icon={
@@ -108,11 +110,13 @@ const MainLayout = () => {
             style={{ fontSize: "18px", color: "#fff", flexShrink: 0 }}
           />
 
-          {/* Right side actions */}
           <div className="flex items-center gap-3 sm:gap-5 pr-1 sm:pr-4">
-            <div className="pt-2">
+          {
+            !isAdmin && (
+                <div className="pt-2">
               <NotificationButton />
-            </div>
+            </div>)
+          }
 
             <Avatar
               src={user?.avatar || undefined}

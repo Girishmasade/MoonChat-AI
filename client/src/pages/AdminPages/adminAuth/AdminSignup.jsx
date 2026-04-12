@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { Form, Input, Button, Typography, message } from "antd";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import { useAdminSignupMutation } from "../../../redux/api/adminApi";
-import {useNavigate} from 'react-router-dom'
+import { useAdminSignupMutation } from "../../../../redux/api/adminApi";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
 const AdminSignup = () => {
   const [form] = Form.useForm();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [adminSignup, { isLoading }] = useAdminSignupMutation();
 
   const SecretKey = import.meta.env.VITE_SECRET_KEY;
@@ -204,7 +204,10 @@ const AdminSignup = () => {
           }}
         >
           Already have an admin account?{" "}
-          <a href="/admin-signin" style={{ color: "#f97316", fontWeight: "500" }}>
+          <a
+            href="/admin-signin"
+            style={{ color: "#f97316", fontWeight: "500" }}
+          >
             Sign in
           </a>
         </div>

@@ -1,10 +1,16 @@
-import React from 'react'
+import { useSelector } from 'react-redux'
+import { Navigate } from 'react-router-dom'
 
-const AdminProtectedRoute = () => {
+const AdminProtectedRoute = ({children}) => {
+  const {token, user} = useSelector((state) => state.auth)
+
+  if (!token || user?.isAdmin !== true) {
+    return <Navigate to="/admin-signin" />;
+  }
   return (
-    <div>
-      
-    </div>
+    <>
+      {children}
+    </>
   )
 }
 

@@ -12,38 +12,46 @@ import OAuthSuccess from "./pages/Auth/OAuthSuccess/OAuthSuccess";
 import MainLayout from "./components/All components/MainLayout";
 import ProtectedRoutes from "./components/Protected & Public Route/ProtectedRoutes";
 import PublicRoute from "./components/Protected & Public Route/PublicRoute";
-import AdminProtectedRoute from "./components/Protected & Public Route/AdminProtectedRoute"; 
+import AdminProtectedRoute from "./components/Protected & Public Route/AdminProtectedRoute";
 import NotFound from "./pages/UserPages/NotFound";
 
-const Dashboard     = lazy(() => import("./pages/Commondashboard/Dashboard"));   
-const About         = lazy(() => import("./pages/Commondashboard/About"));
-const Privacy       = lazy(() => import("./pages/Commondashboard/Privacy"));
-const Terms         = lazy(() => import("./pages/Commondashboard/Terms"));
+const Dashboard = lazy(() => import("./pages/Commondashboard/Dashboard"));
+const About = lazy(() => import("./pages/Commondashboard/About"));
+const Privacy = lazy(() => import("./pages/Commondashboard/Privacy"));
+const Terms = lazy(() => import("./pages/Commondashboard/Terms"));
 const ForgetPassword = lazy(() => import("./pages/Auth/ForgetPassword"));
 
 const UserDashboard = lazy(() => import("./pages/UserPages/UserDashboard"));
-const AiChatting    = lazy(() => import("./pages/AIchatting/AiChatting"));
-const Chats         = lazy(() => import("./pages/UserPages/Chats"));
-const Contacts      = lazy(() => import("./pages/UserPages/Contacts"));
-const Settings      = lazy(() => import("./pages/UserPages/Settings"));
+const AiChatting = lazy(() => import("./pages/AIchatting/AiChatting"));
+const Chats = lazy(() => import("./pages/UserPages/Chats"));
+const Contacts = lazy(() => import("./pages/UserPages/Contacts"));
+const Settings = lazy(() => import("./pages/UserPages/Settings"));
 
-const AdminDashboard = lazy(() => import("./pages/AdminPages/AdminDashboard"));
-const AdminSignup    = lazy(() => import("./pages/Auth/Admin/AdminSignup"));
-const AdminSignin    = lazy(() => import("./pages/Auth/Admin/AdminSignin"));
+const AdminDashboard = lazy(
+  () => import("./pages/AdminPages/AdminPages/AdminDashboard"),
+);
+const AdminSignup = lazy(
+  () => import("./pages/AdminPages/adminAuth/AdminSignup"),
+);
+const AdminSignin = lazy(
+  () => import("./pages/AdminPages/adminAuth/AdminSignin"),
+);
 
 import "./index.css";
 import Loader from "./components/All components/Loader";
 
 const PageLoader = () => (
-  <div style={{
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    height: "100vh",
-    fontFamily: "'Space Grotesk', sans-serif",
-    color: "#888",
-    fontSize: "14px",
-  }}>
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      height: "100vh",
+      fontFamily: "'Space Grotesk', sans-serif",
+      color: "#888",
+      fontSize: "14px",
+    }}
+  >
     Loading...
   </div>
 );
@@ -54,7 +62,6 @@ function App() {
       <Router>
         <Suspense fallback={<Loader />}>
           <Routes>
-
             {/* Public routes */}
             <Route path="/" element={<Navigate to="/dashboard" />} />
             <Route path="/dashboard" element={<Dashboard />} />
@@ -124,26 +131,20 @@ function App() {
                 }
               />
             </Route>
-
-            <Route
-              path="/admin-dashboard"
-              element={
-                  <AdminDashboard />
-              }
-            />
-            <Route
-              path="/admin-signup"
-              element={
-                  <AdminSignup />
-              }
-            />
-            <Route
-              path="/admin-signin"
-              element={<AdminSignin />} 
-            />
+            <Route element={<MainLayout />}>
+              <Route
+                path="/admin-dashboard"
+                element={
+                  <AdminProtectedRoute>
+                    <AdminDashboard />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route path="/admin-signup" element={<AdminSignup />} />
+              <Route path="/admin-signin" element={<AdminSignin />} />
+            </Route>
 
             <Route path="*" element={<NotFound />} />
-
           </Routes>
         </Suspense>
       </Router>
