@@ -39,7 +39,11 @@ const AdminSignin = lazy(
 
 import "./index.css";
 import Loader from "./components/All components/Loader";
-
+import Users from "./pages/AdminPages/AdminPages/Users";
+import AdminChats from "./pages/AdminPages/AdminPages/AdminChats";
+import Analytics from "./pages/AdminPages/AdminPages/Analytics";
+import Billings from "./pages/AdminPages/AdminPages/Billings";
+import AdminSettings from "./pages/AdminPages/AdminPages/AdminSettings";
 const PageLoader = () => (
   <div
     style={{
@@ -137,6 +141,46 @@ function App() {
                 element={
                   <AdminProtectedRoute>
                     <AdminDashboard />
+                  </AdminProtectedRoute>
+                }
+              />
+                 <Route
+                path="/admin-users"
+                element={
+                  <AdminProtectedRoute>
+                    <Users />
+                  </AdminProtectedRoute>
+                }
+              />
+                 <Route
+                path="/admin-chats"
+                element={
+                  <AdminProtectedRoute>
+                    <AdminChats />
+                  </AdminProtectedRoute>
+                }
+              />
+                 <Route
+                path="/admin-analytics"
+                element={
+                  <AdminProtectedRoute>
+                    <Analytics />
+                  </AdminProtectedRoute>
+                }
+              />
+                 <Route
+                path="/admin-billing"
+                element={
+                  <AdminProtectedRoute>
+                    <Billings />
+                  </AdminProtectedRoute>
+                }
+              />
+                 <Route
+                path="/admin-settings"
+                element={
+                  <AdminProtectedRoute>
+                    <AdminSettings />
                   </AdminProtectedRoute>
                 }
               />

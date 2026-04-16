@@ -29,12 +29,12 @@ const Sidebar = () => {
   ];
 
   const adminLinks = [
-    { path: "/admin/dashboard", label: "Dashboard",    icon: <RiDashboardFill /> },
-    { path: "/admin/users",     label: "Users",        icon: <FaUserFriends /> },
-    { path: "/admin/chats",     label: "Chats",        icon: <LuMessageCircleMore /> },
-    { path: "/admin/analytics", label: "Analytics",    icon: <MdAnalytics /> },
-    { path: "/admin/billing",   label: "Billing",      icon: <MdAttachMoney /> },
-    { path: "/admin/settings",  label: "Settings",     icon: <IoIosSettings /> },
+    { path: "/admin-dashboard", label: "Dashboard",    icon: <RiDashboardFill /> },
+    { path: "/admin-users",     label: "Users",        icon: <FaUserFriends /> },
+    { path: "/admin-chats",     label: "Chats",        icon: <LuMessageCircleMore /> },
+    { path: "/admin-analytics", label: "Analytics",    icon: <MdAnalytics /> },
+    { path: "/admin-billing",   label: "Billing",      icon: <MdAttachMoney /> },
+    { path: "/admin-settings",  label: "Settings",     icon: <IoIosSettings /> },
   ];
 
   const navLinks = isAdmin ? adminLinks : userLinks;
